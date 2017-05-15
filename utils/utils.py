@@ -72,3 +72,19 @@ def confirm_user(email, pwd):
         if check[0]['pwd']== hash(pwd):
             return True
     return False
+
+
+"""
+Create assignment **teacher task
+Args:
+    class(es) - list of class(es) the assignment is for
+    assignment - assignment content
+Returns:
+    True if assingment created
+    False if assingment not created
+"""
+def create_assignment(classes, assignment):
+    for clas in classes:
+        check = list(db.students.find({'classes': clas}))
+        if check != []:
+            pass #fxn to add class to student
