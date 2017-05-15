@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'dogs'
 
-UPLOAD_FOLDER = './static/images/'
+UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = set(['java', 'py', 'rkt', 'nlogo'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -54,9 +54,7 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-            info = idek(filename)
-            os.remove(UPLOAD_FOLDER + filename) # remove file after parsing imge
-            return redirect(url_for('main'))
+            return redirect(url_for('upload_file'))
         else:
             return "Not accepted file"
 
