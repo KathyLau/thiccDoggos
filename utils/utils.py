@@ -79,11 +79,12 @@ Create assignment **teacher task
 Args:
     class(es) - list of class(es) the assignment is for
     assignment - assignment content
+    size - group size
 Returns:
     True if assingment created
     False if assingment not created
 """
-def create_assignment(classes, assignment):
+def create_assignment(classes, assignment, size):
     for clas in classes:
         check = list(db.students.find({'classes': clas}))
         if check != []:
