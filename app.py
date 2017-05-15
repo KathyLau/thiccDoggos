@@ -20,7 +20,7 @@ def allowed_file(filename):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
-                               
+
 @app.route("/")
 def root():
     if user in session:
@@ -36,7 +36,30 @@ def studentHome():
 def teacherHome():
     pass
 
-    
+'''
+used by the upload functionallity
+for hw files
+'''
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method=='GET':
+        return render_template('upload.html')
+    else:
+        if 'file' not in request.files:
+            return 'No file part'
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+            info = idek(filename)
+            os.remove(UPLOAD_FOLDER + filename) # remove file after parsing imge
+            return redirect(url_for('main'))
+        else:
+            return "Not accepted file"
+
 if __name__ == "__main__":
     app.debug = True
     app.run()
