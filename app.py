@@ -28,8 +28,20 @@ def uploaded_file(filename):
                                
 @app.route("/")
 def root():
-    return render_template("index.html")
+    if user in session:
+        return redirect(url_for('studentHome')) if session['status'] == 'student' else redirect(url_for('teacherHome'))
+    else:
+        return "not logged in, please login"
 
+@app.route("/studentHome")
+def studentHome():
+    pass
+
+@app.route("/teacherHome")
+def teacherHome():
+    pass
+
+    
 if __name__ == "__main__":
     app.debug = True
     app.run()
