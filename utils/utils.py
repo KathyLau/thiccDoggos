@@ -48,10 +48,10 @@ Returns:
 def register_user(email, pwd1, pwd2):
     if pwd1 != pwd2:
         return False
-    check = list(db.users.find({'email':email}))
+    check = list(db.students.find({'email':email}))
     if check == []:
         t = {'email': email, 'pwd': hash(pwd), 'confirm': False, 'groups': [], 'classes' : [], 'files': [], 'profile': {'firstname': '', 'lastname': ''} }
-        db.users.insert(t)
+        db.students.insert(t)
         return True
     return False
 
@@ -66,7 +66,7 @@ Returns:
     False if user does not exist
 """
 def confirm_user(email, pwd):
-    check = list(db.users.find({'email':email}))
+    check = list(db.students.find({'email':email}))
 
     if check != []:
         if check[0]['pwd']== hash(pwd):
