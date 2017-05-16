@@ -69,18 +69,32 @@ def getTeacher(email):
 #Add A Student to the Database. Password is hashed
 def addStudent( email, password, firstName, lastName, verificationLink ):
     db.students.insert_one(
-    {
-        'email': email,
-        'password': hash(password),
-        'verified': False,
-        'verificationLink': verificationLink,
-        'groups': [],
-        'classes': [],
-        #these are file ids
-        'files': [],
-        'profile': {
-            'firstName': firstname,
-            'lastName': lastname
-        }
-    })
-    
+        {
+            'email': email,
+            'password': hash(password),
+            'verified': False,
+            'verificationLink': verificationLink,
+            'groups': [],
+            'classes': [],
+            #these are file ids
+            'files': [],
+            'profile': {
+                'firstName': firstname,
+                'lastName': lastname
+            }
+        })
+
+#Create a new teacher, temporary hard-coded password
+def addTeacher( email, firstName, lastName, verificationLink ):
+    db.students.insert_one(
+        {
+            'email':email,
+            'password': 'admin',
+            'verified': False,
+            'verificationLink': verificationLink,
+            'classes': [],
+            'profile': {
+                'firstName': 'N/A',
+                'lastName': 'N/A'
+            }
+        })

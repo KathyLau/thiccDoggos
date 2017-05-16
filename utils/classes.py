@@ -38,37 +38,39 @@ def createClass( teacher, className, groupLimit ):
         })
 
 #add a single student to class
-def addToClass( classID, studentID ):
+def addToClass( code, studentEmail ):
     db.classes.update(
-        {'_id': classID },
+        {'code': code },
         {'$push':
-         { 'students': studentID }
+         { 'students': studentEmail }
         })
 
 #get data of a class
-def getClass( classID ):
-    pass
+def getClass( code ):
+    return db.teachers.find_one(
+        {'code': code }
+    )
 
 #teachers can disband classes
-def disbandClass( classID ):
+def disbandClass( code ):
     Class = db.classes.find_one(
-            {'_id': classID }
+            {'code': code }
     )
     db.teachers.update(
-        {'_id': Class['teacher'] },
+        {'email': Class['teacher'] },
         {'$pull':
-         { 'classes': classID }
+         { 'classes': code }
         })
     for student in Class['students']:
         db.students.update(
-            {'_id': student },
+            {'email': student },
             {'$pull':
-             { 'classes': classID,
+             { 'classes': code,
                'groups': '$in': Class['groups'] }
             })
     for group in Class['groups']:
         disbandGroup( group ) #group is the groupID, so we'll use this function again
     db.classes.delete_one(
-        {'_id': classID }
+        {'code': code }
     )
     

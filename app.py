@@ -34,9 +34,9 @@ app.config['MAIL_USE_SSL'] = True
 #registers student and adds to database, stills requires email verif.
 #sends verification email
 #returns false if not registered
-def registerStudent(email, email2, firstName, lastName, password1, password2):
+def registerStudent(email, email1, firstName, lastName, password1, password2):
     #check if email/password + confirm email/password are same
-    if email1 != email2:
+    if email != email1:
         return False
     if password1 != password2:
         return False
@@ -50,7 +50,7 @@ def registerStudent(email, email2, firstName, lastName, password1, password2):
     if not(alreadyRegistered):
         #send email here
         message = Message()
-        message.recipients = [ email1 ]
+        message.recipients = [ email ]
         message.subject = "Confirm Your StuyCS Code Review Account"
         message.html = '''
         <center>
@@ -62,11 +62,40 @@ def registerStudent(email, email2, firstName, lastName, password1, password2):
         ''' % ("127.0.0.1:5000/verify/" + verificationLink)
         mail.send(message)
 
-        addStudent( email1, password1, firstName, lastName, verificationLink )
+        addStudent( email, password1, firstName, lastName, verificationLink )
     
         return True
     return False
 
+def registerTeacher(email, email1):
+    if email != email1:
+        return False
+    #create verification link/profile link
+    verificationLink = utils.getVerificationLink()
+    
+    #list of people with the same email
+    alreadyRegistered = list(db.teachers.find( { 'email': email } ))
+
+    if not(alreadyRegistered):
+        #send email here
+        message = Message()
+        message.recipients = [ email ]
+        message.subject = "Create Your StuyCS Code Review Account"
+        message.html = '''
+        <center>
+        <h1 style="font-weight: 500 ; font-family: Arial">StuyCS Code Review</h1>
+        <p style="font-weight: 500 ; font-family: Arial">Thanks for signing up for StuyCS Code Review! Please press the button below to create your teacher account.</p>
+        <br>
+        <a href="%s" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
+        </center>
+        ''' % ("127.0.0.1:5000/verify/" + verificationLink)
+        mail.send(message)
+
+        addTeacher( email, verificationLink )
+    
+        return True
+    return False
+    
 @app.route("/")
 def root():
     if 'user' in session:
