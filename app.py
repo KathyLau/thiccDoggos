@@ -34,7 +34,7 @@ app.config['MAIL_USE_SSL'] = True
 #registers student and adds to database, stills requires email verif.
 #sends verification email
 #returns false if not registered
-def registerStudent(email, email2, firstname, lastname, password1, password2):
+def registerStudent(email, email2, firstName, lastName, password1, password2):
     #check if email/password + confirm email/password are same
     if email1 != email2:
         return False
@@ -61,24 +61,9 @@ def registerStudent(email, email2, firstname, lastname, password1, password2):
         </center>
         ''' % ("127.0.0.1:5000/verify/" + verificationLink)
         mail.send(message)
-        
-        
-        #add to db here, only password is hashed
-        db.students.insert_one(
-            {
-                'email': email1,
-                'password': hash(password1),
-                'verified': False,
-                'verificationLink': verificationLink,
-                'groups': [],
-                'classes': [],
-                #these are file ids
-                'files': [],
-                'profile': {
-                    'name': firstname + " " + lastname
-                }
-            }
-        )
+
+        addStudent( email1, password1, firstName, lastName, verificationLink )
+    
         return True
     return False
 

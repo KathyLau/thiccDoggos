@@ -65,14 +65,22 @@ def getTeacher(email):
                 'email': email
             }
         )
+
+#Add A Student to the Database. Password is hashed
+def addStudent( email, password, firstName, lastName, verificationLink ):
+    db.students.insert_one(
+    {
+        'email': email,
+        'password': hash(password),
+        'verified': False,
+        'verificationLink': verificationLink,
+        'groups': [],
+        'classes': [],
+        #these are file ids
+        'files': [],
+        'profile': {
+            'firstName': firstname,
+            'lastName': lastname
+        }
+    })
     
-def createClass( teacher, className, groupLimit ):
-    db.classes.insert_one(
-        {
-            'teacher': teacher,
-            'className': className,
-            'groupLimit': groupLimit,
-            'students': [],
-            'groups': [],
-            'classCode': generateClassCode()
-        })
