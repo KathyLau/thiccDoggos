@@ -14,3 +14,6 @@ def getSecretData():
     }
 
     return secretsDictionary
+
+def generateClassCode():
+    pass

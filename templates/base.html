@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block Title%}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="static/css/styles.css">
+  </head>
+  <body>
+    {% if verified == True %}
+
+    {% if status == "student" %}
+    <!-- Insert Student Navigation Bar Here-->
+    {% block Student_Content %}{% endblock %}
+    {% else %}
+    <!--Insert Teacher Navigation Bar Here-->
+    {% block Teacher_Content %}{% endblock %}
+    {% endif %}
+
+    {% else %}
+    <!-- Replace this text with Something Else-->
+    <h1>You're Not Welcome Here</h1>
+    {% endif %}
+   
+    {% block JS_Content %}{% endblock %}
+  </body>
+</html>
