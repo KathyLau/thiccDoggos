@@ -66,4 +66,13 @@ def getTeacher(email):
             }
         )
     
-    
+def createClass( teacher, className, groupLimit ):
+    db.classes.insert_one(
+        {
+            'teacher': teacher,
+            'className': className,
+            'groupLimit': groupLimit,
+            'students': [],
+            'groups': [],
+            'classCode': generateClassCode()
+        })

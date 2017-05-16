@@ -82,9 +82,6 @@ def registerStudent(email, email2, firstname, lastname, password1, password2):
         return True
     return False
 
-def registerTeacher(email, email2, firstname, lastname, password1, password2):
-    pass
-
 @app.route("/")
 def root():
     if 'user' in session:
@@ -105,17 +102,23 @@ def root():
                 #home page of classes / notifications
                 #replace current notifications with this once ayman makes it
                 #utils.getTeacherNotifications(teacher['email'])
-                return render_template("home.html", name = teacher['profile']['name'], email = teacher['email'], classes = teacher['classes'], notifications = None)
+                return redirect( url_for( 'home', verified = student['verified'], notifications = None ) )
             else:
                 #cant find account, prolly error so force logout and go to login page
                 del session['user']
                 return render_template("index.html", message = "Account error. Please try logging in again.")
+    else:
+        #User is Not Logged In
+        return render_template("index.html")
 
 @app.route("/home")
 def home( **kargs ):
-    session['status'] = student
-    return render_template("home.html", status = session['status'], verified = True )
-            
+    if 'user' in session:
+        return render_template("home.html", status = session['status'], verified =  kargs['verified'] )
+    else:
+        return redirect( url_for("root", message = "Please Login or Sign-Up First") )
+
+
 
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):

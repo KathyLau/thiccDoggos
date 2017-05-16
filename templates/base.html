@@ -8,9 +8,9 @@
     <link rel="stylesheet" type="text/css" href="static/css/styles.css">
   </head>
   <body>
-    {% if {{verified} is "true" %}
+    {% if verified == True %}
 
-    {% if {{ status }} is "student" %}
+    {% if status == "student" %}
     <!-- Insert Student Navigation Bar Here-->
     {% block Student_Content %}{% endblock %}
     {% else %}
