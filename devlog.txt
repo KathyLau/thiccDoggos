@@ -9,3 +9,9 @@
 
 kathyL-- 2017-05-12 01:17
 Initialized basic files needed, uploaded design doc
+kevinZ -- 2017-05-15 10:38 PM
+Created Templates stuff, testing now using the app
+kevinZ -- 2017-05-15 11:31 PM
+Working on accounts.py stuff for now 
+kevinZ -- 2017-05-16 12:12 AM
+Did some more work with classes... Gonna head to bed now
