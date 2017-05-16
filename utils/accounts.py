@@ -9,6 +9,7 @@ connection = MongoClient("127.0.0.1")
 db = connection['database']
 students = db['students']
 teachers = db['teachers']
+classes = db['classes']
 
 #get secret data
 secrets = utils.getSecretData()

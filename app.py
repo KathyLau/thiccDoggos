@@ -9,6 +9,7 @@ connection = MongoClient("localhost", 27017, connect = False)
 db = connection['database']
 students = db['students']
 teachers = db['teachers']
+classes = db['classes']
 
 #get secret data
 secrets = utils.getSecretData()
@@ -81,6 +82,9 @@ def registerStudent(email, email2, firstname, lastname, password1, password2):
         return True
     return False
 
+def registerTeacher(email, email2, firstname, lastname, password1, password2):
+    pass
+
 @app.route("/")
 def root():
     if 'user' in session:
@@ -89,7 +93,7 @@ def root():
             student = accounts.getStudent(session['user'])
             if student:
                 #home page of classes
-                return render_template("home.html", name = student['profile']['name'], email = student['email'], classes = student['classes'])
+                return render_template("home.html", name = student['profile']['name'], email = student['email'], classes = student['classes'], notifications = None)
             else:
                 #cant find account, prolly error so force logout and go to login page
                 del session['user']
@@ -99,14 +103,13 @@ def root():
             teacher = accounts.getTeacher(session['user'])
             if teacher:
                 #home page of classes / notifications
-
-@app.route("/studentHome")
-def studentHome():
-    pass
-
-@app.route("/teacherHome")
-def teacherHome():
-    pass
+                #replace current notifications with this once ayman makes it
+                #utils.getTeacherNotifications(teacher['email'])
+                return render_template("home.html", name = teacher['profile']['name'], email = teacher['email'], classes = teacher['classes'], notifications = None)
+            else:
+                #cant find account, prolly error so force logout and go to login page
+                del session['user']
+                return render_template("index.html", message = "Account error. Please try logging in again.")
 
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):
@@ -118,6 +121,28 @@ def allowed_file(filename):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
+
+#used by the upload functionallity
+#for hw files
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method=='GET':
+        return render_template('upload.html')
+    else:
+        if 'file' not in request.files:
+            return 'No file part'
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+            info = idek(filename)
+            os.remove(UPLOAD_FOLDER + filename) # remove file after parsing imge
+            return redirect(url_for('main'))
+        else:
+            return "Not accepted file"
 
 if __name__ == "__main__":
     app.debug = True
