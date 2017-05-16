@@ -8,7 +8,21 @@
     <link rel="stylesheet" type="text/css" href="static/css/styles.css">
   </head>
   <body>
-    {% block Content %}{% endblock %}
+    {% if {{verified} is "true" %}
+
+    {% if {{ status }} is "student" %}
+    <!-- Insert Student Navigation Bar Here-->
+    {% block Student_Content %}{% endblock %}
+    {% else %}
+    <!--Insert Teacher Navigation Bar Here-->
+    {% block Teacher_Content %}{% endblock %}
+    {% endif %}
+
+    {% else %}
+    <!-- Replace this text with Something Else-->
+    <h1>You're Not Welcome Here</h1>
+    {% endif %}
+   
     {% block JS_Content %}{% endblock %}
   </body>
 </html>

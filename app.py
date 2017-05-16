@@ -89,11 +89,11 @@ def registerTeacher(email, email2, firstname, lastname, password1, password2):
 def root():
     if 'user' in session:
         #status will always be set if user's set
-        if 'status' == "student":
+        if session['status'] == "student":
             student = accounts.getStudent(session['user'])
             if student:
                 #home page of classes
-                return render_template("home.html", name = student['profile']['name'], email = student['email'], classes = student['classes'], notifications = None)
+                return redirect( url_for( 'home', verified = student['verified'], notifications = None ) )
             else:
                 #cant find account, prolly error so force logout and go to login page
                 del session['user']
@@ -111,6 +111,12 @@ def root():
                 del session['user']
                 return render_template("index.html", message = "Account error. Please try logging in again.")
 
+@app.route("/home")
+def home( **kargs ):
+    session['status'] = student
+    return render_template("home.html", status = session['status'], verified = True )
+            
+
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):
     return '.' in filename and \
@@ -121,7 +127,6 @@ def allowed_file(filename):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
-
 #used by the upload functionallity
 #for hw files
 @app.route('/upload', methods=['GET', 'POST'])
