@@ -43,7 +43,7 @@ def registerStudent(email, email2, firstName, lastName, password1, password2):
 
     #create verification link/profile link
     verificationLink = utils.getVerificationLink()
-    
+
     #list of people with the same email
     alreadyRegistered = list(db.students.find( { 'email': email } ))
     #checks if above is empty
@@ -63,11 +63,11 @@ def registerStudent(email, email2, firstName, lastName, password1, password2):
         mail.send(message)
 
         addStudent( email1, password1, firstName, lastName, verificationLink )
-    
+
         return True
     return False
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def root():
     if 'user' in session:
         #status will always be set if user's set
@@ -94,7 +94,21 @@ def root():
                 return render_template("index.html", message = "Account error. Please try logging in again.")
     else:
         #User is Not Logged In
-        return render_template("index.html")
+        if request.method=="POST":
+            if request.form["submit"]=="login":
+                email = request.form["email"]
+                pwd = request.form["pwd"]
+                if utlis.accounts.getStudent(email): # and fxn to check pass
+                    pass
+            elif request.form["submit"]=="signup":
+                email = request.form["email"]
+                pwd = request.form["pwd"]
+                pwd2 = request.form["pwd2"]
+                if pwd == pwd2:
+                    utils.accounts.addStudent( email, pwd, '', '', utils.accounts.getVerificationLink())
+        else:
+            return render_template("index.html")
+
 
 @app.route("/home")
 def home( **kargs ):
