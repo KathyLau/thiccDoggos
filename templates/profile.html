@@ -1,7 +1,37 @@
 {% extends 'base.html' %}
+
 {% block Title %}Profile{% endblock %}
 {% block Student_Content %}
 <!-- Insert Student End Here -->
+
+<div class="row">
+
+<div class="col-sm-6">
+
+<form class="form-signin">
+ <h2 class="form-signin-heading">Update Email</h2>
+ <input type="text" class="input-block-level"  name="new_email" id="new_email" placeholder="New Email">
+ <br>
+ <input type="text" class="input-block-level" name="confirm_email" id="confirm_email" placeholder="Confirm Email">
+ <br>
+<input type="submit" value="Submit Email" name="submit">
+ </form>
+
+</div>
+
+ <div class="col-sm-6">
+
+<form class="form-signin">
+ <h2 class="form-signin-heading">Update Password</h2>
+ <input type="password" class="input-block-level"  name="new_password" id="new_password" placeholder="New password">
+ <br>
+ <input type="password" class="input-block-level" name="confirm_password" id="confirm_password" placeholder="Confirm password">
+ <br>
+<input type="submit" value="Submit Password" name="submit"></form>
+
+</div>
+
+</div>
 {% endblock %}
 {% block Teacher_Content %}
 <!-- Insert Teacher End Here -->

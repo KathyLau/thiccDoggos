@@ -18,7 +18,7 @@ app = Flask(__name__)
 mail = Mail(app)
 app.secret_key = secrets['app-secret-key']
 
-UPLOAD_FOLDER = './static/images/'
+UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = set(['java', 'py', 'rkt', 'nlogo'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -42,8 +42,8 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
         return False
 
     #create verification link/profile link
-    verificationLink = utils.getVerificationLink()
-    
+    verificationLink = accounts.getVerificationLink()
+
     #list of people with the same email
     alreadyRegistered = list(db.students.find( { 'email': email } ))
     #checks if above is empty
@@ -59,11 +59,9 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
         <br>
         <a href="%s" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Verify Email</a>
         </center>
-        ''' % ("127.0.0.1:5000/verify/" + verificationLink)
+        '''.format("127.0.0.1:5000/verify/" + verificationLink)
         mail.send(message)
-
-        addStudent( email, password1, firstName, lastName, verificationLink )
-    
+        addStudent( email1, password1, firstName, lastName, verificationLink )
         return True
     return False
 
@@ -95,11 +93,11 @@ def registerTeacher(referrer, email, email1):
         mail.send(message)
 
         addTeacher( email, verificationLink )
-    
+
         return True
     return False
-    
-@app.route("/")
+
+@app.route("/", methods=["GET", "POST"])
 def root():
     if 'user' in session:
         #status will always be set if user's set
@@ -126,7 +124,25 @@ def root():
                 return render_template("index.html", message = "Account error. Please try logging in again.")
     else:
         #User is Not Logged In
-        return render_template("index.html")
+        # FOR STUDENTS
+        if request.method=="POST":
+            if request.form["submit"]=="login":
+                email = request.form["email"]
+                pwd = request.form["pwd"]
+                #print accounts.getStudent(email)
+                if accounts.getStudent(email): # and fxn to check pass
+                    session['status'] = 'student'
+                    session['user'] = email
+                    return redirect( url_for( 'home') )
+            elif request.form["submit"]=="signup":
+                email = request.form["email"]
+                pwd = request.form["pwd"]
+                pwd2 = request.form["pwd2"]
+                registerStudent(email, email, '', '',pwd, pwd2)
+                return render_template("index.html", message = "Signed up ! ")
+        else:
+            return render_template("index.html")
+
 
 @app.route("/home")
 def home( **kargs ):
@@ -135,6 +151,14 @@ def home( **kargs ):
     else:
         return redirect( url_for("root", message = "Please Login or Sign-Up First") )
 
+@app.route("/classes")
+def classes():
+    return render_template("class.html", status = session['status'], verified=True)
+
+
+@app.route("/profile")
+def profile():
+    return render_template("profile.html", status = session['status'], verified=True)
 
 
 #This is used by the until now not in use file upload functionallity
@@ -163,9 +187,7 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-            info = idek(filename)
-            os.remove(UPLOAD_FOLDER + filename) # remove file after parsing imge
-            return redirect(url_for('main'))
+            return redirect(url_for('upload_file'))
         else:
             return "Not accepted file"
 
