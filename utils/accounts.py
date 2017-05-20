@@ -79,8 +79,8 @@ def addStudent( email, password, firstName, lastName, verificationLink ):
             #these are file ids
             'files': [],
             'profile': {
-                'firstName': firstname,
-                'lastName': lastname
+                'firstName': firstName,
+                'lastName': lastName
             }
         })
 

@@ -42,7 +42,7 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
         return False
 
     #create verification link/profile link
-    verificationLink = utils.getVerificationLink()
+    verificationLink = accounts.getVerificationLink()
 
     #list of people with the same email
     alreadyRegistered = list(db.students.find( { 'email': email } ))
@@ -59,7 +59,7 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
         <br>
         <a href="%s" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Verify Email</a>
         </center>
-        ''' % ("127.0.0.1:5000/verify/" + verificationLink)
+        '''.format("127.0.0.1:5000/verify/" + verificationLink)
         mail.send(message)
         addStudent( email1, password1, firstName, lastName, verificationLink )
         return True
@@ -71,7 +71,7 @@ def registerTeacher(email, email1):
     if email != email1:
         return False
     #create verification link/profile link
-    verificationLink = utils.getVerificationLink()
+    verificationLink = accounts.getVerificationLink()
 
     #list of people with the same email
     alreadyRegistered = list(db.teachers.find( { 'email': email } ))
@@ -96,7 +96,7 @@ def registerTeacher(email, email1):
         return True
     return False
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def root():
     if 'user' in session:
         #status will always be set if user's set
@@ -123,18 +123,22 @@ def root():
                 return render_template("index.html", message = "Account error. Please try logging in again.")
     else:
         #User is Not Logged In
+        # FOR STUDENTS
         if request.method=="POST":
             if request.form["submit"]=="login":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
-                if utlis.accounts.getStudent(email): # and fxn to check pass
-                    pass
+                #print accounts.getStudent(email)
+                if accounts.getStudent(email): # and fxn to check pass
+                    session['status'] = 'student'
+                    session['user'] = email
+                    return redirect( url_for( 'home') )
             elif request.form["submit"]=="signup":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
                 pwd2 = request.form["pwd2"]
-                if pwd == pwd2:
-                    utils.accounts.addStudent( email, pwd, '', '', utils.accounts.getVerificationLink())
+                registerStudent(email, email, '', '',pwd, pwd2)
+                return render_template("index.html", message = "Signed up ! ")
         else:
             return render_template("index.html")
 
