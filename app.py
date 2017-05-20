@@ -150,9 +150,14 @@ def home( **kargs ):
     else:
         return redirect( url_for("root", message = "Please Login or Sign-Up First") )
 
-@app.route("/test")
-def test():
-    return render_template("home.html", status = session['status'], verified=True)
+@app.route("/classes")
+def classes():
+    return render_template("class.html", status = session['status'], verified=True)
+
+
+@app.route("/profile")
+def profile():
+    return render_template("profile.html", status = session['status'], verified=True)
 
 
 #This is used by the until now not in use file upload functionallity

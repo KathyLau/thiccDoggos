@@ -18,3 +18,5 @@ Did some more work with classes... Gonna head to bed now
 kathyL -- 2017-05-20 1:29 PM
 fixed some email issues for login/register
 added navbar
+kathyL -- 2017-05-20 3:04 PM
+used bootstrap to design html files for profile and classes
