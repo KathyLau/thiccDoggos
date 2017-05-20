@@ -61,26 +61,18 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
         </center>
         ''' % ("127.0.0.1:5000/verify/" + verificationLink)
         mail.send(message)
-
-<<<<<<< HEAD
         addStudent( email1, password1, firstName, lastName, verificationLink )
-
         return True
     return False
 
-@app.route("/", methods=['GET', 'POST'])
-=======
-        addStudent( email, password1, firstName, lastName, verificationLink )
-    
-        return True
-    return False
+
 
 def registerTeacher(email, email1):
     if email != email1:
         return False
     #create verification link/profile link
     verificationLink = utils.getVerificationLink()
-    
+
     #list of people with the same email
     alreadyRegistered = list(db.teachers.find( { 'email': email } ))
 
@@ -100,12 +92,11 @@ def registerTeacher(email, email1):
         mail.send(message)
 
         addTeacher( email, verificationLink )
-    
+
         return True
     return False
-    
+
 @app.route("/")
->>>>>>> 705bd12c40bdaf8334812bf7db5c29821b721475
 def root():
     if 'user' in session:
         #status will always be set if user's set
