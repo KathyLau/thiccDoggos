@@ -98,3 +98,28 @@ def addTeacher( email, firstName, lastName, verificationLink ):
                 'lastName': 'N/A'
             }
         })
+
+#confirms if user email matches with password
+def confirmStudent(email, pwd):
+    check = list(db.students.find({'email': email}))
+    if check != []:
+        return check[0]['password']==hash(pwd)
+
+
+#update specified field of email account logged into
+def updateField(email, field, newInfo, confirmInfo):
+    if newInfo != confirmInfo:
+        return False
+    check = list(db.students.find({field: email}))
+    if check != []:
+        db.students.update(
+        {
+        'email': email
+        },
+        {'$set':
+        {field: newInfo
+        }
+        }
+        )
+        return True
+    return False

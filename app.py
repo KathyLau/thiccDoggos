@@ -73,7 +73,7 @@ def registerTeacher(referrer, email, email1):
 
     #the teacher who referred this one to signup
     whoReferred = accounts.getTeacher(referrer)
-    
+
     #list of people with the same email
     alreadyRegistered = accounts.getTeacher(email)
 
@@ -130,10 +130,10 @@ def root():
                 email = request.form["email"]
                 pwd = request.form["pwd"]
                 #print accounts.getStudent(email)
-                if accounts.getStudent(email): # and fxn to check pass
+                if accounts.confirmStudent(email, pwd): # and fxn to check pass
                     session['status'] = 'student'
                     session['user'] = email
-                    return redirect( url_for( 'home') )
+                return redirect( url_for( 'home') )
             elif request.form["submit"]=="signup":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
@@ -151,15 +151,24 @@ def home( **kargs ):
     else:
         return redirect( url_for("root", message = "Please Login or Sign-Up First") )
 
+@app.route("/logout")
+def logout():
+    session.pop("user")
+    return redirect( url_for("root", message = "Please Login or Sign-Up First") )
+
 @app.route("/classes")
 def classes():
     return render_template("class.html", status = session['status'], verified=True)
 
 
-@app.route("/profile")
+@app.route("/profile", methods=["GET", "POST"])
 def profile():
+    if request.method=="POST":
+        if request.form['submit']=="Submit Email":
+            accounts.updateField(session['user'], 'email', request.form["new_email"], request.form["confirm_email"])
+        else:
+            accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"])
     return render_template("profile.html", status = session['status'], verified=True)
-
 
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):
