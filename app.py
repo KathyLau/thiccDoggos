@@ -148,6 +148,7 @@ def root():
                 return render_template("index.html", message = request.args['message'])
             else:
                 return render_template("index.html")
+
 @app.route("/home")
 def home():
     if 'user' in session:
@@ -204,7 +205,7 @@ def profile():
     return render_template("profile.html", status = session['status'], verified=True)
 
 @app.route("/class/<classCode>")
-def viewClass():
+def viewClass(classCode):
     if 'user' in session:
         if session['status'] == 'student':
             #Insert Student end of Class
