@@ -3,6 +3,7 @@ from flask_mail import Mail, Message
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 from utils import utils, accounts, classy
+import os
 
 #connect to mongo
 connection = MongoClient("localhost", 27017, connect = False)
@@ -12,11 +13,11 @@ teachers = db['teachers']
 classes = db['classes']
 
 #get secret data
-secrets = utils.getSecretData()
+#secrets = utils.getSecretData() #Can't Do this cause no secrets.txt on heroku (gotta deploy manually LMAO)
 
 app = Flask(__name__)
 mail = Mail(app)
-app.secret_key = secrets['app-secret-key']
+app.secret_key = os.environ['app-secret-key']
 
 UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = set(['java', 'py', 'rkt', 'nlogo'])
@@ -26,8 +27,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 #mail configs
 app.config['MAIL_SERVER'] ='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = secrets['email']
-app.config['MAIL_PASSWORD'] = secrets['email-password']
+app.config['MAIL_USERNAME'] = os.environ['email']
+app.config['MAIL_PASSWORD'] = os.environ['email-password']
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
