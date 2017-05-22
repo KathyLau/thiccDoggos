@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mail import Mail, Message
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-from utils import utils, accounts, classy
+from utils import utils, accounts, classy, groups
 import os
 
 #connect to mongo
@@ -195,6 +195,23 @@ def createaClass():
                 session.pop('status')
                 return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access this Feature" ) )
             return render_template( "createClass.html", status = session['status'], verified=True )
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First" ))
+
+@app.route("/createGroup", methods=['GET', 'POST'])
+def createaGroup():
+    if 'user' in session:
+        if request.form:
+            if 'groupName' in request.form:
+                groups.createGroups( session['user'], '', request.form['groupName'], '5') # we need a way to get group limit
+                return redirect( url_for( 'groups', message = "Group Creation Successful" ))
+        elif request.args:
+            if 'message' in request.args:
+                return render_template( "createGroup.html", message = request.args['message'])
+            else:
+                print request.args
+        else:
+            return render_template( "createGroup.html", status = session['status'], verified=True )
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
