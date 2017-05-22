@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mail import Mail, Message
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-from utils import utils, accounts, classes
+from utils import utils, accounts, classy
 
 #connect to mongo
 connection = MongoClient("localhost", 27017, connect = False)
@@ -133,6 +133,9 @@ def root():
                 if accounts.confirmStudent(email, pwd): # and fxn to check pass
                     session['status'] = 'student'
                     session['user'] = email
+                elif accounts.confirmTeacher( email, pwd ):
+                    session['status'] = 'teacher'
+                    session['user'] = email
                 return redirect( url_for( 'home') )
             elif request.form["submit"]=="signup":
                 email = request.form["email"]
@@ -146,9 +149,9 @@ def root():
             else:
                 return render_template("index.html")
 @app.route("/home")
-def home( **kargs ):
+def home():
     if 'user' in session:
-        return render_template("home.html", status = session['status'], verified =  kargs['verified'] )
+        return render_template("home.html", status = session['status'], verified = True )
     else:
         return redirect( url_for("root", message = "Please Login or Sign-Up First") )
 
@@ -161,21 +164,25 @@ def logout():
 def classes():
     if 'user' in session:
         if session['status'] == 'student':
-            classes = getStudentClasses( session['user'] )
+            your_classes = classy.getStudentClasses( session['user'] )
         elif session['status'] == 'teacher':
-            classes = getTeacherClasses( session['user'] )
-        return render_template("class.html", status = session['status'], verified=True)
+            your_classes = classy.getTeacherClasses( session['user'] )
+        return render_template("classes.html", status = session['status'], verified=True, your_classes=your_classes)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
-@app.route("/createClass")
+@app.route("/createClass", methods=['GET', 'POST'])
 def createaClass():
     if 'user' in session:
-        if request.args:
-            if 'className' in request.args and 'groupLimit' in request.args:
-                createClass( session['user'], request.args['className'], request.args['groupLimit'])
-            elif 'message' in request.args:
+        if request.form:
+            if 'className' in request.form and 'groupLimit' in request.form:
+                classy.createClass( session['user'], request.form['className'], request.form['groupLimit'])
+                return redirect( url_for( 'classes', message = "Class Creation Successful" ))
+        elif request.args:
+            if 'message' in request.args:
                 return render_template( "createClass.html", message = request.args['message'])
+            else:
+                print request.args
         else:
             if session['status'] != 'teacher':
                 session.pop('user')

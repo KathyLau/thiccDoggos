@@ -26,15 +26,22 @@ def createClassCode():
         return code
     
 #creates a class and adds to database
-def createClass( teacher, className, groupLimit ):
+def createClass( teacherEmail, className, groupLimit ):
+    teacher = db.teachers.find_one( {'email':teacherEmail} )
+    code = createClassCode()
     db.classes.insert_one(
         {
-            'teacher': teacher,
+            'teacher': teacher['profile']['firstName'] + " " + teacher['profile']['lastName'],
             'className': className,
             'groupLimit': groupLimit,
             'students': [],
             'groups': [],
-            'code': generateClassCode()
+            'code': code
+        })
+    db.teachers.update(
+        { 'email': teacherEmail },
+        { '$push':
+          {'classes': code}
         })
 
 #add a single student to class

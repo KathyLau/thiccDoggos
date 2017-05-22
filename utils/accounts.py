@@ -105,6 +105,11 @@ def confirmStudent(email, pwd):
     if check != []:
         return check[0]['password']==hash(pwd)
 
+def confirmTeacher(email, pwd):
+    check = list(db.teachers.find({'email': email}))
+    if check != []:
+        return check[0]['password']==hash(pwd)
+
 
 #update specified field of email account logged into
 def updateField(email, field, newInfo, confirmInfo):
