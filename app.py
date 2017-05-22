@@ -191,6 +191,8 @@ def createaClass():
             return render_template( "createClass.html", status = session['status'], verified=True )
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
+
+
     
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
@@ -200,6 +202,17 @@ def profile():
         else:
             accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"])
     return render_template("profile.html", status = session['status'], verified=True)
+
+@app.route("/class/<classCode>")
+def viewClass():
+    if 'user' in session:
+        if session['status'] == 'student':
+            #Insert Student end of Class
+            pass
+        else:
+            
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First" ))
 
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):
