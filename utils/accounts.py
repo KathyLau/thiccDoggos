@@ -11,8 +11,6 @@ students = db['students']
 teachers = db['teachers']
 classes = db['classes']
 
-#get secret data
-secrets = utils.getSecretData()
 
 #hashes text, used for sensitive data
 def hash(text):

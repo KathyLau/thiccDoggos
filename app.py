@@ -13,10 +13,11 @@ teachers = db['teachers']
 classes = db['classes']
 
 #get secret data
-secrets = utils.getSecretData()
+secrets = utils.getSecretData() #Can't Do this cause no secrets.txt on heroku (gotta deploy manually LMAO)
 
 app = Flask(__name__)
 mail = Mail(app)
+#app.secret_key = os.environ['app-secret-key']
 app.secret_key = secrets['app-secret-key']
 
 UPLOAD_FOLDER = './data/'
@@ -149,6 +150,7 @@ def root():
                 return render_template("index.html", message = request.args['message'])
             else:
                 return render_template("index.html")
+
 @app.route("/home")
 def home():
     if 'user' in session:
