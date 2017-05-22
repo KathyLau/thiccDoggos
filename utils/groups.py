@@ -21,4 +21,3 @@ def createGroup( studentEmail, assignmentName, groupName ):
             'members': [studentEmail],
             'assignments': [],
               })
-  

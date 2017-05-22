@@ -214,7 +214,7 @@ def viewClass(classCode):
     if 'user' in session:
         if session['status'] == 'student':
             #Insert Student end of Class
-            pass
+            return render_template("class.html", status = session['status'], verified=True)
         else:
             return classCode
             pass
@@ -248,8 +248,8 @@ def uploaded_file(filename):
                                filename)
 #used by the upload functionallity
 #for hw files
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
+@app.route('/upload/<assignmentName>', methods=['GET', 'POST'])
+def upload_file(assignmentName):
     if request.method=='GET':
         return render_template('upload.html', status = session['status'],verified=True)
     else:
@@ -261,8 +261,10 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            ext = filename[filename.find('.'):]
+            filename = session['user']+'-'+assignmentName + ext
             file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-            return redirect(url_for('upload_file'))
+            return redirect(url_for('upload_file',assignmentName=assignmentName))
         else:
             return "Not accepted file"
 

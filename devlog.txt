@@ -25,4 +25,7 @@ added update fields fxns , styled homepage,
 kevinZ -- 2017-05-21 9:12 PM
 made some progress on classes. also, fuck jinja
 kathyL -- 2017-05-11 11:13 PM
-made interaction of adding and joining classes between students and teacher work 
+made interaction of adding and joining classes between students and teacher work
+kathyL -- 2017-05-12 9:23 AM
+polish upload file fxn to save the file in the name of email-assignmentName format
+added page for groups for classes
