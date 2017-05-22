@@ -31,15 +31,25 @@
 {% endblock %}
 
 {% block Teacher_Content %}
-
-Class Info:
-<form method="post">
-<input type="text" name="class_name" id="class_name" placeholder="Class Name">
-<br>
-
-<input type="text" name="num" id="num" placeholder="Group Limit">
-<br>
-<input type="submit" value="create_class" name="submit">
-</form>
-
+<center>
+  <h3>Your Classes</h3>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-8">
+        <ul id="classList">
+          {% for class in your_classes %}
+          
+      </div>
+      <div class="col-sm-2"></div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-8">
+        <a class="button" href="/createClass">Create a Class</a>
+      </div>
+      <div class="col-sm-2"></div>
+    </div>
+  </div>  
+</center>
 {% endblock %}

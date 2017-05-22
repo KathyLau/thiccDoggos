@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mail import Mail, Message
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-from utils import utils, accounts
+from utils import utils, accounts, classes
 
 #connect to mongo
 connection = MongoClient("localhost", 27017, connect = False)
@@ -141,9 +141,10 @@ def root():
                 registerStudent(email, email, '', '',pwd, pwd2)
                 return render_template("index.html", message = "Signed up ! ")
         else:
-            return render_template("index.html")
-
-
+            if 'message' in request.args:
+                return render_template("index.html", message = request.args['message'])
+            else:
+                return render_template("index.html")
 @app.route("/home")
 def home( **kargs ):
     if 'user' in session:
@@ -154,13 +155,36 @@ def home( **kargs ):
 @app.route("/logout")
 def logout():
     session.pop("user")
-    return redirect( url_for("root", message = "Please Login or Sign-Up First") )
+    return redirect( url_for("root", message = "Logout Successful") )
 
 @app.route("/classes")
 def classes():
-    return render_template("class.html", status = session['status'], verified=True)
+    if 'user' in session:
+        if session['status'] == 'student':
+            classes = getStudentClasses( session['user'] )
+        elif session['status'] == 'teacher':
+            classes = getTeacherClasses( session['user'] )
+        return render_template("class.html", status = session['status'], verified=True)
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First" ))
 
-
+@app.route("/createClass")
+def createaClass():
+    if 'user' in session:
+        if request.args:
+            if 'className' in request.args and 'groupLimit' in request.args:
+                createClass( session['user'], request.args['className'], request.args['groupLimit'])
+            elif 'message' in request.args:
+                return render_template( "createClass.html", message = request.args['message'])
+        else:
+            if session['status'] != 'teacher':
+                session.pop('user')
+                session.pop('status')
+                return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access this Feature" ) )
+            return render_template( "createClass.html", status = session['status'], verified=True )
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First" ))
+    
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if request.method=="POST":

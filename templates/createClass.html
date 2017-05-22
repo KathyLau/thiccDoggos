@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block Student_Content %}
+<h1>You're in the wrong place, bud</h1>
+{% endblock %}
+{% block Teacher_Content %}
+<center>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-8">
+        
+        <form class="form-login" method="post" action="/createClass">
+          <h2 class="form-signin-heading">Class Information</h2>
+          <input type="text" class="input-block-level" name="className" id="className" placeholder="className">
+          <br><br>
+          <input type="text" class="input-block-level" name="groupLimit" id="groupLimit" placeholder="groupLimit">
+          <br><br>
+          <input type="submit" value="create" name="Create Class">
+        </form>
+      </div>
+      <div class="col-sm-2"></div>
+    </div>
+  </div>
+</center>
+{% endblock %}

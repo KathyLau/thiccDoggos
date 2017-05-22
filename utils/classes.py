@@ -47,9 +47,21 @@ def addToClass( code, studentEmail ):
 
 #get data of a class
 def getClass( code ):
-    return db.teachers.find_one(
+    return db.classes.find_one(
         {'code': code }
     )
+
+def getStudentClasses( email ):
+    student = db.students.find_one( {'email': email} )
+    classCodes = student['classes']
+    classes = [ db.classes.find_one( {'code': code } ) for code in classCodes ]
+    return classes
+
+def getTeacherClasses( email ):
+    teacher = db.teachers.find_one( {'email': email} )
+    classCodes = teacher['classes']
+    classes = [ db.classes.find_one( {'code': code } ) for code in classCodes ]
+    return classes
 
 #teachers can disband classes
 def disbandClass( code ):
@@ -66,7 +78,7 @@ def disbandClass( code ):
             {'email': student },
             {'$pull':
              { 'classes': code,
-               'groups': '$in': Class['groups'] }
+               'groups': { '$in': Class['groups'] } }
             })
     for group in Class['groups']:
         disbandGroup( group ) #group is the groupID, so we'll use this function again
