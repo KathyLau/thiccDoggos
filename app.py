@@ -157,18 +157,24 @@ def root():
                 pwd = request.form["pwd"]
                 #print accounts.getStudent(email)
                 check = accounts.confirmStudent(email, pwd) # and fxn to check pass
-                #if verified
-                if check[0]:
-                    #password correct
-                    if check[1]:
-                        session['status'] = 'student'
-                        session['user'] = email
-                        return redirect( url_for( 'home') )
-                    #password incorrect
+                #if account exists
+                if check:
+                    #if verified
+                    if check[0]:
+                        #password correct
+                        if check[1]:
+                            session['status'] = 'student'
+                            session['user'] = email
+                            return redirect( url_for( 'home') )
+                        #password incorrect
+                        else:
+                            return render_template("index.html", message = "Incorrect password.")
+                    #if not verified
                     else:
-                        return render_template("index.html", message = "Incorrect password.")
+                        return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getStudent(email)[3])
+                #if account doesnt exist
                 else:
-                    return render_template("index.hmtl", message="Your account isn't verified!", verificationLink = accounts.getStudent(email)[3])
+                    return render_template("index.html", message = "Account doesn't exist.")
 
             elif accounts.confirmTeacher( email, pwd ):
                 session['status'] = 'teacher'
