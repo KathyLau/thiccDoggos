@@ -99,6 +99,7 @@ def registerTeacher(referrer, email, email1):
 
 @app.route("/", methods=["GET", "POST"])
 def root():
+    return "root test"
     if 'user' in session:
         #status will always be set if user's set
         if session['status'] == "student":
