@@ -3,6 +3,7 @@ from flask_mail import Mail, Message
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 from utils import utils, accounts, classy
+import os
 
 #connect to mongo
 connection = MongoClient("localhost", 27017, connect = False)
@@ -168,7 +169,6 @@ def classes():
                 code = request.form["class_code"]
                 classy.addToClass(code, session['user'])
             your_classes = classy.getStudentClasses( session['user'] )
-            print your_classes
         elif session['status'] == 'teacher':
             your_classes = classy.getTeacherClasses( session['user'] )
         return render_template("classes.html", status = session['status'], verified=True, your_classes=your_classes)
@@ -219,6 +219,21 @@ def viewClass(classCode):
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
+
+#just a placeholder, there's no groups.html rn
+@app.route("/groups", methods=["POST", "GET"])
+def groups():
+    if 'user' in session:
+        if session['status'] == 'student':
+            your_groups = classy.getStudentGroups( session['user'] )
+        elif session['status'] == 'teacher':
+            your_groups = classy.getTeacherGroups( session['user'] )
+        return render_template("groups.html", status = session['status'], verified=True, your_classes=your_classes)
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First" ))
+
+
+
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):
     return '.' in filename and \
@@ -234,7 +249,7 @@ def uploaded_file(filename):
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     if request.method=='GET':
-        return render_template('upload.html')
+        return render_template('upload.html', status = session['status'],verified=True)
     else:
         if 'file' not in request.files:
             return 'No file part'
