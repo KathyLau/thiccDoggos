@@ -98,14 +98,18 @@ def addTeacher( email, firstName, lastName, verificationLink ):
         })
 
 #confirms if user email matches with password
+#returns duple of
+#(verified, password correct)
 def confirmStudent(email, pwd):
-    check = list(db.students.find({'email': email}))
-    if check != []:
-        return check[0]['password']==hash(pwd)
+    check = getStudent(email)
+    if check:
+        return (check[2], check[0]['password'] == hash(pwd))
+    else:
+        return None
 
 def confirmTeacher(email, pwd):
-    check = list(db.teachers.find({'email': email}))
-    if check != []:
+    check = getStudent(email)
+    if check:
         return check[0]['password']==hash(pwd)
 
 
@@ -113,8 +117,8 @@ def confirmTeacher(email, pwd):
 def updateField(email, field, newInfo, confirmInfo):
     if newInfo != confirmInfo:
         return False
-    check = list(db.students.find({field: email}))
-    if check != []:
+    check = getStudent(email)
+    if check:
         db.students.update(
         {
         'email': email
