@@ -1,4 +1,4 @@
-'''
+
 def getSecretData():
     #get data
     secrets = open("secrets.txt", "r")
@@ -15,4 +15,4 @@ def getSecretData():
     }
 
     return secretsDictionary
-'''
+
