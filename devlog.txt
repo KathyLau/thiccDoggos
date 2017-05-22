@@ -20,7 +20,9 @@ fixed some email issues for login/register
 added navbar
 kathyL -- 2017-05-20 3:04 PM
 used bootstrap to design html files for profile and classes
-kathyL -- 2017-05-11 11:33 PM
-added update fields fxns , styled homepage, 
+kathyL -- 2017-05-11 11:33 AM
+added update fields fxns , styled homepage,
 kevinZ -- 2017-05-21 9:12 PM
 made some progress on classes. also, fuck jinja
+kathyL -- 2017-05-11 11:13 PM
+made interaction of adding and joining classes between students and teacher work 

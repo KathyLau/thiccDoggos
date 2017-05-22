@@ -24,10 +24,10 @@ def createClassCode():
         return code
     else:
         return code
-    
+
 #creates a class and adds to database
 def createClass( teacherEmail, className, groupLimit ):
-    teacher = db.teachers.find_one( {'email':teacherEmail} )
+    teacher = list(db.teachers.find( {'email':teacherEmail} ))[0]
     code = createClassCode()
     db.classes.insert_one(
         {
@@ -51,28 +51,39 @@ def addToClass( code, studentEmail ):
         {'$push':
          { 'students': studentEmail }
         })
+    db.students.update(
+        {'email': studentEmail },
+        {'$push':
+         { 'classes': code }
+        })
 
 #get data of a class
 def getClass( code ):
-    return db.classes.find_one(
+    return db.classes.find(
         {'code': code }
     )
 
 def getStudentClasses( email ):
-    student = db.students.find_one( {'email': email} )
-    classCodes = student['classes']
-    classes = [ db.classes.find_one( {'code': code } ) for code in classCodes ]
+    student = list(db.students.find( {'email': email} ))
+    classCodes = student[0]['classes']
+    classes = []
+    for code in classCodes:
+        classinfo = list (db.classes.find( {'code': code } ))[0]
+        classes.append([str(classinfo['code']), str(classinfo['className']),str(classinfo['groupLimit']), str(classinfo['teacher']) ])
     return classes
 
 def getTeacherClasses( email ):
-    teacher = db.teachers.find_one( {'email': email} )
-    classCodes = teacher['classes']
-    classes = [ db.classes.find_one( {'code': code } ) for code in classCodes ]
+    teacher = list(db.teachers.find( {'email': email} ))
+    classCodes = teacher[0]['classes']
+    classes=[]
+    for code in classCodes:
+        classinfo = list(db.classes.find({'code':code}))[0]
+        classes.append([str(classinfo['code']), str(classinfo['className'])])
     return classes
 
 #teachers can disband classes
 def disbandClass( code ):
-    Class = db.classes.find_one(
+    Class = db.classes.find(
             {'code': code }
     )
     db.teachers.update(
@@ -92,4 +103,3 @@ def disbandClass( code ):
     db.classes.delete_one(
         {'code': code }
     )
-    

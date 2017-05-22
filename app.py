@@ -160,11 +160,15 @@ def logout():
     session.pop("user")
     return redirect( url_for("root", message = "Logout Successful") )
 
-@app.route("/classes")
+@app.route("/classes", methods=["POST", "GET"])
 def classes():
     if 'user' in session:
         if session['status'] == 'student':
+            if request.method=="POST":
+                code = request.form["class_code"]
+                classy.addToClass(code, session['user'])
             your_classes = classy.getStudentClasses( session['user'] )
+            print your_classes
         elif session['status'] == 'teacher':
             your_classes = classy.getTeacherClasses( session['user'] )
         return render_template("classes.html", status = session['status'], verified=True, your_classes=your_classes)
@@ -193,7 +197,7 @@ def createaClass():
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
 
-    
+
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if request.method=="POST":
@@ -204,7 +208,7 @@ def profile():
     return render_template("profile.html", status = session['status'], verified=True)
 
 @app.route("/class/<classCode>")
-def viewClass():
+def viewClass(classCode):
     if 'user' in session:
         if session['status'] == 'student':
             #Insert Student end of Class

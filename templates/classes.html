@@ -18,13 +18,11 @@
 <div class="row">
   <div class="col-sm-2"> </div>
   <div class="col-sm-8">
-    <p class="form-signin">
   <h3>  Your Classes</h3>
 
     {% for class in your_classes %}
-    {{class | safe}}
+    {{class[0] | safe}} - {{class[1] | safe}} - {{class[2] | safe}} - {{class[3] | safe}}<br>
     {% endfor %}
-</p>
    </div>
    <div class="col-sm-2"> </div>
 </div>
@@ -39,7 +37,7 @@
       <div class="col-sm-8">
         <ul id="classList">
           {% for class in your_classes %}
-          <li><a href="/class/{{class}}"></li>
+          <li><a href="/class/{{class[0]}}"> {{class[1]}} - {{class[0]}}</li>
           {% endfor %}
       </div>
       <div class="col-sm-2"></div>
@@ -47,10 +45,11 @@
     <div class="row">
       <div class="col-sm-2"></div>
       <div class="col-sm-8">
+        <hr>
         <a class="button" href="/createClass">Create a Class</a>
       </div>
       <div class="col-sm-2"></div>
     </div>
-  </div>  
+  </div>
 </center>
 {% endblock %}
