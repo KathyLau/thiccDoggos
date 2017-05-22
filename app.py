@@ -210,7 +210,8 @@ def viewClass():
             #Insert Student end of Class
             pass
         else:
-            
+            return classCode
+            pass
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
