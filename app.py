@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mail import Mail, Message
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-from utils import utils, accounts, classy, groups
+from utils import utils, accounts, classy, groupy
 from threading import Thread
 import os
 
