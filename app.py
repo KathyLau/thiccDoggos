@@ -2,16 +2,17 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mail import Mail, Message
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-from utils import utils, accounts, classy, groups
+from utils import utils, accounts, classy, groupy
 from threading import Thread
 import os
 
 #connect to mongo
 connection = MongoClient("localhost", 27017, connect = False)
-db = connection['database']
+db = connection['STUY_CS_CODE_REVIEW']
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']
+groups = db['groups']
 
 #get secret data
 secrets = utils.getSecretData() #Can't Do this cause no secrets.txt on heroku (gotta deploy manually LMAO)
@@ -157,8 +158,7 @@ def root():
             if request.form["submit"]=="login":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
-                #print accounts.getStudent(email)
-                check = accounts.confirmStudent(email, pwd) # and fxn to check pass
+                check = check = accounts.confirmStudent(email, pwd)
                 #if account exists
                 if check:
                     #if verified
@@ -170,12 +170,13 @@ def root():
                             return redirect( url_for( 'home') )
                         #password incorrect
                         else:
-                            return render_template("index.html", message = "Incorrect password.")
+                            return render_template("index.html", message = "Incorrect Password")
                     #if not verified
                     else:
-                        return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getStudent(email)[3])
+                        return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getStudent(email)['verificationLink'])
                 #if account doesnt exist
                 else:
+<<<<<<< HEAD
                     return render_template("index.html", message = "Account doesn't exist.")
 
                 #now moving onto teachers
@@ -183,6 +184,21 @@ def root():
                 if check:
                     session['status'] = 'teacher'
                     session['user'] = email
+=======
+                    check = accounts.confirmTeacher(email, pwd)
+                    if check:
+                        if check[0]:
+                            if check[1]:
+                                session['status'] = 'teacher'
+                                session['user'] = email
+                                return redirect( url_for( 'home' ))
+                            else:
+                                return render_template("index.html", message = "Incorrect Password")
+                        else:
+                            return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getTeacher(email)['verificationLink'])
+                    else:
+                        return render_template("index.html", message = "Account doesn't exist.")
+>>>>>>> 1d3bc001178f0cde7dff6f5c0abb25d95757e1c3
                 
             elif request.form["submit"]=="signup":
                 email = request.form["email"]
@@ -282,7 +298,7 @@ def viewClass(classCode):
             return classCode
             pass
     else:
-        return redirect( url_for( "root", message = "Please Sign In First" ))
+        return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
 
 
 #just a placeholder, there's no groups.html rn

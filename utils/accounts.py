@@ -6,7 +6,7 @@ import utils
 
 #connect to mongo
 connection = MongoClient("127.0.0.1")
-db = connection['database']
+db = connection['STUY_CS_CODE_REVIEW']
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']
@@ -43,7 +43,7 @@ def getStudent(email):
     if count != 1:
         return False
     else:
-        return db.students.find(
+        return db.students.find_one(
             {
                 'email': email
             }
@@ -58,7 +58,7 @@ def getTeacher(email):
     if count != 1:
         return False
     else:
-        return db.teachers.find(
+        return db.teachers.find_one(
             {
                 'email': email
             }
@@ -102,7 +102,7 @@ def addTeacher( email, firstName, lastName, verificationLink ):
 def confirmStudent(email, pwd):
     check = getStudent(email)
     if check:
-        return (check[0]['verified'], check[0]['password'] == hash(pwd))
+        return (check['verified'], check['password'] == hash(pwd))
     else:
         return None
 
@@ -111,7 +111,7 @@ def confirmStudent(email, pwd):
 def confirmTeacher(email, pwd):
     check = getTeacher(email)
     if check:
-        return (check[0]['verified'], check[0]['password'] == hash(pwd))
+        return (check['verified'], check['password']==hash(pwd))
     else:
         return None
 
@@ -122,13 +122,8 @@ def updateField(email, field, newInfo, confirmInfo):
     check = getStudent(email)
     if check:
         db.students.update(
-        {
-        'email': email
-        },
-        {'$set':
-        {field: newInfo
-        }
-        }
+            { 'email': email },
+            { '$set': { field: newInfo } }
         )
         return True
     return False
