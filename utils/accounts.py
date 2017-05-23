@@ -6,7 +6,7 @@ import utils
 
 #connect to mongo
 connection = MongoClient("127.0.0.1")
-db = connection['STUY_CS_CODE_REVIEW']
+db = connection['STUYCS_CODE_REVIEW']
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']

@@ -8,7 +8,7 @@ import os
 
 #connect to mongo
 connection = MongoClient("localhost", 27017, connect = False)
-db = connection['STUY_CS_CODE_REVIEW']
+db = connection['STUYCS_CODE_REVIEW']
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']
@@ -64,7 +64,6 @@ def sendVerificationEmail(email, verificationLink):
     <a href="{0}" style="padding: 1.5% ; text-decoration: none ; color: #404040; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Verify Email</a>
 </center>
     '''.format("http://127.0.0.1:5000/verify/" + verificationLink)
-    print message.html
     sendEmailAsync(app, message)
     
 #this sends a mail to register a teacher account
@@ -80,7 +79,6 @@ def sendRegistrationEmail(email, referrer, verificationLink):
     <a href="{1}" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
     </center>
     '''.format(whoReferred['name'], "http://127.0.0.1:5000/verify/" + verificationLink)
-    print message.html
     sendEmailAsync(app, message)
     
 #registers student and adds to database, stills requires email verif.
@@ -176,7 +174,6 @@ def root():
                         return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getStudent(email)['verificationLink'])
                 #if account doesnt exist
                 else:
-<<<<<<< HEAD
                     return render_template("index.html", message = "Account doesn't exist.")
 
                 #now moving onto teachers
@@ -184,7 +181,6 @@ def root():
                 if check:
                     session['status'] = 'teacher'
                     session['user'] = email
-=======
                     check = accounts.confirmTeacher(email, pwd)
                     if check:
                         if check[0]:
@@ -195,10 +191,9 @@ def root():
                             else:
                                 return render_template("index.html", message = "Incorrect Password")
                         else:
-                            return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getTeacher(email)['verificationLink'])
+                            return render_template("index.html", message = "Your account isn't verified, please check your email to enable your account.")
                     else:
                         return render_template("index.html", message = "Account doesn't exist.")
->>>>>>> 1d3bc001178f0cde7dff6f5c0abb25d95757e1c3
                 
             elif request.form["submit"]=="signup":
                 email = request.form["email"]
