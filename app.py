@@ -63,6 +63,7 @@ def sendVerificationEmail(email, verificationLink):
     <a href="{0}" style="padding: 1.5% ; text-decoration: none ; color: #404040; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Verify Email</a>
 </center>
     '''.format("127.0.0.1:5000/verify/" + verificationLink)
+    print message.html
     sendEmailAsync(app, message)
     
 #this sends a mail to register a teacher account
@@ -73,11 +74,12 @@ def sendRegistrationEmail(email, referrer, verificationLink):
     message.html = '''
     <center>
     <h1 style="font-weight: 500 ; font-family: Arial">StuyCS Code Review</h1>
-    <p style="font-weight: 500 ; font-family: Arial">%s has referred you to join StuyCS Code Review as a teacher. Please press the button below to create your teacher account.</p>
+    <p style="font-weight: 500 ; font-family: Arial">{0} has referred you to join StuyCS Code Review as a teacher. Please press the button below to create your teacher account.</p>
     <br>
-    <a href="%s" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
+    <a href="{1}" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
     </center>
-    ''' % (whoReferred['name'], "127.0.0.1:5000/verify/" + verificationLink)
+    '''.format(whoReferred['name'], "127.0.0.1:5000/verify/" + verificationLink)
+    print message.html
     sendEmailAsync(app, message)
     
 #registers student and adds to database, stills requires email verif.
@@ -176,9 +178,11 @@ def root():
                 else:
                     return render_template("index.html", message = "Account doesn't exist.")
 
-            elif accounts.confirmTeacher( email, pwd ):
-                session['status'] = 'teacher'
-                session['user'] = email
+                #now moving onto teachers
+                check = accounts.confirmTeacher(email, pwd)
+                if check:
+                    session['status'] = 'teacher'
+                    session['user'] = email
                 
             elif request.form["submit"]=="signup":
                 email = request.form["email"]

@@ -84,12 +84,11 @@ def addStudent( email, password, firstName, lastName, verificationLink ):
 
 #Create a new teacher, temporary hard-coded password
 def addTeacher( email, firstName, lastName, verificationLink ):
-    db.students.insert_one(
+    db.teachers.insert_one(
         {
-            'email':email,
+            'email': email,
             'password': 'admin',
             'verified': False,
-            'verificationLink': verificationLink,
             'classes': [],
             'profile': {
                 'firstName': 'N/A',
@@ -103,15 +102,18 @@ def addTeacher( email, firstName, lastName, verificationLink ):
 def confirmStudent(email, pwd):
     check = getStudent(email)
     if check:
-        return (check[2], check[0]['password'] == hash(pwd))
+        return (check[0]['verified'], check[0]['password'] == hash(pwd))
     else:
         return None
 
+#returns duple of
+#(account created, password correct)
 def confirmTeacher(email, pwd):
-    check = getStudent(email)
+    check = getTeacher(email)
     if check:
-        return check[0]['password']==hash(pwd)
-
+        return (check[0]['verified'], check[0]['password'] == hash(pwd))
+    else:
+        return None
 
 #update specified field of email account logged into
 def updateField(email, field, newInfo, confirmInfo):
