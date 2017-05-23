@@ -40,9 +40,15 @@ def getStudent(email):
             'email': email
         }
     )
+    #print count
     if count != 1:
         return False
     else:
+        # print db.students.find_one(
+        #     {
+        #         'email': email
+        #     }
+        # )
         return db.students.find_one(
             {
                 'email': email
@@ -55,9 +61,15 @@ def getTeacher(email):
             'email': email
         }
     )
+    #print count
     if count != 1:
         return False
     else:
+        # print db.students.find_one(
+        #         {
+        #         'email': email
+        #     }
+        # )
         return db.teachers.find_one(
             {
                 'email': email

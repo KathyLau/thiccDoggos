@@ -95,7 +95,7 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
     verificationLink = accounts.getVerificationLink()
 
     #list of people with the same email
-    alreadyRegistered = list(db.students.find( { 'email': email } ))
+    alreadyRegistered = accounts.getStudent(email)
     #checks if above is empty
     if not(alreadyRegistered):
         #send email here
@@ -118,7 +118,7 @@ def registerTeacher(referrer, email, email1):
 
     if not(alreadyRegistered):
         #send email here
-
+        sendRegistrationEmail(email, referrer, verificationLink)
         addTeacher( email, verificationLink )
 
         return True
