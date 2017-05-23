@@ -2,21 +2,22 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mail import Mail, Message
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-from utils import utils, accounts, classy, groups
+from utils import utils, accounts, classy, groupy
+from threading import Thread
 import os
 
 #connect to mongo
 connection = MongoClient("localhost", 27017, connect = False)
-db = connection['database']
+db = connection['STUY_CS_CODE_REVIEW']
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']
+groups = db['groups']
 
 #get secret data
 secrets = utils.getSecretData() #Can't Do this cause no secrets.txt on heroku (gotta deploy manually LMAO)
 
 app = Flask(__name__)
-mail = Mail(app)
 #app.secret_key = os.environ['app-secret-key']
 app.secret_key = secrets['app-secret-key']
 
@@ -32,7 +33,54 @@ app.config['MAIL_USERNAME'] = secrets['email']
 app.config['MAIL_PASSWORD'] = secrets['email-password']
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = ("StuyCS Code Review", secrets['email'])
 
+#initialize mail after config
+mail = Mail(app)
+
+#here is async wrapper for mail
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
+
+#forces flask-mail to send email asynchronously
+@async
+def sendEmailAsync(app, message):
+    with app.app_context():
+        mail.send(message)
+
+#this sends a mail, with email and verification link
+def sendVerificationEmail(email, verificationLink):
+    message = Message()
+    message.recipients = [ email ]
+    message.subject = "Confirm Your StuyCS Code Review Account"
+    message.html = '''
+    <center>
+<h1 style="font-weight: 500 ; font-family: Arial">StuyCS Code Review</h1>
+    <p style="font-weight: 500 ; font-family: Arial">Thanks for signing up for StuyCS Code Review! Please press the button below to verify your account.</p>
+    <br><br>
+    <a href="{0}" style="padding: 1.5% ; text-decoration: none ; color: #404040; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Verify Email</a>
+</center>
+    '''.format("127.0.0.1:5000/verify/" + verificationLink)
+    sendEmailAsync(app, message)
+    
+#this sends a mail to register a teacher account
+def sendRegistrationEmail(email, referrer, verificationLink):
+    message = Message()
+    message.recipients = [ email ]
+    message.subject = "Create Your StuyCS Code Review Account"
+    message.html = '''
+    <center>
+    <h1 style="font-weight: 500 ; font-family: Arial">StuyCS Code Review</h1>
+    <p style="font-weight: 500 ; font-family: Arial">%s has referred you to join StuyCS Code Review as a teacher. Please press the button below to create your teacher account.</p>
+    <br>
+    <a href="%s" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
+    </center>
+    ''' % (whoReferred['name'], "127.0.0.1:5000/verify/" + verificationLink)
+    sendEmailAsync(app, message)
+    
 #registers student and adds to database, stills requires email verif.
 #sends verification email
 #returns false if not registered
@@ -51,19 +99,8 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
     #checks if above is empty
     if not(alreadyRegistered):
         #send email here
-        message = Message()
-        message.recipients = [ email ]
-        message.subject = "Confirm Your StuyCS Code Review Account"
-        message.html = '''
-        <center>
-        <h1 style="font-weight: 500 ; font-family: Arial">StuyCS Code Review</h1>
-        <p style="font-weight: 500 ; font-family: Arial">Thanks for signing up for StuyCS Code Review! Please press the button below to verify your account.</p>
-        <br>
-        <a href="%s" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Verify Email</a>
-        </center>
-        '''.format("127.0.0.1:5000/verify/" + verificationLink)
-        mail.send(message)
-        addStudent( email1, password1, firstName, lastName, verificationLink )
+        sendVerificationEmail(email, verificationLink)
+        accounts.addStudent( email1, password1, firstName, lastName, verificationLink )
         return True
     return False
 
@@ -81,18 +118,6 @@ def registerTeacher(referrer, email, email1):
 
     if not(alreadyRegistered):
         #send email here
-        message = Message()
-        message.recipients = [ email ]
-        message.subject = "Create Your StuyCS Code Review Account"
-        message.html = '''
-        <center>
-        <h1 style="font-weight: 500 ; font-family: Arial">StuyCS Code Review</h1>
-        <p style="font-weight: 500 ; font-family: Arial">%s has referred you to join StuyCS Code Review as a teacher. Please press the button below to create your teacher account.</p>
-        <br>
-        <a href="%s" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
-        </center>
-        ''' % (whoReferred['name'], "127.0.0.1:5000/verify/" + verificationLink)
-        mail.send(message)
 
         addTeacher( email, verificationLink )
 
@@ -107,7 +132,7 @@ def root():
             student = accounts.getStudent(session['user'])
             if student:
                 #home page of classes
-                return redirect( url_for( 'home', verified = student['verified'], notifications = None ) )
+                return redirect( url_for( 'home', notifications = None ) )
             else:
                 #cant find account, prolly error so force logout and go to login page
                 del session['user']
@@ -131,14 +156,38 @@ def root():
             if request.form["submit"]=="login":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
-                #print accounts.getStudent(email)
-                if accounts.confirmStudent(email, pwd): # and fxn to check pass
-                    session['status'] = 'student'
-                    session['user'] = email
-                elif accounts.confirmTeacher( email, pwd ):
-                    session['status'] = 'teacher'
-                    session['user'] = email
-                return redirect( url_for( 'home') )
+                check = check = accounts.confirmStudent(email, pwd)
+                #if account exists
+                if check:
+                    #if verified
+                    if check[0]:
+                        #password correct
+                        if check[1]:
+                            session['status'] = 'student'
+                            session['user'] = email
+                            return redirect( url_for( 'home') )
+                        #password incorrect
+                        else:
+                            return render_template("index.html", message = "Incorrect Password")
+                    #if not verified
+                    else:
+                        return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getStudent(email)['verificationLink'])
+                #if account doesnt exist
+                else:
+                    check = accounts.confirmTeacher(email, pwd)
+                    if check:
+                        if check[0]:
+                            if check[1]:
+                                session['status'] = 'teacher'
+                                session['user'] = email
+                                return redirect( url_for( 'home' ))
+                            else:
+                                return render_template("index.html", message = "Incorrect Password")
+                        else:
+                            return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getTeacher(email)['verificationLink'])
+                    else:
+                        return render_template("index.html", message = "Account doesn't exist.")
+                
             elif request.form["submit"]=="signup":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
@@ -222,6 +271,7 @@ def profile():
     if request.method=="POST":
         if request.form['submit']=="Submit Email":
             accounts.updateField(session['user'], 'email', request.form["new_email"], request.form["confirm_email"])
+
         else:
             accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"])
     return render_template("profile.html", status = session['status'], verified=True)
@@ -247,6 +297,7 @@ def groups():
             your_groups = classy.getStudentGroups( session['user'] )
         elif session['status'] == 'teacher':
             your_groups = classy.getTeacherGroups( session['user'] )
+
         return render_template("groups.html", status = session['status'], verified=True, your_classes=your_classes)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
@@ -280,6 +331,7 @@ def upload_file(assignmentName):
             filename = secure_filename(file.filename)
             ext = filename[filename.find('.'):]
             filename = session['user']+'-'+assignmentName + ext
+
             file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
             return redirect(url_for('upload_file',assignmentName=assignmentName))
         else:

@@ -2,10 +2,11 @@ from pymongo import MongoClient
 import random
 import string
 import accounts
+import groupy
 
 #connect to mongo
 connection = MongoClient("127.0.0.1")
-db = connection['database']
+db = connection['STUY_CS_CODE_REVIEW']
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']
@@ -99,7 +100,7 @@ def disbandClass( code ):
                'groups': { '$in': Class['groups'] } }
             })
     for group in Class['groups']:
-        disbandGroup( group ) #group is the groupID, so we'll use this function again
+        groupy.disbandGroup( group ) #group is the groupID, so we'll use this function again
     db.classes.delete_one(
         {'code': code }
     )
