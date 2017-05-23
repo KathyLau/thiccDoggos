@@ -63,7 +63,7 @@ def sendVerificationEmail(email, verificationLink):
     <br><br>
     <a href="{0}" style="padding: 1.5% ; text-decoration: none ; color: #404040; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Verify Email</a>
 </center>
-    '''.format("127.0.0.1:5000/verify/" + verificationLink)
+    '''.format("http://127.0.0.1:5000/verify/" + verificationLink)
     print message.html
     sendEmailAsync(app, message)
     
@@ -79,7 +79,7 @@ def sendRegistrationEmail(email, referrer, verificationLink):
     <br>
     <a href="{1}" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
     </center>
-    '''.format(whoReferred['name'], "127.0.0.1:5000/verify/" + verificationLink)
+    '''.format(whoReferred['name'], "http://127.0.0.1:5000/verify/" + verificationLink)
     print message.html
     sendEmailAsync(app, message)
     
