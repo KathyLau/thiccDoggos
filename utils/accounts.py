@@ -43,7 +43,7 @@ def getStudent(email):
     if count != 1:
         return False
     else:
-        return db.students.find(
+        return db.students.find_one(
             {
                 'email': email
             }
@@ -58,7 +58,7 @@ def getTeacher(email):
     if count != 1:
         return False
     else:
-        return db.teachers.find(
+        return db.teachers.find_one(
             {
                 'email': email
             }
@@ -103,14 +103,16 @@ def addTeacher( email, firstName, lastName, verificationLink ):
 def confirmStudent(email, pwd):
     check = getStudent(email)
     if check:
-        return (check[2], check[0]['password'] == hash(pwd))
+        return (check['verified'], check['password'] == hash(pwd))
     else:
         return None
 
 def confirmTeacher(email, pwd):
-    check = getStudent(email)
+    check = getTeacher(email)
     if check:
-        return check[0]['password']==hash(pwd)
+        return (check['verified'], check['password']==hash(pwd))
+    else:
+        return None
 
 
 #update specified field of email account logged into

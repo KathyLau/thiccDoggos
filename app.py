@@ -155,8 +155,7 @@ def root():
             if request.form["submit"]=="login":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
-                #print accounts.getStudent(email)
-                check = accounts.confirmStudent(email, pwd) # and fxn to check pass
+                check = check = accounts.confirmStudent(email, pwd)
                 #if account exists
                 if check:
                     #if verified
@@ -168,17 +167,25 @@ def root():
                             return redirect( url_for( 'home') )
                         #password incorrect
                         else:
-                            return render_template("index.html", message = "Incorrect password.")
+                            return render_template("index.html", message = "Incorrect Password")
                     #if not verified
                     else:
-                        return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getStudent(email)[3])
+                        return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getStudent(email)['verificationLink'])
                 #if account doesnt exist
                 else:
-                    return render_template("index.html", message = "Account doesn't exist.")
-
-            elif accounts.confirmTeacher( email, pwd ):
-                session['status'] = 'teacher'
-                session['user'] = email
+                    check = accounts.confirmTeacher(email, pwd)
+                    if check:
+                        if check[0]:
+                            if check[1]:
+                                session['status'] = 'teacher'
+                                session['user'] = email
+                                return redirect( url_for( 'home' ))
+                            else:
+                                return render_template("index.html", message = "Incorrect Password")
+                        else:
+                            return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getTeacher(email)['verificationLink'])
+                    else:
+                        return render_template("index.html", message = "Account doesn't exist.")
                 
             elif request.form["submit"]=="signup":
                 email = request.form["email"]
