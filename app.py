@@ -236,7 +236,7 @@ def viewClass(classCode):
             return classCode
             pass
     else:
-        return redirect( url_for( "root", message = "Please Sign In First" ))
+        return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
 
 
 #just a placeholder, there's no groups.html rn
