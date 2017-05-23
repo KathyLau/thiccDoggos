@@ -35,3 +35,5 @@ kevinZ -- 2017-05-22 10:05 PM
 bug fixes for smoother login and logout procedure
 kevinZ -- 2017-05-22 10:50 PM
 changed db name and added files for reseting and adding admin accounts to database.
+kathyL -- 2017-05-23 10:07 AM
+fixed email verificationl link

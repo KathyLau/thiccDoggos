@@ -33,7 +33,6 @@ def getVerificationLink():
         return link
 
 #finds account from email which is psuedo id since it's unique
-#returns false if failed, or if more than 1 acc with that email
 def getStudent(email):
     count = db.students.count(
         {
@@ -54,6 +53,29 @@ def getStudent(email):
                 'email': email
             }
         )
+
+
+
+#finds account from email which is psuedo id since it's unique
+def getAccount(link):
+    return db.students.find(
+            {
+                'verificationLink': link
+            }
+        )
+'''    count = db.students.count(
+        {
+            'verificationLink': link
+        }
+    )
+    #print count
+    if count != 1:
+        return False
+    return db.students.find_one(
+            {
+                'verificationLink': link
+            }
+        )'''
 
 def getTeacher(email):
     count = db.teachers.count(

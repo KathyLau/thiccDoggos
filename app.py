@@ -65,7 +65,7 @@ def sendVerificationEmail(email, verificationLink):
 </center>
     '''.format("http://127.0.0.1:5000/verify/" + verificationLink)
     sendEmailAsync(app, message)
-    
+
 #this sends a mail to register a teacher account
 def sendRegistrationEmail(email, referrer, verificationLink):
     message = Message()
@@ -80,7 +80,7 @@ def sendRegistrationEmail(email, referrer, verificationLink):
     </center>
     '''.format(whoReferred['name'], "http://127.0.0.1:5000/verify/" + verificationLink)
     sendEmailAsync(app, message)
-    
+
 #registers student and adds to database, stills requires email verif.
 #sends verification email
 #returns false if not registered
@@ -160,6 +160,7 @@ def root():
                 #if account exists
                 if check:
                     #if verified
+
                     if check[0]:
                         #password correct
                         if check[1]:
@@ -171,6 +172,7 @@ def root():
                             return render_template("index.html", message = "Incorrect Password")
                     #if not verified
                     else:
+                        #print accounts.getStudent(email)['verificationLink']
                         return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getStudent(email)['verificationLink'])
                 #if account doesnt exist
                 else:
@@ -194,7 +196,7 @@ def root():
                             return render_template("index.html", message = "Your account isn't verified, please check your email to enable your account.")
                     else:
                         return render_template("index.html", message = "Account doesn't exist.")
-                
+
             elif request.form["submit"]=="signup":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
@@ -213,6 +215,14 @@ def home():
         return render_template("home.html", status = session['status'], verified = True )
     else:
         return redirect( url_for("root", message = "Please Login or Sign-Up First") )
+
+@app.route("/verify/<link>")
+def verify(link):
+    #print link
+    #print accounts.getAccount(link)
+    email = accounts.getAccount(link)[0]['email']
+    accounts.updateField(email, 'verified', True, True)
+    return redirect(url_for('home'))
 
 @app.route("/logout")
 def logout():
