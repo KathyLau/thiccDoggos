@@ -31,3 +31,5 @@ polish upload file fxn to save the file in the name of email-assignmentName form
 added page for groups for classes
 kathyL -- 2017-05-22 12:31 PM
 make create Group and join group pages
+kevinZ -- 2017-05-22 10:05 PM
+bug fixes for smoother login and logout procedure

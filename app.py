@@ -8,10 +8,11 @@ import os
 
 #connect to mongo
 connection = MongoClient("localhost", 27017, connect = False)
-db = connection['database']
+db = connection['STUY_CS_CODE_REVIEW']
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']
+groups = db['groups']
 
 #get secret data
 secrets = utils.getSecretData() #Can't Do this cause no secrets.txt on heroku (gotta deploy manually LMAO)
