@@ -54,12 +54,16 @@ def getGroup( name ):
         {'name': name }
     )
 
+#this fxn is wrong does not work we need a new one
 def getStudentGroups( email ):
+    groups = []
     student = list(db.students.find( {'email': email} ))
+    if len(student) < 1: return groups
     groupCodes = student[0]['group']
     classes = []
     for code in classCodes:
         groupinfo = list (db.groups.find( {'code': code } ))[0]
+        groups.append(groupinfo)
         #Insert group information necessary
         #groups.append([str(info['code']), str(classinfo['className']),str(classinfo['groupLimit']), str(classinfo['teacher']) ])
     return groups

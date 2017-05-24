@@ -148,6 +148,7 @@ def confirmTeacher(email, pwd):
         return (check['verified'], check['password']==hash(pwd))
     else:
         return None
+        
 
 #update specified field of email account logged into
 def updateField(email, field, newInfo, confirmInfo):

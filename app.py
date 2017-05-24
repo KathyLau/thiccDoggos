@@ -227,6 +227,7 @@ def verify(link):
 @app.route("/logout")
 def logout():
     session.pop("user")
+    session.pop("status")
     return redirect( url_for("root", message = "Logout Successful") )
 
 @app.route("/classes", methods=["POST", "GET"])
@@ -264,20 +265,20 @@ def createaClass():
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
-@app.route("/createGroup", methods=['GET', 'POST'])
-def createaGroup():
+@app.route("/class/<code>/createGroup", methods=['GET', 'POST'])
+def createaGroup(code):
     if 'user' in session:
         if request.form:
             if 'groupName' in request.form:
                 groups.createGroups( session['user'], '', request.form['groupName'], '5') # we need a way to get group limit
-                return redirect( url_for( 'groups', message = "Group Creation Successful" ))
+                return redirect( url_for( 'groups', message = "Group Creation Successful", code=code ))
         elif request.args:
             if 'message' in request.args:
-                return render_template( "createGroup.html", message = request.args['message'])
+                return render_template( "createGroup.html", message = request.args['message'], code=code)
             else:
                 print request.args
         else:
-            return render_template( "createGroup.html", status = session['status'], verified=True )
+            return render_template( "createGroup.html", status = session['status'], verified=True, code=code )
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -311,11 +312,13 @@ def viewClass(classCode):
 def groups():
     if 'user' in session:
         if session['status'] == 'student':
-            your_groups = classy.getStudentGroups( session['user'] )
+            pass
+            #your_groups = groupy.getStudentGroups( session['user'] )
         elif session['status'] == 'teacher':
-            your_groups = classy.getTeacherGroups( session['user'] )
+            pass
+            #your_groups = groupy.getTeacherGroups( session['user'] )
 
-        return render_template("groups.html", status = session['status'], verified=True, your_classes=your_classes)
+        return render_template("class.html", status = session['status'], verified=True)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
