@@ -41,3 +41,5 @@ kevinZ -- 2017-05-24 8:28 PM
 modified classes to match new class details (ie, they now have periods ))
 kevinZ -- 2017-05-24 10:11 PM
 worked on class.html and some backend to go with it
+kevinZ -- 2017-05-24 10:39 PM
+finished up on class.html ish.... still gotta do the rest of it
