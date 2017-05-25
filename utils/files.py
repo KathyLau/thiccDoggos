@@ -12,28 +12,39 @@ classes = db['classes']
 
 #how a user uploads a file
 #takes name of uploader, assignment, and file OBJECT
+#type = upload
 def uploadFile(upload, uploaderName, assignmentName):
-    fileID = fs.put(upload, uploader = uploader, assignment = assignmentName, link = '')
+    fileID = fs.put(upload, uploader = uploader, assignment = assignmentName, fileType = "upload")
+    return fileID
+
+#upload file from github link
+#type = github
+def uploadFileFromGithub(uploaderName, assignmentName, githubUsername, repository, fileName):
+    response = urllib2.urlopen('https://raw.githubusercontent.com/{0}/{1}/master/{2}'.format(githubUsername, repository, fileName))
+    responseString = response.read()
+    
+    fileID = fs.put(responseString, filename = fileName, uploader = uploaderName, assignment = assignmentName, fileType = "github")
     return fileID
 
 #get a file
 #returns dictionary of
 #{ 'assignment', 'uploader', 'file' }
+#or (github files)
+#{'assignment', 'uploader', 'link', 'file'}
 #NOTE: the file is a string
 def getFile(fileID):
     data = fs.get(fileID)
-    return {
-        'assignment': data.assignment,
-        'uploader': data.uploader,
-        'link': data.link,
-        'file': data.read()
-    }
+    if data.fileType == "github":
+        return {
+            'uploader': data.uploader,
+            'link': data.link,
+            'assignment': data.assignment,
+            'file': data
+        }
+    else:
+        return {
+            'uploader': data.uploader,
+            'assignment': data.assignment,
+            'file': data.read()
+        }
 
-#upload file from github link
-def getFileFromGithub(user, repository, fileName):
-    response = urllib2.urlopen('https://raw.githubusercontent.com/{0}/{1}/master/{2}'.format(user, repository, fileName))
-    responseString = response.read()
-    return responseString
-
-x = getFileFromGithub("eccentricayman", "notes", "index.html")
-print x
