@@ -1,14 +1,16 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mail import Mail, Message
 from pymongo import MongoClient
+import gridfs
 from werkzeug.utils import secure_filename
-from utils import utils, accounts, classy, groupy
+from utils import utils, accounts, classy, groupy, files
 from threading import Thread
 import os
 
 #connect to mongo
 connection = MongoClient("localhost", 27017, connect = False)
 db = connection['STUYCS_CODE_REVIEW']
+fs = gridfs.GridFS(db)
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']
@@ -226,8 +228,11 @@ def verify(link):
 
 @app.route("/logout")
 def logout():
-    session.pop("user")
-    return redirect( url_for("root", message = "Logout Successful") )
+    #this doesnt matter because we only check
+    #for it if user exists
+    #del session['status']
+    del session['user']
+    return render_template("index.html", message = "Logout Successful")
 
 @app.route("/classes", methods=["POST", "GET"])
 def classes():
