@@ -5,6 +5,8 @@ connection = MongoClient("127.0.0.1")
 db = connection['STUYCS_CODE_REVIEW']
 
 def drop_all():
-    db.dropDatabase()
+    db.teachers.drop()
+    db.students.drop()
+    db.classes.drop()
 
 drop_all()

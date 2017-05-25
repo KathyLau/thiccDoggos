@@ -27,30 +27,38 @@ def createClassCode():
         return code
 
 #creates a class and adds to database
-def createClass( teacherEmail, className, groupLimit ):
+def createClass( teacherEmail, form ):
+
+    def getPeriods( formWithChecklist ):
+        return [ key[-1] for key in formWithChecklist.keys() if key[:-1] == 'pd' ]
+    
     teacher = list(db.teachers.find( {'email':teacherEmail} ))[0]
     code = createClassCode()
+    periods = getPeriods( form ) # list of periods
+    className = form['className']
     db.classes.insert_one(
         {
             'teacher': teacher['profile']['firstName'] + " " + teacher['profile']['lastName'],
             'className': className,
-            'groupLimit': groupLimit,
-            'students': [],
-            'groups': [],
+            'periods':{ period : { 'students': [], 'groups': [] } for period in periods },
             'code': code
         })
     db.teachers.update(
         { 'email': teacherEmail },
         { '$push':
-          {'classes': code}
+          {'classes': code }
         })
 
 #add a single student to class
 def addToClass( code, studentEmail ):
+    #code = classCode-period#
+    codeList = code.split("-")
+    classCode = codeList[0]
+    period = codeList[1]
     db.classes.update(
-        {'code': code },
+        {'code': classCode },        
         {'$push':
-         { 'students': studentEmail }
+         {'periods.%s.students'%(period): studentEmail }
         })
     db.students.update(
         {'email': studentEmail },
