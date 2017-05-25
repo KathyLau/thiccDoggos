@@ -13,7 +13,7 @@
 {% endfor %}
 {% endblock %}
 {% block Teacher_Content %}
-<div class="container">
+<div class="container-fluid">
   <div class="row">
     <div class="col-sm-1"></div>
     <div class="col-sm-10">
@@ -41,57 +41,57 @@
           </div>
         </span>
       </div>
+    </div>
+    <div class="col-sm-1"></div>
+  </div>
+  <div class="row">
+    <div class="col-sm-4">
       <h3>    Your Students</h3>
       {% for pd in periods %}
-    Period:  {{pd}}<br>
+      Period:  {{pd}}<br>
 
-    {% for student in periods[pd]['students'] %}
-     {{student}},
+      {% for student in periods[pd]['students'] %}
+      {{student}},
       {% endfor %}
       <br>
       {% endfor %}
-
+    </div>
+    <div class="col-sm-4">
       <br><h3>Student Groups</h3>
       {% for pd in periods %}
-    Period:  {{pd}}<br>
+      Period:  {{pd}}<br>
 
-    {% for group in periods[pd]['groups'] %}
-     {{group}},
+      {% for group in periods[pd]['groups'] %}
+      {{group}},
       {% endfor %}
       <br>
       {% endfor %}
-
-      <div class="col-sm-1">
-      </div>
     </div>
-    <div class="row">
-      <div class="col-sm-2"></div>
-      <div class="col-sm-8">
-
-      </div>
-      <div class="col-sm-2"></div>
+    <div class="col-sm-4">
+      
     </div>
   </div>
-  <script>
-    var popUpWindow = function(){
-    var popup = document.getElementById("myPopup");
-    popup.classList.toggle("show");
-    console.log(popup)
-    }
-    document.getElementById("changeName").addEventListener( "click", popUpWindow );
+</div>
+<script>
+  var popUpWindow = function(){
+  var popup = document.getElementById("myPopup");
+  popup.classList.toggle("show");
+  console.log(popup)
+  }
+  document.getElementById("changeName").addEventListener( "click", popUpWindow );
 
-    var changeName =function(){
-    var newName = document.getElementById("newClassName").value;
-    var popup = document.getElementById("myPopup");
-    popup.classList.toggle("show");
-    var classCode = document.getElementById("classCode").innerHTML;
-    $.post("/changeClassName", {"newName": newName, "code": classCode }, function(d){
-    console.log(d);
-    })
-    var className = document.getElementById("className");
-    className.innerHTML = newName
-    }
-    document.getElementById("submitClassName").addEventListener("click", changeName)
+  var changeName =function(){
+  var newName = document.getElementById("newClassName").value;
+  var popup = document.getElementById("myPopup");
+  popup.classList.toggle("show");
+  var classCode = document.getElementById("classCode").innerHTML;
+  $.post("/changeClassName", {"newName": newName, "code": classCode }, function(d){
+  console.log(d);
+  })
+  var className = document.getElementById("className");
+  className.innerHTML = newName
+  }
+  document.getElementById("submitClassName").addEventListener("click", changeName)
 
-  </script>
-  {% endblock %}
+</script>
+{% endblock %}

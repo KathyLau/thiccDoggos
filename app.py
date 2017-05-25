@@ -208,7 +208,7 @@ def root():
 @app.route("/home")
 def home():
     if 'user' in session:
-        return render_template("home.html", status = session['status'], verified = True )
+        return render_template("home.html", status = session['status'], verified = session['verified'] )
     else:
         return redirect( url_for("root", message = "Please Login or Sign-Up First") )
 
@@ -236,7 +236,7 @@ def classes():
             your_classes = classy.getStudentClasses( session['user'] )
         elif session['status'] == 'teacher':
             your_classes = classy.getTeacherClasses( session['user'] )
-        return render_template("classes.html", status = session['status'], verified=True, your_classes=your_classes)
+        return render_template("classes.html", status = session['status'], verified=session['verified'], your_classes=your_classes)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -258,7 +258,7 @@ def createaClass():
                 session.pop('user')
                 session.pop('status')
                 return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Class Creation Feature" ) )
-            return render_template( "createClass.html", status = session['status'], verified=True )
+            return render_template( "createClass.html", status = session['status'], verified=session['verified'] )
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -269,7 +269,7 @@ def viewClass(classCode):
         if session['status'] == 'teacher':
             theClass = classy.getClass(classCode)
             periods = classy.getStudentsInYourClass(classCode, 0)
-            return render_template("class.html", status = session['status'], verified=True, className = theClass['className'], classCode = classCode, periods=periods)
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, periods=periods)
 
         else:
             codetemp = classCode.split("-")
@@ -279,7 +279,7 @@ def viewClass(classCode):
             peepsInfo = classy.getStudentsInYourClass(code, pd)
             #print peepsInfo
             peeps = peepsInfo['students']
-            return render_template("class.html", status = session['status'], verified=True, className = theClass['className'], classCode = classCode, peeps=peeps)
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, peeps=peeps)
     else:
         return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
 
@@ -305,7 +305,7 @@ def createaGroup(code):
             else:
                 print request.args
         else:
-            return render_template( "createGroup.html", status = session['status'], verified=True, code=code )
+            return render_template( "createGroup.html", status = session['status'], verified=['verified'], code=code )
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -323,7 +323,7 @@ def profile():
 
         else:
             accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"])
-    return render_template("profile.html", status = session['status'], verified=True)
+    return render_template("profile.html", status = session['status'], verified=['verified'])
 
 #just a placeholder, there's no groups.html rn
 @app.route("/groups", methods=["POST", "GET"])
@@ -335,8 +335,8 @@ def groups():
         elif session['status'] == 'teacher':
             pass
             #your_groups = groupy.getTeacherGroups( session['user'] )
-
-        return render_template("class.html", status = session['status'], verified=True)
+        return render_template( "base.html" , status = session['status'], verified = session['verified'] )
+        #return render_template("class.html", status = session['status'], verified=True)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -352,6 +352,7 @@ def allowed_file(filename):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
+
 #used by the upload functionallity
 #for hw files
 @app.route('/upload/<assignmentName>', methods=['GET', 'POST'])
