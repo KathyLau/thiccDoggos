@@ -107,7 +107,7 @@ def root():
             student = accounts.getStudent(session['user'])
             if student:
                 #home page of classes
-                return redirect( url_for( 'home', verified = student['verified'], notifications = None ) )
+                return redirect( url_for( 'home', verified = True, notifications = None ) )
             else:
                 #cant find account, prolly error so force logout and go to login page
                 del session['user']
