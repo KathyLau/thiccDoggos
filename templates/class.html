@@ -2,6 +2,15 @@
 {% block stylesheet %}<link rel="stylesheet" type="text/css" href="../static/css/styles.css">{% endblock %}
 {% block Title %}Class{% endblock %}
 {% block Student_Content %}
+
+<h1>Class Name:<span id="className">{{className}}</span></h1>
+<br>
+<p style="font-size: 12px; color: gray">ClassCode:<span id="classCode">{{classCode}}</span></p>
+<h3> Students In Your Class </h3>
+
+{% for p in peeps %}
+{{p}},
+{% endfor %}
 {% endblock %}
 {% block Teacher_Content %}
 <div class="container">
@@ -10,14 +19,15 @@
     <div class="col-sm-10">
       <h1>Class Name:<span id="className">{{className}}</span></h1>
       <br>
-      
+      <p style="font-size: 12px; color: gray">ClassCode:<span id="classCode">{{classCode}}</span></p>
+
       <div class="popup">
         <p id="changeName" style="font-size: 10px; color: gray">Change Class Name</p>
         <!-- PopUp Stuff that is hidden -->
         <span class="popup-text" id="myPopup">
           <div class="container">
             <div class="row header">
-              
+
             </div>
             <div class="row">
               <div class="col-sm-1"></div>
@@ -31,12 +41,33 @@
           </div>
         </span>
       </div>
-      <div class="col-sm-1"></div>
+      <h3>    Your Students</h3>
+      {% for pd in periods %}
+    Period:  {{pd}}<br>
+
+    {% for student in periods[pd]['students'] %}
+     {{student}},
+      {% endfor %}
+      <br>
+      {% endfor %}
+
+      <br><h3>Student Groups</h3>
+      {% for pd in periods %}
+    Period:  {{pd}}<br>
+
+    {% for group in periods[pd]['groups'] %}
+     {{group}},
+      {% endfor %}
+      <br>
+      {% endfor %}
+
+      <div class="col-sm-1">
+      </div>
     </div>
     <div class="row">
       <div class="col-sm-2"></div>
       <div class="col-sm-8">
-        
+
       </div>
       <div class="col-sm-2"></div>
     </div>
@@ -53,11 +84,12 @@
     var newName = document.getElementById("newClassName").value;
     var popup = document.getElementById("myPopup");
     popup.classList.toggle("show");
-    $.post("/changeClassName", {"newName": newName}, function(d){
+    var classCode = document.getElementById("classCode").innerHTML;
+    $.post("/changeClassName", {"newName": newName, "code": classCode }, function(d){
     console.log(d);
     })
     var className = document.getElementById("className");
-    className.HTML = newName
+    className.innerHTML = newName
     }
     document.getElementById("submitClassName").addEventListener("click", changeName)
 

@@ -148,17 +148,33 @@ def confirmTeacher(email, pwd):
         return (check['verified'], check['password']==hash(pwd))
     else:
         return None
-        
+
 
 #update specified field of email account logged into
 def updateField(email, field, newInfo, confirmInfo):
-    if newInfo != confirmInfo:
+    if field=='password' and newInfo != confirmInfo:
         return False
     check = getStudent(email)
     if check:
-        db.students.update(
+        if field != 'profile':
+            db.students.update(
             { 'email': email },
             { '$set': { field: newInfo } }
+        )
+        else:
+            fname = check['profile']['firstName']
+            lname = check['profile']['lastName']
+            if confirmInfo =="firstName":
+                db.students.update(
+            { 'email': email },
+            { '$set': { field: {'lastName': lname, 'firstName': newInfo}
+            }}
+        )
+            else:
+                db.students.update(
+            { 'email': email },
+            { '$set': { field: {'lastName': newInfo, 'firstName': fname}
+            }}
         )
         return True
     return False

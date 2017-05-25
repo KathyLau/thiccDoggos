@@ -265,19 +265,30 @@ def createaClass():
 @app.route("/class/<classCode>")
 def viewClass(classCode):
     if 'user' in session:
+
         if session['status'] == 'teacher':
-            #Insert Student end of Class
-            return render_template("class.html", status = session['status'], verified=True, )
+            theClass = classy.getClass(classCode)
+            periods = classy.getStudentsInYourClass(classCode, 0)
+            return render_template("class.html", status = session['status'], verified=True, className = theClass['className'], classCode = classCode, periods=periods)
+
         else:
-            return classCode
-            pass
+            codetemp = classCode.split("-")
+            code = codetemp[0]
+            pd = codetemp[1]
+            theClass = classy.getClass(code)
+            peepsInfo = classy.getStudentsInYourClass(code, pd)
+            #print peepsInfo
+            peeps = peepsInfo['students']
+            return render_template("class.html", status = session['status'], verified=True, className = theClass['className'], classCode = classCode, peeps=peeps)
     else:
         return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
 
 @app.route("/changeClassName", methods=['POST'])
 def changeClassName():
     if request.form:
-        pass
+        print request.form
+        classy.updateName( request.form['code'], request.form['newName'])
+        return "sucess"
     else:
         return "error"
 
@@ -304,7 +315,11 @@ def createaGroup(code):
 def profile():
     if request.method=="POST":
         if request.form['submit']=="Submit Email":
-            accounts.updateField(session['user'], 'email', request.form["new_email"], request.form["confirm_email"])
+            accounts.updateField(session['user'], 'email', request.form["new_email"],request.form["new_email"])
+        elif request.form['submit']=="Submit FirstName":
+            accounts.updateField(session['user'], 'profile', {'firstName':request.form["fname"]}, 'firstName')
+        elif request.form['submit']=="Submit LastName":
+            accounts.updateField(session['user'], 'profile', {'lastName':request.form["lname"]},'lastName')
 
         else:
             accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"])

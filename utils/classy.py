@@ -69,9 +69,16 @@ def addToClass( code, studentEmail ):
 
 #get data of a class
 def getClass( code ):
-    return db.classes.find(
+    return db.classes.find_one(
         {'code': code }
     )
+
+def updateName( code, newName ):
+    db.classes.update(
+        {'code':code},
+        {'$set':
+         {'className':newName}
+        })
 
 def getStudentClasses( email ):
     student = list(db.students.find( {'email': email} ))
@@ -80,8 +87,9 @@ def getStudentClasses( email ):
     for code in classCodes:
         codetemp = code.split("-")
         code = codetemp[0]
+        pd = codetemp[1]
         classinfo = list (db.classes.find( {'code': code } ))[0]
-        classes.append([str(classinfo['code']), str(classinfo['className']),str(classinfo['teacher']) ])
+        classes.append([str(classinfo['code'] + '-' + pd), str(classinfo['className']),str(classinfo['teacher']) ])
     return classes
 
 def getTeacherClasses( email ):
@@ -92,6 +100,15 @@ def getTeacherClasses( email ):
         classinfo = list(db.classes.find({'code':code}))[0]
         classes.append([str(classinfo['code']), str(classinfo['className'])])
     return classes
+
+#0 is for teachers to get all pds
+def getStudentsInYourClass(code, pd):
+    periods = list(db.classes.find({'code':code}))[0]['periods']
+    if pd == 0:
+        return periods
+    return periods[pd]
+
+
 
 #teachers can disband classes
 def disbandClass( code ):
