@@ -81,15 +81,17 @@ def updateName( code, newName ):
         })
 
 def getStudentClasses( email ):
-    student = list(db.students.find( {'email': email} ))
-    classCodes = student[0]['classes']
+    student = accounts.getStudent(email)
+    classCodes = student['classes']
     classes = []
     for code in classCodes:
         codetemp = code.split("-")
         code = codetemp[0]
         pd = codetemp[1]
-        classinfo = list (db.classes.find( {'code': code } ))[0]
-        classes.append([str(classinfo['code'] + '-' + pd), str(classinfo['className']),str(classinfo['teacher']) ])
+        if db.classes.count({'code': code}) > 0:
+            classinfo = db.classes.find_one( {'code': code } )
+        #print classinfo
+            classes.append([str(classinfo['code'] + '-' + pd), str(classinfo['className']),str(classinfo['teacher']) ])
     return classes
 
 def getTeacherClasses( email ):

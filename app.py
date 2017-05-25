@@ -305,7 +305,7 @@ def createaGroup(code):
             else:
                 print request.args
         else:
-            return render_template( "createGroup.html", status = session['status'], verified=['verified'], code=code )
+            return render_template( "createGroup.html", status = session['status'], verified=session['verified'], code=code )
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -323,7 +323,7 @@ def profile():
 
         else:
             accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"])
-    return render_template("profile.html", status = session['status'], verified=['verified'])
+    return render_template("profile.html", status = session['status'], verified=session['verified'])
 
 #just a placeholder, there's no groups.html rn
 @app.route("/groups", methods=["POST", "GET"])
