@@ -37,3 +37,5 @@ kevinZ -- 2017-05-22 10:50 PM
 changed db name and added files for reseting and adding admin accounts to database.
 kathyL -- 2017-05-23 10:07 AM
 fixed email verificationl link
+kevinZ -- 2017-05-24 8:28 PM
+modified classes to match new class details (ie, they now have periods ))
