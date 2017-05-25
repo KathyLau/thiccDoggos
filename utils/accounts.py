@@ -6,7 +6,7 @@ import utils
 
 #connect to mongo
 connection = MongoClient("127.0.0.1")
-db = connection['database']
+db = connection['STUYCS_CODE_REVIEW']
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']
@@ -33,21 +33,49 @@ def getVerificationLink():
         return link
 
 #finds account from email which is psuedo id since it's unique
-#returns false if failed, or if more than 1 acc with that email
 def getStudent(email):
     count = db.students.count(
         {
             'email': email
         }
     )
+    #print count
     if count != 1:
         return False
     else:
-        return db.students.find(
+        # print db.students.find_one(
+        #     {
+        #         'email': email
+        #     }
+        # )
+        return db.students.find_one(
             {
                 'email': email
             }
         )
+
+
+
+#finds account from email which is psuedo id since it's unique
+def getAccount(link):
+    return db.students.find(
+            {
+                'verificationLink': link
+            }
+        )
+'''    count = db.students.count(
+        {
+            'verificationLink': link
+        }
+    )
+    #print count
+    if count != 1:
+        return False
+    return db.students.find_one(
+            {
+                'verificationLink': link
+            }
+        )'''
 
 def getTeacher(email):
     count = db.teachers.count(
@@ -55,10 +83,16 @@ def getTeacher(email):
             'email': email
         }
     )
+    #print count
     if count != 1:
         return False
     else:
-        return db.teachers.find(
+        # print db.students.find_one(
+        #         {
+        #         'email': email
+        #     }
+        # )
+        return db.teachers.find_one(
             {
                 'email': email
             }
@@ -84,12 +118,11 @@ def addStudent( email, password, firstName, lastName, verificationLink ):
 
 #Create a new teacher, temporary hard-coded password
 def addTeacher( email, firstName, lastName, verificationLink ):
-    db.students.insert_one(
+    db.teachers.insert_one(
         {
-            'email':email,
+            'email': email,
             'password': 'admin',
             'verified': False,
-            'verificationLink': verificationLink,
             'classes': [],
             'profile': {
                 'firstName': 'N/A',
@@ -98,31 +131,50 @@ def addTeacher( email, firstName, lastName, verificationLink ):
         })
 
 #confirms if user email matches with password
+#returns duple of
+#(verified, password correct)
 def confirmStudent(email, pwd):
-    check = list(db.students.find({'email': email}))
-    if check != []:
-        return check[0]['password']==hash(pwd)
+    check = getStudent(email)
+    if check:
+        return (check['verified'], check['password'] == hash(pwd))
+    else:
+        return None
 
+#returns duple of
+#(account created, password correct)
 def confirmTeacher(email, pwd):
-    check = list(db.teachers.find({'email': email}))
-    if check != []:
-        return check[0]['password']==hash(pwd)
+    check = getTeacher(email)
+    if check:
+        return (check['verified'], check['password']==hash(pwd))
+    else:
+        return None
 
 
 #update specified field of email account logged into
 def updateField(email, field, newInfo, confirmInfo):
-    if newInfo != confirmInfo:
+    if field=='password' and newInfo != confirmInfo:
         return False
-    check = list(db.students.find({field: email}))
-    if check != []:
-        db.students.update(
-        {
-        'email': email
-        },
-        {'$set':
-        {field: newInfo
-        }
-        }
+    check = getStudent(email)
+    if check:
+        if field != 'profile':
+            db.students.update(
+            { 'email': email },
+            { '$set': { field: newInfo } }
+        )
+        else:
+            fname = check['profile']['firstName']
+            lname = check['profile']['lastName']
+            if confirmInfo =="firstName":
+                db.students.update(
+            { 'email': email },
+            { '$set': { field: {'lastName': lname, 'firstName': newInfo}
+            }}
+        )
+            else:
+                db.students.update(
+            { 'email': email },
+            { '$set': { field: {'lastName': newInfo, 'firstName': fname}
+            }}
         )
         return True
     return False
