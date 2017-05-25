@@ -38,7 +38,8 @@ def createClass( teacherEmail, form ):
     className = form['className']
     db.classes.insert_one(
         {
-            'teacher': teacher['profile']['firstName'] + " " + teacher['profile']['lastName'],
+            'teacherName': teacher['profile']['firstName'] + " " + teacher['profile']['lastName'],
+            'teacher': teacherEmail,
             'className': className,
             'periods':{ period : { 'students': [], 'groups': [] } for period in periods },
             'code': code

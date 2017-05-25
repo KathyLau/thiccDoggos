@@ -1,20 +1,65 @@
 {% extends 'base.html' %}
+{% block stylesheet %}<link rel="stylesheet" type="text/css" href="../static/css/styles.css">{% endblock %}
 {% block Title %}Class{% endblock %}
 {% block Student_Content %}
-<center><h3>Your Groups </h3>
-  Hover to See Members<br><br>Click to Join
-{% for group in groups %}
-
-{{group | safe}} <br>
-
-{% endfor %}
-<br>
-<br>
-<br>
-<h3>
-<a href="/class/{{code}}createGroup">Create Group </a> </h3>
-</center>
 {% endblock %}
 {% block Teacher_Content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-1"></div>
+    <div class="col-sm-10">
+      <h1>Class Name:<span id="className">{{className}}</span></h1>
+      <br>
+      
+      <div class="popup">
+        <p id="changeName" style="font-size: 10px; color: gray">Change Class Name</p>
+        <!-- PopUp Stuff that is hidden -->
+        <span class="popup-text" id="myPopup">
+          <div class="container">
+            <div class="row header">
+              
+            </div>
+            <div class="row">
+              <div class="col-sm-1"></div>
+              <div class="col-sm-10">
+                <p style="font-size: 16px">New Class Name: <input type="text" id="newClassName" placeHolder="{{className}}"></p>
+                <br>
+                <input type="submit" class="btn btn-default" id="submitClassName" name="Submit Change">
+              </div>
+              <div class="col-sm-1"></div>
+            </div>
+          </div>
+        </span>
+      </div>
+      <div class="col-sm-1"></div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-8">
+        
+      </div>
+      <div class="col-sm-2"></div>
+    </div>
+  </div>
+  <script>
+    var popUpWindow = function(){
+    var popup = document.getElementById("myPopup");
+    popup.classList.toggle("show");
+    console.log(popup)
+    }
+    document.getElementById("changeName").addEventListener( "click", popUpWindow );
 
-{% endblock %}
+    var changeName =function(){
+    var newName = document.getElementById("newClassName").value;
+    var popup = document.getElementById("myPopup");
+    popup.classList.toggle("show");
+    $.post("/changeClassName", {"newName": newName}, function(d){
+    console.log(d);
+    })
+    var className = document.getElementById("className");
+    className.HTML = newName
+    }
+    document.getElementById("submitClassName").addEventListener("click", changeName)
+
+  </script>
+  {% endblock %}

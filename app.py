@@ -274,6 +274,12 @@ def viewClass(classCode):
     else:
         return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
 
+@app.route("/changeClassName", methods=['POST'])
+def changeClassName():
+    if request.form:
+        
+    else:
+        return "error"
     
 @app.route("/class/<code>/createGroup", methods=['GET', 'POST'])
 def createaGroup(code):
