@@ -265,9 +265,10 @@ def createaClass():
 @app.route("/class/<classCode>")
 def viewClass(classCode):
     if 'user' in session:
+        theClass = classy.getClass(classCode);
         if session['status'] == 'teacher':
             #Insert Student end of Class
-            return render_template("class.html", status = session['status'], verified=True, )
+            return render_template("class.html", status = session['status'], verified=True, className = theClass['className'], classCode = classCode)
         else:
             return classCode
             pass
@@ -277,7 +278,9 @@ def viewClass(classCode):
 @app.route("/changeClassName", methods=['POST'])
 def changeClassName():
     if request.form:
-        
+        print request.form
+        classy.updateName( request.form['code'], request.form['newName'])
+        return "sucess"
     else:
         return "error"
     

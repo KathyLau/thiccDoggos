@@ -10,6 +10,8 @@
     <div class="col-sm-10">
       <h1>Class Name:<span id="className">{{className}}</span></h1>
       <br>
+      <p style="font-size: 12px; color: gray">ClassCode:<span id="classCode">{{classCode}}</span></p>
+      <br>
       
       <div class="popup">
         <p id="changeName" style="font-size: 10px; color: gray">Change Class Name</p>
@@ -53,11 +55,12 @@
     var newName = document.getElementById("newClassName").value;
     var popup = document.getElementById("myPopup");
     popup.classList.toggle("show");
-    $.post("/changeClassName", {"newName": newName}, function(d){
+    var classCode = document.getElementById("classCode").innerHTML;
+    $.post("/changeClassName", {"newName": newName, "code": classCode }, function(d){
     console.log(d);
     })
     var className = document.getElementById("className");
-    className.HTML = newName
+    className.innerHTML = newName
     }
     document.getElementById("submitClassName").addEventListener("click", changeName)
 

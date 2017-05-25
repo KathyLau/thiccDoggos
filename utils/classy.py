@@ -69,9 +69,16 @@ def addToClass( code, studentEmail ):
 
 #get data of a class
 def getClass( code ):
-    return db.classes.find(
+    return db.classes.find_one(
         {'code': code }
     )
+
+def updateName( code, newName ):
+    db.classes.update(
+        {'code':code},
+        {'$set':
+         {'className':newName}
+        })
 
 def getStudentClasses( email ):
     student = list(db.students.find( {'email': email} ))
