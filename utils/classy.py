@@ -31,7 +31,7 @@ def createClass( teacherEmail, form ):
 
     def getPeriods( formWithChecklist ):
         return [ key[-1] for key in formWithChecklist.keys() if key[:-1] == 'pd' ]
-    
+
     teacher = list(db.teachers.find( {'email':teacherEmail} ))[0]
     code = createClassCode()
     periods = getPeriods( form ) # list of periods
@@ -57,7 +57,7 @@ def addToClass( code, studentEmail ):
     classCode = codeList[0]
     period = codeList[1]
     db.classes.update(
-        {'code': classCode },        
+        {'code': classCode },
         {'$push':
          {'periods.%s.students'%(period): studentEmail }
         })
@@ -78,8 +78,10 @@ def getStudentClasses( email ):
     classCodes = student[0]['classes']
     classes = []
     for code in classCodes:
+        codetemp = code.split("-")
+        code = codetemp[0]
         classinfo = list (db.classes.find( {'code': code } ))[0]
-        classes.append([str(classinfo['code']), str(classinfo['className']),str(classinfo['groupLimit']), str(classinfo['teacher']) ])
+        classes.append([str(classinfo['code']), str(classinfo['className']),str(classinfo['teacher']) ])
     return classes
 
 def getTeacherClasses( email ):

@@ -233,7 +233,7 @@ def classes():
             if request.method=="POST":
                 code = request.form["class_code"]
                 classy.addToClass(code, session['user'])
-            your_classes = [ ] #classy.getStudentClasses( session['user'] )
+            your_classes = classy.getStudentClasses( session['user'] )
         elif session['status'] == 'teacher':
             your_classes = classy.getTeacherClasses( session['user'] )
         return render_template("classes.html", status = session['status'], verified=True, your_classes=your_classes)
@@ -277,10 +277,10 @@ def viewClass(classCode):
 @app.route("/changeClassName", methods=['POST'])
 def changeClassName():
     if request.form:
-        
+        pass
     else:
         return "error"
-    
+
 @app.route("/class/<code>/createGroup", methods=['GET', 'POST'])
 def createaGroup(code):
     if 'user' in session:
