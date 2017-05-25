@@ -39,3 +39,5 @@ kathyL -- 2017-05-23 10:07 AM
 fixed email verificationl link
 kevinZ -- 2017-05-24 8:28 PM
 modified classes to match new class details (ie, they now have periods ))
+kevinZ -- 2017-05-24 10:11 PM
+worked on class.html and some backend to go with it
