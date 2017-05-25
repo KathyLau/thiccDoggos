@@ -2,6 +2,8 @@ from pymongo import MongoClient
 
 connection = MongoClient("127.0.0.1")
 db = connection['STUYCS_CODE_REVIEW']
+teachers = db['teachers']
+students = db['students']
 
 def addAdminTeacher():
     db.teachers.insert_one(

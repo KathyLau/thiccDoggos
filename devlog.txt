@@ -37,3 +37,12 @@ kevinZ -- 2017-05-22 10:50 PM
 changed db name and added files for reseting and adding admin accounts to database.
 kathyL -- 2017-05-23 10:07 AM
 fixed email verificationl link
+kevinZ -- 2017-05-24 8:28 PM
+modified classes to match new class details (ie, they now have periods ))
+kevinZ -- 2017-05-24 10:11 PM
+worked on class.html and some backend to go with it
+kevinZ -- 2017-05-24 10:39 PM
+finished up on class.html ish.... still gotta do the rest of it
+kathyL -- 2017-05-25 12:34 AM
+worked on displaying students to teachers by periods
+also displays students in a student's class on class page

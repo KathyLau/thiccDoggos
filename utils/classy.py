@@ -27,30 +27,39 @@ def createClassCode():
         return code
 
 #creates a class and adds to database
-def createClass( teacherEmail, className, groupLimit ):
+def createClass( teacherEmail, form ):
+
+    def getPeriods( formWithChecklist ):
+        return [ key[-1] for key in formWithChecklist.keys() if key[:-1] == 'pd' ]
+
     teacher = list(db.teachers.find( {'email':teacherEmail} ))[0]
     code = createClassCode()
+    periods = getPeriods( form ) # list of periods
+    className = form['className']
     db.classes.insert_one(
         {
-            'teacher': teacher['profile']['firstName'] + " " + teacher['profile']['lastName'],
+            'teacherName': teacher['profile']['firstName'] + " " + teacher['profile']['lastName'],
+            'teacher': teacherEmail,
             'className': className,
-            'groupLimit': groupLimit,
-            'students': [],
-            'groups': [],
+            'periods':{ period : { 'students': [], 'groups': [] } for period in periods },
             'code': code
         })
     db.teachers.update(
         { 'email': teacherEmail },
         { '$push':
-          {'classes': code}
+          {'classes': code }
         })
 
 #add a single student to class
 def addToClass( code, studentEmail ):
+    #code = classCode-period#
+    codeList = code.split("-")
+    classCode = codeList[0]
+    period = codeList[1]
     db.classes.update(
-        {'code': code },
+        {'code': classCode },
         {'$push':
-         { 'students': studentEmail }
+         {'periods.%s.students'%(period): studentEmail }
         })
     db.students.update(
         {'email': studentEmail },
@@ -60,17 +69,29 @@ def addToClass( code, studentEmail ):
 
 #get data of a class
 def getClass( code ):
-    return db.classes.find(
+    return db.classes.find_one(
         {'code': code }
     )
 
+def updateName( code, newName ):
+    db.classes.update(
+        {'code':code},
+        {'$set':
+         {'className':newName}
+        })
+
 def getStudentClasses( email ):
-    student = list(db.students.find( {'email': email} ))
-    classCodes = student[0]['classes']
+    student = accounts.getStudent(email)
+    classCodes = student['classes']
     classes = []
     for code in classCodes:
-        classinfo = list (db.classes.find( {'code': code } ))[0]
-        classes.append([str(classinfo['code']), str(classinfo['className']),str(classinfo['groupLimit']), str(classinfo['teacher']) ])
+        codetemp = code.split("-")
+        code = codetemp[0]
+        pd = codetemp[1]
+        if db.classes.count({'code': code}) > 0:
+            classinfo = db.classes.find_one( {'code': code } )
+        #print classinfo
+            classes.append([str(classinfo['code'] + '-' + pd), str(classinfo['className']),str(classinfo['teacher']) ])
     return classes
 
 def getTeacherClasses( email ):
@@ -81,6 +102,15 @@ def getTeacherClasses( email ):
         classinfo = list(db.classes.find({'code':code}))[0]
         classes.append([str(classinfo['code']), str(classinfo['className'])])
     return classes
+
+#0 is for teachers to get all pds
+def getStudentsInYourClass(code, pd):
+    periods = list(db.classes.find({'code':code}))[0]['periods']
+    if pd == 0:
+        return periods
+    return periods[pd]
+
+
 
 #teachers can disband classes
 def disbandClass( code ):

@@ -8,7 +8,8 @@ from threading import Thread
 import os
 
 #connect to mongo
-connection = MongoClient("localhost", 27017, connect = False)
+#connection = MongoClient("localhost", 27017, connect = False)
+connection = MongoClient("127.0.0.1")
 db = connection['STUYCS_CODE_REVIEW']
 fs = gridfs.GridFS(db)
 students = db['students']
@@ -146,7 +147,7 @@ def root():
                 #home page of classes / notifications
                 #replace current notifications with this once ayman makes it
                 #utils.getTeacherNotifications(teacher['email'])
-                return redirect( url_for( 'home', verified = student['verified'], notifications = None ) )
+                return redirect( url_for( 'home', notifications = None ) )
             else:
                 #cant find account, prolly error so force logout and go to login page
                 del session['user']
@@ -154,20 +155,20 @@ def root():
     else:
         #User is Not Logged In
         # FOR STUDENTS
-        if request.method=="POST":
+        if request.form:
             if request.form["submit"]=="login":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
-                check = check = accounts.confirmStudent(email, pwd)
+                check = accounts.confirmStudent(email, pwd)
                 #if account exists
                 if check:
                     #if verified
-
                     if check[0]:
                         #password correct
                         if check[1]:
                             session['status'] = 'student'
                             session['user'] = email
+                            session['verified'] = True
                             return redirect( url_for( 'home') )
                         #password incorrect
                         else:
@@ -176,21 +177,16 @@ def root():
                     else:
                         #print accounts.getStudent(email)['verificationLink']
                         return render_template("index.html", message = "Your account isn't verified!", verificationLink = accounts.getStudent(email)['verificationLink'])
-                #if account doesnt exist
                 else:
-                    return render_template("index.html", message = "Account doesn't exist.")
 
-                #now moving onto teachers
-                check = accounts.confirmTeacher(email, pwd)
-                if check:
-                    session['status'] = 'teacher'
-                    session['user'] = email
+                    #now moving onto teachers
                     check = accounts.confirmTeacher(email, pwd)
                     if check:
                         if check[0]:
                             if check[1]:
                                 session['status'] = 'teacher'
                                 session['user'] = email
+                                session['verified'] = True
                                 return redirect( url_for( 'home' ))
                             else:
                                 return render_template("index.html", message = "Incorrect Password")
@@ -214,7 +210,7 @@ def root():
 @app.route("/home")
 def home():
     if 'user' in session:
-        return render_template("home.html", status = session['status'], verified = True )
+        return render_template("home.html", status = session['status'], verified = session['verified'] )
     else:
         return redirect( url_for("root", message = "Please Login or Sign-Up First") )
 
@@ -228,10 +224,8 @@ def verify(link):
 
 @app.route("/logout")
 def logout():
-    #this doesnt matter because we only check
-    #for it if user exists
-    #del session['status']
-    del session['user']
+    session.pop("user")
+    session.pop("status")
     return render_template("index.html", message = "Logout Successful")
 
 @app.route("/classes", methods=["POST", "GET"])
@@ -244,7 +238,7 @@ def classes():
             your_classes = classy.getStudentClasses( session['user'] )
         elif session['status'] == 'teacher':
             your_classes = classy.getTeacherClasses( session['user'] )
-        return render_template("classes.html", status = session['status'], verified=True, your_classes=your_classes)
+        return render_template("classes.html", status = session['status'], verified=session['verified'], your_classes=your_classes)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -252,8 +246,9 @@ def classes():
 def createaClass():
     if 'user' in session:
         if request.form:
-            if 'className' in request.form and 'groupLimit' in request.form:
-                classy.createClass( session['user'], request.form['className'], request.form['groupLimit'])
+            if 'className' in request.form:
+                print request.form
+                classy.createClass( session['user'], request.form )
                 return redirect( url_for( 'classes', message = "Class Creation Successful" ))
         elif request.args:
             if 'message' in request.args:
@@ -264,25 +259,55 @@ def createaClass():
             if session['status'] != 'teacher':
                 session.pop('user')
                 session.pop('status')
-                return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access this Feature" ) )
-            return render_template( "createClass.html", status = session['status'], verified=True )
+                return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Class Creation Feature" ) )
+            return render_template( "createClass.html", status = session['status'], verified=session['verified'] )
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
-@app.route("/createGroup", methods=['GET', 'POST'])
-def createaGroup():
+@app.route("/class/<classCode>")
+def viewClass(classCode):
+    if 'user' in session:
+
+        if session['status'] == 'teacher':
+            theClass = classy.getClass(classCode)
+            periods = classy.getStudentsInYourClass(classCode, 0)
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, periods=periods)
+
+        else:
+            codetemp = classCode.split("-")
+            code = codetemp[0]
+            pd = codetemp[1]
+            theClass = classy.getClass(code)
+            peepsInfo = classy.getStudentsInYourClass(code, pd)
+            #print peepsInfo
+            peeps = peepsInfo['students']
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, peeps=peeps)
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
+
+@app.route("/changeClassName", methods=['POST'])
+def changeClassName():
+    if request.form:
+        print request.form
+        classy.updateName( request.form['code'], request.form['newName'])
+        return "sucess"
+    else:
+        return "error"
+
+@app.route("/class/<code>/createGroup", methods=['GET', 'POST'])
+def createaGroup(code):
     if 'user' in session:
         if request.form:
             if 'groupName' in request.form:
                 groups.createGroups( session['user'], '', request.form['groupName'], '5') # we need a way to get group limit
-                return redirect( url_for( 'groups', message = "Group Creation Successful" ))
+                return redirect( url_for( 'groups', message = "Group Creation Successful", code=code ))
         elif request.args:
             if 'message' in request.args:
-                return render_template( "createGroup.html", message = request.args['message'])
+                return render_template( "createGroup.html", message = request.args['message'], code=code)
             else:
                 print request.args
         else:
-            return render_template( "createGroup.html", status = session['status'], verified=True )
+            return render_template( "createGroup.html", status = session['status'], verified=session['verified'], code=code )
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -292,35 +317,28 @@ def createaGroup():
 def profile():
     if request.method=="POST":
         if request.form['submit']=="Submit Email":
-            accounts.updateField(session['user'], 'email', request.form["new_email"], request.form["confirm_email"])
+            accounts.updateField(session['user'], 'email', request.form["new_email"],request.form["new_email"])
+        elif request.form['submit']=="Submit FirstName":
+            accounts.updateField(session['user'], 'profile', request.form["fname"], 'firstName')
+        elif request.form['submit']=="Submit LastName":
+            accounts.updateField(session['user'], 'profile', request.form["lname"],'lastName')
 
         else:
             accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"])
-    return render_template("profile.html", status = session['status'], verified=True)
-
-@app.route("/class/<classCode>")
-def viewClass(classCode):
-    if 'user' in session:
-        if session['status'] == 'student':
-            #Insert Student end of Class
-            return render_template("class.html", status = session['status'], verified=True)
-        else:
-            return classCode
-            pass
-    else:
-        return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
-
+    return render_template("profile.html", status = session['status'], verified=session['verified'])
 
 #just a placeholder, there's no groups.html rn
 @app.route("/groups", methods=["POST", "GET"])
 def groups():
     if 'user' in session:
         if session['status'] == 'student':
-            your_groups = classy.getStudentGroups( session['user'] )
+            pass
+            #your_groups = groupy.getStudentGroups( session['user'] )
         elif session['status'] == 'teacher':
-            your_groups = classy.getTeacherGroups( session['user'] )
-
-        return render_template("groups.html", status = session['status'], verified=True, your_classes=your_classes)
+            pass
+            #your_groups = groupy.getTeacherGroups( session['user'] )
+        return render_template( "base.html" , status = session['status'], verified = session['verified'] )
+        #return render_template("class.html", status = session['status'], verified=True)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -336,10 +354,11 @@ def allowed_file(filename):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
+
 #used by the upload functionallity
 #for hw files
-@app.route('/upload/<assignmentName>', methods=['GET', 'POST'])
-def upload_file(assignmentName):
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
     if request.method=='GET':
         return render_template('upload.html', status = session['status'],verified=True)
     else:
@@ -352,10 +371,10 @@ def upload_file(assignmentName):
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             ext = filename[filename.find('.'):]
-            filename = session['user']+'-'+assignmentName + ext
+            filename = session['user']+'-'+ filename #+ ext
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-            return redirect(url_for('upload_file',assignmentName=assignmentName))
+            return redirect(url_for('upload_file'))
         else:
             return "Not accepted file"
 
