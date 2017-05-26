@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mail import Mail, Message
 from pymongo import MongoClient
+import gridfs
 from werkzeug.utils import secure_filename
-from utils import utils, accounts, classy, groupy, assign
+from utils import utils, accounts, classy, groupy, assign, files
 from threading import Thread
 import os
 
@@ -10,6 +11,7 @@ import os
 #connection = MongoClient("localhost", 27017, connect = False)
 connection = MongoClient("127.0.0.1")
 db = connection['STUYCS_CODE_REVIEW']
+fs = gridfs.GridFS(db)
 students = db['students']
 teachers = db['teachers']
 classes = db['classes']
@@ -224,7 +226,7 @@ def verify(link):
 def logout():
     session.pop("user")
     session.pop("status")
-    return redirect( url_for("root", message = "Logout Successful") )
+    return render_template("index.html", message = "Logout Successful")
 
 @app.route("/classes", methods=["POST", "GET"])
 def classes():
