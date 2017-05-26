@@ -9,44 +9,63 @@
 
 kathyL-- 2017-05-12 01:17
 Initialized basic files needed, uploaded design doc
+
 kevinZ -- 2017-05-15 10:38 PM
 Created Templates stuff, testing now using the app
+
 kevinZ -- 2017-05-15 11:31 PM
 Working on accounts.py stuff for now
+
 kevinZ -- 2017-05-16 12:12 AM
 Did some more work with classes... Gonna head to bed now
+
 kathyL -- 2017-05-20 1:29 PM
 fixed some email issues for login/register
 added navbar
+
 kathyL -- 2017-05-20 3:04 PM
 used bootstrap to design html files for profile and classes
+
 kathyL -- 2017-05-11 11:33 AM
 added update fields fxns , styled homepage,
+
 kevinZ -- 2017-05-21 9:12 PM
 made some progress on classes. also, fuck jinja
+
 kathyL -- 2017-05-21 11:13 PM
 made interaction of adding and joining classes between students and teacher work
+
 kathyL -- 2017-05-22 9:23 AM
 polish upload file fxn to save the file in the name of email-assignmentName format
 added page for groups for classes
+
 kathyL -- 2017-05-22 12:31 PM
 make create Group and join group pages
+
 kevinZ -- 2017-05-22 10:05 PM
 bug fixes for smoother login and logout procedure
+
 kevinZ -- 2017-05-22 10:50 PM
 changed db name and added files for reseting and adding admin accounts to database.
+
 kathyL -- 2017-05-23 10:07 AM
 fixed email verificationl link
+
 kevinZ -- 2017-05-24 8:28 PM
 modified classes to match new class details (ie, they now have periods ))
+
 kevinZ -- 2017-05-24 10:11 PM
 worked on class.html and some backend to go with it
+
 kevinZ -- 2017-05-24 10:39 PM
 finished up on class.html ish.... still gotta do the rest of it
+
 kathyL -- 2017-05-25 12:34 AM
 worked on displaying students to teachers by periods
 also displays students in a student's class on class page
+
 kevinZ -- 2017-05-25 10:54 PM
 completed assignment creation on the teacher end. Not sure how the assignment page will look like, so holding off from that from now
+
 kathyL -- 2017-05-26 12:19 AM
 added assignment routes for teachers and students and updated file name storage
