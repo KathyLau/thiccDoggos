@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mail import Mail, Message
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-from utils import utils, accounts, classy, groupy
+from utils import utils, accounts, classy, groupy, assign
 from threading import Thread
 import os
 
@@ -257,6 +257,7 @@ def createaClass():
             if session['status'] != 'teacher':
                 session.pop('user')
                 session.pop('status')
+                session.pop('verified')
                 return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Class Creation Feature" ) )
             return render_template( "createClass.html", status = session['status'], verified=session['verified'] )
     else:
@@ -265,11 +266,15 @@ def createaClass():
 @app.route("/class/<classCode>")
 def viewClass(classCode):
     if 'user' in session:
-
+        message = ""
+        if request.args:
+            if message in request.args:
+                message = request.args['message']
+        
         if session['status'] == 'teacher':
             theClass = classy.getClass(classCode)
             periods = classy.getStudentsInYourClass(classCode, 0)
-            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, periods=periods)
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, periods=periods, message=message, assignments=assign.getAssignments(classCode))
 
         else:
             codetemp = classCode.split("-")
@@ -279,7 +284,7 @@ def viewClass(classCode):
             peepsInfo = classy.getStudentsInYourClass(code, pd)
             #print peepsInfo
             peeps = peepsInfo['students']
-            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, peeps=peeps)
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, peeps=peeps, message=message)
     else:
         return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
 
@@ -292,6 +297,26 @@ def changeClassName():
     else:
         return "error"
 
+@app.route("/createAssignment", methods=['GET', 'POST'])
+def createAnAssignment():
+    if 'user' in session:
+        if session['status'] != 'teacher':
+            session.pop('user')
+            session.pop('status')
+            session.pop('verified')
+            return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Assignment Creation Feature" ) )
+        if request.form:
+            if 'assignmentName'and'classCode' and 'dueDate' and 'details' in request.form:
+                assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['dueDate'], True if 'groupsAllowed' in request.form else False, request.form['details'] )
+                return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assigment Created"))
+        elif request.args:
+            message = ""
+            if message in request.args:
+                message = request.args['message']
+            return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.args['classCode'], message = "")
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First" ))
+    
 @app.route("/class/<code>/createGroup", methods=['GET', 'POST'])
 def createaGroup(code):
     if 'user' in session:
