@@ -152,8 +152,11 @@ def confirmTeacher(email, pwd):
 
 #update specified field of email account logged into
 def updateField(email, field, newInfo, confirmInfo):
-    if field=='password' and newInfo != confirmInfo:
-        return False
+    if field=='password':
+        if newInfo != confirmInfo:
+            return False
+        else:
+            newInfo = hash(newInfo)
     check = getStudent(email)
     if check:
         if field != 'profile':

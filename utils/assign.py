@@ -30,8 +30,11 @@ def createAssignment( assignName, classCode, dueDate, groupsAllowed, details ):
             'class': classCode,
             'dueDate': dueDate,
             'description':details,
-            'responses': [ ] 
+            'responses': [ ]
     })
 
 def getAssignments( classCode ):
-    return [assignment for assignment in db.assignments.find( {'class':classCode } )] 
+    return [assignment for assignment in db.assignments.find( {'class':classCode } )]
+
+def getAssignmentsByID( ID ):
+    return [assignment for assignment in db.assignments.find( {'assignmentID': ID } )]

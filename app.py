@@ -272,7 +272,7 @@ def viewClass(classCode):
         if request.args:
             if message in request.args:
                 message = request.args['message']
-        
+
         if session['status'] == 'teacher':
             theClass = classy.getClass(classCode)
             periods = classy.getStudentsInYourClass(classCode, 0)
@@ -286,7 +286,7 @@ def viewClass(classCode):
             peepsInfo = classy.getStudentsInYourClass(code, pd)
             #print peepsInfo
             peeps = peepsInfo['students']
-            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, peeps=peeps, message=message)
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, peeps=peeps, message=message,  assignments=assign.getAssignments(code))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
 
@@ -318,7 +318,7 @@ def createAnAssignment():
             return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.args['classCode'], message = "")
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
-    
+
 @app.route("/class/<code>/createGroup", methods=['GET', 'POST'])
 def createaGroup(code):
     if 'user' in session:
@@ -367,6 +367,24 @@ def groups():
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
+@app.route("/assignment/<assignmentID>", methods=["GET", "POST"])
+def assignment(assignmentID):
+    if 'user' in session:
+
+        if session['status'] == 'teacher':
+            assignments = assign.getAssignmentsByID(assignmentID)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments)
+        else:
+            if request.method=="POST":
+                upload_file(assignmentID)
+            assignments = assign.getAssignmentsByID(assignmentID)
+            link=''
+            #AYMAN HOW DO I CHECK / VIEW FILES
+            if os.path.exists("/data/" + assignmentID + "-" + session['user'] + ".py"):
+                link = "/data/" + assignmentID + "-" + session['user'] + ".py"
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=link)
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
 
 #This is used by the until now not in use file upload functionallity
@@ -379,29 +397,22 @@ def allowed_file(filename):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
-
-#used by the upload functionallity
-#for hw files
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.method=='GET':
-        return render_template('upload.html', status = session['status'],verified=True)
+def upload_file(ID):
+    if 'file' not in request.files:
+        return 'No file part'
+    file = request.files['file']
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        ext = filename[filename.find('.'):]
+        filename = ID + '-' + session['user'] + ext
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+        return redirect(url_for('assignment', assignmentID=ID))
     else:
-        if 'file' not in request.files:
-            return 'No file part'
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            ext = filename[filename.find('.'):]
-            filename = session['user']+'-'+ filename #+ ext
+        return "Not accepted file"
 
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-            return redirect(url_for('upload_file'))
-        else:
-            return "Not accepted file"
 
 if __name__ == "__main__":
     app.debug = True

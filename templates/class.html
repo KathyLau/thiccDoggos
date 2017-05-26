@@ -11,6 +11,13 @@
 {% for p in peeps %}
 {{p}},
 {% endfor %}
+
+<h3>Assignments</h3>
+<ul>
+  {% for assignment in assignments %}
+  <li><a href="/assignment/{{assignment['assignmentID']}}">Assignment {{assignment['assignmentName']}}</a></li>
+  {% endfor %}
+</ul>
 {% endblock %}
 {% block Teacher_Content %}
 <div class="container-fluid">
@@ -43,7 +50,7 @@
     </div>
     <div class="col-sm-1"></div>
   </div>
-  <div class="row"> 
+  <div class="row">
     <div class="col-sm-4">
   <div class="row">
     <div class="col-sm-1"></div>
