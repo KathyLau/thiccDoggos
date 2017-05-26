@@ -46,3 +46,5 @@ finished up on class.html ish.... still gotta do the rest of it
 kathyL -- 2017-05-25 12:34 AM
 worked on displaying students to teachers by periods
 also displays students in a student's class on class page
+kevinZ -- 2017-05-25 10:54 PM
+completed assignment creation on the teacher end. Not sure how the assignment page will look like, so holding off from that from now
