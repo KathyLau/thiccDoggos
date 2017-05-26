@@ -149,6 +149,12 @@ def confirmTeacher(email, pwd):
     else:
         return None
 
+def addStudentFile(email, filename):
+    db.students.update(
+    { 'email': email },
+    { '$push':
+      {'files': filename }
+    })
 
 #update specified field of email account logged into
 def updateField(email, field, newInfo, confirmInfo):

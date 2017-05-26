@@ -409,6 +409,7 @@ def upload_file(ID):
         ext = filename[filename.find('.'):]
         filename = ID + '-' + session['user'] + ext
         file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+        accounts.addStudentFile(filename, filename)
         return redirect(url_for('assignment', assignmentID=ID))
     else:
         return "Not accepted file"
