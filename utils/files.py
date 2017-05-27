@@ -14,7 +14,7 @@ classes = db['classes']
 #takes name of uploader, assignment, and file OBJECT
 #type = upload
 def uploadFile(upload, uploaderName, assignmentName):
-    fileID = fs.put(upload, uploader = uploader, assignment = assignmentName, fileType = "upload")
+    fileID = fs.put(upload, uploader = uploaderName, assignment = assignmentName, filename=assignmentName,fileType = "upload")
     return fileID
 
 #upload file from github link
@@ -22,7 +22,7 @@ def uploadFile(upload, uploaderName, assignmentName):
 def uploadFileFromGithub(uploaderName, assignmentName, githubUsername, repository, fileName):
     response = urllib2.urlopen('https://raw.githubusercontent.com/{0}/{1}/master/{2}'.format(githubUsername, repository, fileName))
     responseString = response.read()
-    
+
     fileID = fs.put(responseString, filename = fileName, uploader = uploaderName, assignment = assignmentName, fileType = "github")
     return fileID
 
@@ -33,7 +33,12 @@ def uploadFileFromGithub(uploaderName, assignmentName, githubUsername, repositor
 #{'assignment', 'uploader', 'link', 'file'}
 #NOTE: the file is a string
 def getFile(fileID):
-    data = fs.get(fileID)
+    #data = fs.get(fileID)
+    data = fs.get_last_version(fileID)
+    #data =  list(db.fs.files.find({'assignment': fileID}))
+    #if len(data) == 0:
+#        return ''
+#    data = data[0]
     if data.fileType == "github":
         return {
             'uploader': data.uploader,
@@ -47,4 +52,3 @@ def getFile(fileID):
             'assignment': data.assignment,
             'file': data.read()
         }
-

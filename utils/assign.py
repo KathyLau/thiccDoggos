@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import random
 import string
+import accounts, files
 
 connection = MongoClient("127.0.0.1")
 db = connection['STUYCS_CODE_REVIEW']
@@ -38,3 +39,12 @@ def getAssignments( classCode ):
 
 def getAssignmentsByID( ID ):
     return [assignment for assignment in db.assignments.find( {'assignmentID': ID } )]
+
+def getAssignmentSubmissions (user, assignmentID):
+    prevFiles=[]
+    filess = accounts.getStudent(user)['files']
+    for f in filess:
+        #print assignmentID
+        try: prevFiles.append(files.getFile(assignmentID))
+        except: pass
+    return prevFiles

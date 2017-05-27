@@ -378,11 +378,8 @@ def assignment(assignmentID):
             if request.method=="POST":
                 upload_file(assignmentID)
             assignments = assign.getAssignmentsByID(assignmentID)
-            link=''
-            #AYMAN HOW DO I CHECK / VIEW FILES
-            if os.path.exists("/data/" + assignmentID + "-" + session['user'] + ".py"):
-                link = "/data/" + assignmentID + "-" + session['user'] + ".py"
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=link)
+            prevFiles = assign.getAssignmentSubmissions(session['user'], assignmentID)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles)
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
@@ -405,11 +402,16 @@ def upload_file(ID):
         flash('No selected file')
         return redirect(request.url)
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        ext = filename[filename.find('.'):]
-        filename = ID + '-' + session['user'] + ext
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-        accounts.addStudentFile(session['user'], filename)
+        #filename = secure_filename(file.filename)
+        #ext = filename[filename.find('.'):]
+        #filename = session['user'] + '-' + ID + ext
+        #file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+        buffer = []
+        buffer.append("Content-type: %s" % file.content_type)
+        buffer.append("File content: %s" % file.stream.read())
+        upload = '|'.join(buffer)
+        newID = files.uploadFile(upload, session['user'], ID)
+        accounts.addStudentFile(session['user'], ID)
         return redirect(url_for('assignment', assignmentID=ID))
     else:
         return "Not accepted file"
