@@ -226,7 +226,7 @@ def verify(link):
 def logout():
     session.pop("user")
     session.pop("status")
-    return render_template("index.html", message = "Logout Successful")
+    return redirect( url_for("root", message = "Logout Successful"))
 
 @app.route("/classes", methods=["POST", "GET"])
 def classes():
@@ -367,22 +367,36 @@ def groups():
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
+@app.route("/assignment/<assignmentID>/<studentEmail>", methods=["GET", "POST"])
+def assignmentStudent(assignmentID, studentEmail):
+    if 'user' in session:
+        if session['status'] == 'teacher':
+            assignments = assign.getAssignmentsByID(assignmentID)
+            responses = assign.teacherGetAssignments(assignments, assignmentID, 1)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False)
+        else:
+            pass
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
+
+
 @app.route("/assignment/<assignmentID>", methods=["GET", "POST"])
 def assignment(assignmentID):
     if 'user' in session:
 
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments)
+            responses = assign.teacherGetAssignments(assignments, assignmentID, 0)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=True)
         else:
             if request.method=="POST":
                 upload_file(assignmentID)
-            assignments = assign.getAssignmentsByID(assignmentID)
+                assign.submitAssignment(session['user'], assignmentID)
+            assignments='' #assign.getAssignmentsByID(assignmentID)
             prevFiles = assign.getAssignmentSubmissions(session['user'], assignmentID)
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles)
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
-
 
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):

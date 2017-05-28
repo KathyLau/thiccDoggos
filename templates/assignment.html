@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block Title %}Assignments{% endblock %}
+
 {% block Student_Content %}
 
 <div class="container">
@@ -27,5 +28,18 @@
 	{% endfor %}
 <br>
 <h3> Submitted Code Reviews </h3>
+{% for r in responses %}
+<div class="container">
+    <div class="header"><span>
+			{% if link %}
+			<a href="/assignment/{{ID}}/{{r}}"> {{r | safe}}</a>
+			{% else %}
+			{{r | safe}}
+			{% endif %}
+			</span>
+    </div>
+</div>
+ <br>
+{% endfor %}
 
 {% endblock %}

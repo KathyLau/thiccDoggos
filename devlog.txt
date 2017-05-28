@@ -73,3 +73,6 @@ added assignment routes for teachers and students and updated file name storage
 kathyL -- 2017-05-27 5:13 PM
 implemented gridFS file storing
 student can now see file uploaded on the right side of assignment/code page
+
+kathyL -- 2017-05-28 2:15 PM
+student and teachers can now see the files uploaded in text format displayed nicely

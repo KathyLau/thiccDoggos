@@ -43,8 +43,26 @@ def getAssignmentsByID( ID ):
 def getAssignmentSubmissions (user, assignmentID):
     prevFiles=[]
     filess = accounts.getStudent(user)['files']
-    for f in filess:
-        #print assignmentID
-        try: prevFiles.append(files.getFile(assignmentID))
-        except: pass
+    try:
+        prevFiles.append(files.getFile(assignmentID))
+        prevFiles = prevFiles[0]['file'].replace('\n', ' <br> ')
+        start = prevFiles.find("content:")
+        prevFiles = prevFiles[start + 8:]
+    except: pass
     return prevFiles
+
+def submitAssignment(user, assignmentID):
+    db.assignments.update({"assignmentID":assignmentID}, {"$push": {"responses":user}})
+
+# get information from assignment ID
+# number coded
+# 0 - get only students who submitted a file
+# 1 - get the students with the files
+def teacherGetAssignments(assignments, assignmentID, status):
+    responses=[]
+    if len(assignments)>0:
+        students = assignments[0]['responses']
+        if status == 0: responses = [ str(s) for s in students]
+        elif status == 1:
+            for s in students: responses.append(getAssignmentSubmissions(str(s),assignmentID))
+    return responses
