@@ -2,6 +2,7 @@ from pymongo import MongoClient
 import random
 import string
 import accounts, files
+import datetime, time
 
 connection = MongoClient("127.0.0.1")
 db = connection['STUYCS_CODE_REVIEW']
@@ -51,8 +52,15 @@ def getAssignmentSubmissions (user, assignmentID):
     except: pass
     return prevFiles
 
-def submitAssignment(user, assignmentID):
-    db.assignments.update({"assignmentID":assignmentID}, {"$push": {"responses":user}})
+def submitAssignment(email, assignmentID):
+    ts = time.time()
+    db.assignments.update({"assignmentID":assignmentID},
+    {"$push":
+    {"responses":
+    {'student': email,
+    'timestamp': datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'),
+    'comments':[] # comments by other students in [classmate: comment] format
+    }}})
 
 # get information from assignment ID
 # number coded
@@ -62,7 +70,7 @@ def teacherGetAssignments(assignments, assignmentID, status):
     responses=[]
     if len(assignments)>0:
         students = assignments[0]['responses']
-        if status == 0: responses = [ str(s) for s in students]
+        if status == 0: responses = [ str(s['student']) for s in students]
         elif status == 1:
-            for s in students: responses.append(getAssignmentSubmissions(str(s),assignmentID))
+            for s in students: responses.append(getAssignmentSubmissions(str(s['student']),assignmentID))
     return responses
