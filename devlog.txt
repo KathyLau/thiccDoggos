@@ -76,3 +76,6 @@ student can now see file uploaded on the right side of assignment/code page
 
 kathyL -- 2017-05-28 2:15 PM
 student and teachers can now see the files uploaded in text format displayed nicely
+
+kathyL -- 2017-05-28 5:00 PM
+fixed bug that let newest file be shown from upload

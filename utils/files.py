@@ -14,7 +14,7 @@ classes = db['classes']
 #takes name of uploader, assignment, and file OBJECT
 #type = upload
 def uploadFile(upload, uploaderName, assignmentName):
-    fileID = fs.put(upload, uploader = uploaderName, assignment = assignmentName, filename=assignmentName,fileType = "upload")
+    fileID = fs.put(upload, uploader = uploaderName, assignment = assignmentName, filename=uploaderName + '-' + assignmentName,fileType = "upload")
     return fileID
 
 #upload file from github link
@@ -32,7 +32,7 @@ def uploadFileFromGithub(uploaderName, assignmentName, githubUsername, repositor
 #or (github files)
 #{'assignment', 'uploader', 'link', 'file'}
 #NOTE: the file is a string
-def getFile(fileID):
+def getFile(fileID, uploader):
     #data = fs.get(fileID)
     data = fs.get_last_version(fileID)
     #data =  list(db.fs.files.find({'assignment': fileID}))

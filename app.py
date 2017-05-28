@@ -372,7 +372,7 @@ def assignmentStudent(assignmentID, studentEmail):
     if 'user' in session:
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
-            responses = assign.teacherGetAssignments(assignments, assignmentID, 1)
+            responses = assign.teacherGetAssignments(assignments, assignmentID, 1, studentEmail)
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False)
         else:
             pass
@@ -391,7 +391,6 @@ def assignment(assignmentID):
         else:
             if request.method=="POST":
                 upload_file(assignmentID)
-                assign.submitAssignment(session['user'], assignmentID)
             assignments='' #assign.getAssignmentsByID(assignmentID)
             prevFiles = assign.getAssignmentSubmissions(session['user'], assignmentID)
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles)
@@ -426,6 +425,7 @@ def upload_file(ID):
         upload = '|'.join(buffer)
         newID = files.uploadFile(upload, session['user'], ID)
         accounts.addStudentFile(session['user'], ID)
+        assign.submitAssignment(session['user'], ID)
         return redirect(url_for('assignment', assignmentID=ID))
     else:
         return "Not accepted file"

@@ -44,8 +44,9 @@ def getAssignmentsByID( ID ):
 def getAssignmentSubmissions (user, assignmentID):
     prevFiles=[]
     filess = accounts.getStudent(user)['files']
+    if len(filess) == 0: return prevFiles
     try:
-        prevFiles.append(files.getFile(assignmentID))
+        prevFiles.append(files.getFile(user + '-' + assignmentID, user))
         prevFiles = prevFiles[0]['file'].replace('\n', ' <br> ')
         start = prevFiles.find("content:")
         prevFiles = prevFiles[start + 8:]
@@ -66,11 +67,19 @@ def submitAssignment(email, assignmentID):
 # number coded
 # 0 - get only students who submitted a file
 # 1 - get the students with the files
-def teacherGetAssignments(assignments, assignmentID, status):
+def teacherGetAssignments(assignments, assignmentID, status, email):
     responses=[]
+    retL = []
     if len(assignments)>0:
         students = assignments[0]['responses']
-        if status == 0: responses = [ str(s['student']) for s in students]
+        for s in students:
+            if str(s['student']) not in responses:  responses.append(str(s['student']) )
+        if status == 0: return responses
         elif status == 1:
-            for s in students: responses.append(getAssignmentSubmissions(str(s['student']),assignmentID))
-    return responses
+            for s in responses:
+                if s==email:
+                    try:
+                        retL.append(getAssignmentSubmissions(str(s),assignmentID))
+                    except: pass
+                #print getAssignmentSubmissions(str(s['student']), assignmentID)
+    return retL
