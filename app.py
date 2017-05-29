@@ -386,7 +386,7 @@ def assignment(assignmentID):
 
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
-            responses = assign.teacherGetAssignments(assignments, assignmentID, 0)
+            responses = assign.teacherGetAssignments(assignments, assignmentID, 0, '')
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=True)
         else:
             if request.method=="POST":
@@ -396,6 +396,12 @@ def assignment(assignmentID):
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles)
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
+
+@app.route("/assignment/<assignmentID>/enableReviews")
+def enableReviews(assignmentID):
+    print assign.assignGroupReviews(assignmentID, 2)
+
+
 
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):
@@ -415,10 +421,6 @@ def upload_file(ID):
         flash('No selected file')
         return redirect(request.url)
     if file and allowed_file(file.filename):
-        #filename = secure_filename(file.filename)
-        #ext = filename[filename.find('.'):]
-        #filename = session['user'] + '-' + ID + ext
-        #file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
         buffer = []
         buffer.append("Content-type: %s" % file.content_type)
         buffer.append("File content: %s" % file.stream.read())

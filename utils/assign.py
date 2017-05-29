@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import random
 import string
 import accounts, files
-import datetime, time
+import datetime, time, random
 
 connection = MongoClient("127.0.0.1")
 db = connection['STUYCS_CODE_REVIEW']
@@ -83,3 +83,9 @@ def teacherGetAssignments(assignments, assignmentID, status, email):
                     except: pass
                 #print getAssignmentSubmissions(str(s['student']), assignmentID)
     return retL
+
+def assignGroupReviews(assignmentID, num):
+    assigns = getAssignmentsByID(assignmentID)
+    responses = teacherGetAssignments(assigns, assignmentID, 0, '')
+    peepsToReview = random.sample(responses, num)
+    return peepsToReview

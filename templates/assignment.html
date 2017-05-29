@@ -27,7 +27,9 @@
 		Due Date:  {{assignment['dueDate']}}<br>
 	{% endfor %}
 <br>
-<h3> Submitted Code Reviews </h3>
+<h3> Submitted Code  </h3>
+<div class="col-sm-1">  <a class="btn btn-default" href="/assignment/{{ID}}/enableReviews">Enable Reviews</a></div>
+<br><br>
 {% for r in responses %}
 <div class="container">
     <div class="header"><span>
@@ -38,6 +40,7 @@
 			{% endif %}
 			</span>
     </div>
+
 </div>
  <br>
 {% endfor %}
