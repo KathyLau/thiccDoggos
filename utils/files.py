@@ -14,8 +14,12 @@ classes = db['classes']
 #takes name of uploader, assignment, and file OBJECT
 #type = upload
 def uploadFile(upload, uploaderName, assignmentName):
-    fileID = fs.put(upload, uploader = uploader, assignment = assignmentName, fileType = "upload")
+    fileID = fs.put(upload, uploader = uploader, assignment = assignmentName, source = "upload")
     return fileID
+
+def parseGithubLink(link):
+    linkSplit = link.split("/")
+    pass
 
 #upload file from github link
 #type = github
@@ -23,7 +27,7 @@ def uploadFileFromGithub(uploaderName, assignmentName, githubUsername, repositor
     response = urllib2.urlopen('https://raw.githubusercontent.com/{0}/{1}/master/{2}'.format(githubUsername, repository, fileName))
     responseString = response.read()
     
-    fileID = fs.put(responseString, filename = fileName, uploader = uploaderName, assignment = assignmentName, fileType = "github")
+    fileID = fs.put(responseString, filename = fileName, uploader = uploaderName, assignment = assignmentName, source = "github")
     return fileID
 
 #get a file
@@ -39,12 +43,14 @@ def getFile(fileID):
             'uploader': data.uploader,
             'link': data.link,
             'assignment': data.assignment,
-            'file': data
+            'file': data.read(),
+            'source': data.source
         }
     else:
         return {
             'uploader': data.uploader,
             'assignment': data.assignment,
-            'file': data.read()
+            'file': data.read(),
+            'source': data.source
         }
 
