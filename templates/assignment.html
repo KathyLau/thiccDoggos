@@ -1,14 +1,22 @@
 {% extends 'base.html' %}
 
 {% block Title %}Assignments{% endblock %}
+
 {% block Student_Content %}
-<a href="{{link}}"> Previously Submitted File </a>
-<form method="post" enctype="multipart/form-data"> ...
-<input type="file" name="file" id="file">
-<br>
-<br>
-<input type="submit" value="Upload File" name="submit">
-</form>
+
+<div class="container">
+	<div class="row">
+		<div class="col-sm-6">
+			<form method="post" enctype="multipart/form-data"> ...
+				<input type="file" name="file" id="file"> <br><br>
+				<input type="submit" value="Upload File" name="submit">
+			</form>
+		</div>
+		<div class="col-sm-6">
+{{link | safe}}
+		</div>
+	</div>
+</div>
 {% endblock %}
 
 {% block Teacher_Content %}
@@ -19,6 +27,22 @@
 		Due Date:  {{assignment['dueDate']}}<br>
 	{% endfor %}
 <br>
-<h3> Submitted Code Reviews </h3>
+<h3> Submitted Code  </h3>
+<div class="col-sm-1">  <a class="btn btn-default" href="/assignment/{{ID}}/enableReviews">Enable Reviews</a></div>
+<br><br>
+{% for r in responses %}
+<div class="container">
+    <div class="header"><span>
+			{% if link %}
+			<a href="/assignment/{{ID}}/{{r}}"> {{r | safe}}</a>
+			{% else %}
+			{{r | safe}}
+			{% endif %}
+			</span>
+    </div>
+
+</div>
+ <br>
+{% endfor %}
 
 {% endblock %}

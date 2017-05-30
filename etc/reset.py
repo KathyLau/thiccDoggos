@@ -8,5 +8,6 @@ def drop_all():
     db.teachers.drop()
     db.students.drop()
     db.classes.drop()
+    db.assignments.drop()
 
 drop_all()

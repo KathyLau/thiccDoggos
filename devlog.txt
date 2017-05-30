@@ -69,3 +69,13 @@ completed assignment creation on the teacher end. Not sure how the assignment pa
 
 kathyL -- 2017-05-26 12:19 AM
 added assignment routes for teachers and students and updated file name storage
+
+kathyL -- 2017-05-27 5:13 PM
+implemented gridFS file storing
+student can now see file uploaded on the right side of assignment/code page
+
+kathyL -- 2017-05-28 2:15 PM
+student and teachers can now see the files uploaded in text format displayed nicely
+
+kathyL -- 2017-05-28 5:00 PM
+fixed bug that let newest file be shown from upload
