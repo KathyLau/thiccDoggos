@@ -28,7 +28,7 @@
 	{% endfor %}
 <br>
 <h3> Submitted Code  </h3>
-<div class="col-sm-1">  <a class="btn btn-default" href="/assignment/{{ID}}/enableReviews">Enable Reviews</a></div>
+<div class="col-sm-1">  <a class="btn btn-default" href="/assignment/{{ID}}/enableReviews">Enable Random Pair Reviews</a></div>
 <br><br>
 {% for r in responses %}
 <div class="container">
@@ -44,5 +44,12 @@
 </div>
  <br>
 {% endfor %}
+
+{% if assigned %}
+	<h1>Paired Together Randomly</h1>
+	{% for studentPair in assigned %}
+		<p>{{ studentPair[0] }}, {{ studentPair[1] }}</p>
+	{% endfor %}
+{% endif %}
 
 {% endblock %}

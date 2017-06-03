@@ -84,8 +84,34 @@ def teacherGetAssignments(assignments, assignmentID, status, email):
                 #print getAssignmentSubmissions(str(s['student']), assignmentID)
     return retL
 
-def assignGroupReviews(assignmentID, num):
+def assignRandomReviews(assignmentID, num):
     assigns = getAssignmentsByID(assignmentID)
     responses = teacherGetAssignments(assigns, assignmentID, 0, '')
-    peepsToReview = random.sample(responses, num)
-    return peepsToReview
+    randomStudents = random.sample(responses, len(responses))
+    pairs = []
+    for student in range(0, len(randomStudents), num):
+        pair = []
+        for pairNumber in range(0, num):
+            pair.append(randomStudents[student + pairNumber])
+        pairs.append(pair)
+    db.assignments.update({"assignmentID":assignmentID},
+                          {
+                              'pairs': pairs
+                          })
+    return pairs
+
+#gets assigned code for a student with his email
+def getAssignedCode(email, assignmentID):
+    assignment = db.assignments.find({
+        'assignmentID': assignmentID
+    })
+    if not('pairs' in assignment):
+        return False
+    else:
+        pairs = assignment['pairs']
+        for pair in pairs:
+            if (pair[0] == email):
+                return getAssignmentSubmissions(pair[1], assignmentID)
+            elif (pair[1] == emai):
+                return getAssignmentSubmissions(pair[0], assignmentID)
+    

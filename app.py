@@ -367,18 +367,17 @@ def groups():
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
-@app.route("/assignment/<assignmentID>/<studentEmail>", methods=["GET", "POST"])
-def assignmentStudent(assignmentID, studentEmail):
-    if 'user' in session:
-        if session['status'] == 'teacher':
-            assignments = assign.getAssignmentsByID(assignmentID)
-            responses = assign.teacherGetAssignments(assignments, assignmentID, 1, studentEmail)
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False)
-        else:
-            pass
-    else:
-        return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
-
+# @app.route("/assignment/<assignmentID>/<studentEmail>", methods=["GET", "POST"])
+# def assignmentStudent(assignmentID, studentEmail):
+#     if 'user' in session:
+#         if session['status'] == 'teacher':
+#             assignments = assign.getAssignmentsByID(assignmentID)
+#             responses = assign.teacherGetAssignments(assignments, assignmentID, 1, studentEmail)
+#             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False)
+#         else:
+#             pass
+#     else:
+#         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
 @app.route("/assignment/<assignmentID>", methods=["GET", "POST"])
 def assignment(assignmentID):
@@ -387,7 +386,7 @@ def assignment(assignmentID):
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
             responses = assign.teacherGetAssignments(assignments, assignmentID, 0, '')
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=True)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, assigned = [],  link=True)
         else:
             if request.method=="POST":
                 upload_file(assignmentID)
@@ -397,11 +396,41 @@ def assignment(assignmentID):
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
-@app.route("/assignment/<assignmentID>/enableReviews")
+@app.route("/assignment/<assignmentID>/enableReviews", methods = ["GET", "POST"])
 def enableReviews(assignmentID):
-    print assign.assignGroupReviews(assignmentID, 2)
+    return render_template("assignment.html", status = session['status'], verified =  session['verified'], assigned = assign.assignRandomReviews(assignmentID, 2))
 
+@app.route("/reviews")
+def viewStudentClasses():
+    return render_template("reviews.html", status = session['status'], verified = session['verified'], classes = accounts.getStudent(session['email'])['classes'])
 
+@app.route("/reviews/class/<classCode>")
+def viewStudentClass(classCode):
+    if 'user' in session:
+        codetemp = classCode.split("-")
+        code = codetemp[0]
+        pd = codetemp[1]
+        theClass = classy.getClass(code)
+        peepsInfo = classy.getStudentsInYourClass(code, pd)
+        #print peepsInfo
+        peeps = peepsInfo['students']
+        return render_template("reviews.html", status = session['status'], verified = session['verified'], className = theClass['className'], message = message, assignments = assign.getAssignments(code))
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First"))
+
+@app.route("/reviews/assigment/<assignmentID>")
+def getAssigmentToReview(assigmentID):
+    if 'user' in session:
+        if request.form:
+            pass
+        else:
+            assignedCode = assign.getAssignedCode(session['email'], assignmentID)
+            if (assignedCode):
+                return render_template("reviews.html", codeToReview = assignedCode)
+            else:
+                return render_template("reviews.html", message = "You haven't been assigned any code to review for this assignment yet.")
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First"))
 
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):
