@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block Title %}Reviews{% endblock %}
+{% block Student_Content %}
+	{% if message %}
+		<h1>{{ message }}</h1>
+	{% endif %}
+	{% if classes %}
+		<ul id="classList">
+			{% for class in classes %}
+				<li><a href="/reviews/class/{{class[0]}}"> {{class[1]}} - {{class[0]}}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+	{% if className %}
+		<h3>Assignments for {{ className }}</h3>
+		<ul>
+			{% for assignment in assignments %}
+				<li><a href="/reviews/assignment/{{assignment['assignmentID']}}">Assignment {{assignment['assignmentName']}}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+	{% if assignment %}
+		<h1>{{ codeSource }} Code for Assignment {{ assignment['assignmentName'] }}</h1>
+		<div>
+			{% if codeToReview %}
+				<div>{{ codeToReview }}</div>
+			{% endif %}
+		</div>
+		<br>
+		<form method="post">
+			<input type="text" placeholder="Write your comments here!" name="comments" />
+			<br><br>
+			<input type="submit" value="Upload Comments" name="submit" />
+		</form>
+	{% endif %}
+{% endblock %}

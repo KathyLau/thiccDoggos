@@ -2,54 +2,97 @@
 
 {% block Title %}Profile{% endblock %}
 {% block Student_Content %}
-<!-- Insert Student End Here -->
+	<!-- Insert Student End Here -->
 
-<div class="row">
+	<div class="row">
 
-  <div class="col-sm-3">
+		<div class="col-sm-3">
 
-  <form class="form-signin" method="post">
-   <h2 class="form-signin-heading">Update First Name</h2>
-   <input type="text" class="input-block-level"  name="fname" id="fname" placeholder="First Name">
-     <input type="submit" value="Submit FirstName" name="submit">
-   </form>
+			<form class="form-signin" method="post">
 
-  </div>
-  <div class="col-sm-3">
+				<h2 class="form-signin-heading">Update First Name</h2>
+				<input type="text" class="input-block-level"  name="fname" id="fname" placeholder="First Name">
+				<input type="submit" value="Submit FirstName" name="submit">
+			</form>
 
-  <form class="form-signin" method="post">
-   <h2 class="form-signin-heading">Update Last Name</h2>
-   <input type="text" class="input-block-level"  name="lname" id="lname" placeholder="Last Name">
-   <br>
-  <input type="submit" value="Submit LastName" name="submit">
-   </form>
+		</div>
+		<div class="col-sm-3">
 
-  </div>
-<div class="col-sm-3">
+			<form class="form-signin" method="post">
+				<h2 class="form-signin-heading">Update Last Name</h2>
+				<input type="text" class="input-block-level"  name="lname" id="lname" placeholder="Last Name">
+				<br>
+				<input type="submit" value="Submit LastName" name="submit">
+			</form>
 
-<form class="form-signin" method="post">
- <h2 class="form-signin-heading">Update Email</h2>
- <input type="text" class="input-block-level"  name="new_email" id="new_email" placeholder="New Email">
- <br>
-<input type="submit" value="Submit Email" name="submit">
- </form>
+		</div>
+		<div class="col-sm-3">
 
-</div>
+			<div class="col-sm-3">
 
- <div class="col-sm-3">
+				<form class="form-signin" method="post">
+					<h2 class="form-signin-heading">Update Password</h2>
+					<input type="password" class="input-block-level"  name="new_password" id="new_password" placeholder="New password">
+					<br>
+					<input type="password" class="input-block-level" name="confirm_password" id="confirm_password" placeholder="Confirm password">
+					<br>
+					<input type="submit" value="Submit Password" name="submit"></form>
 
-<form class="form-signin" method="post">
- <h2 class="form-signin-heading">Update Password</h2>
- <input type="password" class="input-block-level"  name="new_password" id="new_password" placeholder="New password">
- <br>
- <input type="password" class="input-block-level" name="confirm_password" id="confirm_password" placeholder="Confirm password">
- <br>
-<input type="submit" value="Submit Password" name="submit"></form>
+			</div>
 
-</div>
-
-</div>
+		</div>
 {% endblock %}
 {% block Teacher_Content %}
-<!-- Insert Teacher End Here -->
+	<!-- Insert Teacher End Here -->
+	<div>
+		<form class="form-signin" method="post">
+
+			<h2 class="form-signin-heading">Update First Name</h2>
+			<input type="text" class="input-block-level"  name="fname" id="fname" placeholder="First Name">
+			<input type="submit" value="Submit FirstName" name="submit">
+		</form>
+
+	</div>
+	<div class="col-sm-3">
+
+		<form class="form-signin" method="post">
+			<h2 class="form-signin-heading">Update Last Name</h2>
+			<input type="text" class="input-block-level"  name="lname" id="lname" placeholder="Last Name">
+			<br>
+			<input type="submit" value="Submit LastName" name="submit">
+		</form>
+
+	</div>
+	<div class="col-sm-3">
+
+		<form class="form-signin" method="post">
+			<h2 class="form-signin-heading">Update Email</h2>
+			<input type="text" class="input-block-level"  name="new_email" id="new_email" placeholder="New Email">
+			<br>
+			<input type="submit" value="Submit Email" name="submit">
+		</form>
+
+	</div>
+
+	<div class="col-sm-3">
+
+		<form class="form-signin" method="post">
+			<h2 class="form-signin-heading">Update Password</h2>
+			<input type="password" class="input-block-level"  name="new_password" id="new_password" placeholder="New password">
+			<br>
+			<input type="password" class="input-block-level" name="confirm_password" id="confirm_password" placeholder="Confirm password">
+			<br>
+			<input type="submit" value="Submit Password" name="submit"></form>
+	</div>
+
+	<br>
+	
+	<h1>Invite a Teacher</h1>
+	<form class="form-signin" method="post">
+		<input type="text" name="name" placeholder="Teacher's Name" />
+		<br>
+		<input type="text" name="email" placeholder="Teacher's Email" />
+		<br>
+		<input type="submit" name="submit" value="Send Invitation Email" />
+	</form>
 {% endblock %}

@@ -40,7 +40,8 @@ def createAssignment( assignName, classCode, dueDate, groupsAllowed, details ):
             'description':details,
             'reviewEnabled': False,
             'filesAssigned': 0,
-            'responses': [ ]
+            'pairs': [],
+            'responses': []
     })
 
 def getAssignments( classCode ):
@@ -53,9 +54,11 @@ def getAssignmentSubmissions (user, assignmentID):
     prevFiles=[]
     filess = accounts.getStudent(user)['files']
     if len(filess) == 0: return prevFiles
+
     try:
         prevFiles.append(files.getFile(user + '-' + assignmentID, user))
-        prevFiles = prevFiles[0]['file'].replace('\n', ' <br> ')
+        #print prevFiles
+        prevFiles = prevFiles[0]['file']#.replace('\n', ' <br> ')
         start = prevFiles.find("content:")
         prevFiles = prevFiles[start + 8:]
     except: pass
@@ -92,8 +95,71 @@ def teacherGetAssignments(assignments, assignmentID, status, email):
                 #print getAssignmentSubmissions(str(s['student']), assignmentID)
     return retL
 
-def assignGroupReviews(assignmentID, num):
+def assignRandomReviews(assignmentID, num):
     assigns = getAssignmentsByID(assignmentID)
     responses = teacherGetAssignments(assigns, assignmentID, 0, '')
-    peepsToReview = random.sample(responses, num)
-    return peepsToReview
+    randomStudents = random.sample(responses, len(responses))
+    pairs = []
+    for student in range(0, len(randomStudents), num):
+        pair = []
+        for pairNumber in range(0, num):
+            pair.append(randomStudents[student + pairNumber])
+        pairs.append(pair)
+    db.assignments.update(
+        { "assignmentID": assignmentID },
+        { "$set":
+          {
+              'pairs': pairs
+          }
+        })
+    return pairs
+
+#gets assigned code for a student with his email
+#returns [person assigned to, that person's code]
+def getAssignedCode(email, assignmentID):
+    assignment = db.assignments.find_one({
+        'assignmentID': assignmentID
+    })
+    if not(assignment['pairs']):
+        return ["", False]
+    else:
+        pairs = assignment['pairs']
+        for pair in pairs:
+            if (pair[0] == email):
+                print getAssignmentSubmissions(pair[1], assignmentID)
+                return [pair[1], getAssignmentSubmissions(pair[1], assignmentID)]
+            elif (pair[1] == email):
+                print getAssignmentSubmissions(pair[0], assignmentID)
+                return [pair[0], getAssignmentSubmissions(pair[0], assignmentID)]
+
+#submits a comment from a student
+def submitComment(comment, codeOwner, submitter, assignmentID):
+    db.assignments.update(
+        {
+            'assignmentID': assignmentID,
+            'responses.student': str(codeOwner)
+        },
+        {
+            '$push': {
+                "responses.$.comments": [str(submitter), comment]
+            }
+        }
+    )
+    #for response in assignment['responses']:
+    #    if response['student'] == codeOwner:
+    #        response['comments'].append([submitter, comment])
+
+#shows all comments for user submission of assignment
+#gives commenter if teacher
+def getComments(user, assignmentID, accountType):
+    assignment = db.assignments.find_one({ 'assignmentID': assignmentID })
+    comments = []
+    for response in assignment['responses']:
+        if response['student'] == user:
+            if accountType == "teacher":
+                return response['comments']
+            else:
+                for comment in response['comments']:
+                    #dont append names
+                    comments.append(comment[1])
+                return comments

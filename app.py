@@ -107,9 +107,7 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
         return True
     return False
 
-def registerTeacher(referrer, email, email1):
-    if email != email1:
-        return False
+def registerTeacher(referrer, email):
     #create verification link/profile link
     verificationLink = utils.getVerificationLink()
 
@@ -219,7 +217,7 @@ def verify(link):
     #print link
     #print accounts.getAccount(link)
     email = accounts.getAccount(link)[0]['email']
-    accounts.updateField(email, 'verified', True, True)
+    accounts.updateField(email, 'verified', True, True, "student")
     return redirect(url_for('home'))
 
 @app.route("/logout")
@@ -310,7 +308,7 @@ def createAnAssignment():
         if request.form:
             if 'assignmentName'and'classCode' and 'dueDate' and 'details' in request.form:
                 assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['dueDate'], True if 'groupsAllowed' in request.form else False, request.form['details'] )
-                return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assigment Created"))
+                return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assignment Created"))
         elif request.args:
             message = ""
             if message in request.args:
@@ -338,19 +336,25 @@ def createaGroup(code):
 
 
 
-@app.route("/profile", methods=["GET", "POST"])
+@app.route("/settings", methods=["GET", "POST"])
 def profile():
     if request.method=="POST":
-        if request.form['submit']=="Submit Email":
-            accounts.updateField(session['user'], 'email', request.form["new_email"],request.form["new_email"])
-        elif request.form['submit']=="Submit FirstName":
-            accounts.updateField(session['user'], 'profile', request.form["fname"], 'firstName')
+        formMessage = ""
+        if request.form['submit']=="Submit FirstName":
+            accounts.updateField(session['user'], 'profile', request.form["fname"], 'firstName', session['status'])
         elif request.form['submit']=="Submit LastName":
-            accounts.updateField(session['user'], 'profile', request.form["lname"],'lastName')
-
-        else:
-            accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"])
-    return render_template("profile.html", status = session['status'], verified=session['verified'])
+            accounts.updateField(session['user'], 'profile', request.form["lname"],'lastName', session['status'])
+        elif request.form['submit'] == "Submit Password":
+            accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"], session['status'])
+            formMessage = "Password updated."
+        #inviting a new teacher
+        elif request.form['submit'] == "Send Invitation Email" and session['status'] == "teacher":
+            if "email" in request.form:
+                registerTeacher(session['user'], request.form["email"])
+                formMessage = "Invitation sent."
+            else:
+                formMessage = "Please enter an email!"
+    return render_template("profile.html", status = session['status'], verified=session['verified'], message = formMessage)
 
 #just a placeholder, there's no groups.html rn
 @app.route("/groups", methods=["POST", "GET"])
@@ -373,35 +377,71 @@ def assignmentStudent(assignmentID, studentEmail):
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
             responses = assign.teacherGetAssignments(assignments, assignmentID, 1, studentEmail)
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False, comments = assign.getComments(studentEmail, assignmentID, session['status']))
         else:
-            pass
+            return redirect( url_for( "root", message = "You aren't allowed here." ))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
-
 
 @app.route("/assignment/<assignmentID>", methods=["GET", "POST"])
 def assignment(assignmentID):
     if 'user' in session:
-
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
             responses = assign.teacherGetAssignments(assignments, assignmentID, 0, '')
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=True)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, assigned = [],  link=True)
         else:
             if request.method=="POST":
                 upload_file(assignmentID)
             assignments='' #assign.getAssignmentsByID(assignmentID)
             prevFiles = assign.getAssignmentSubmissions(session['user'], assignmentID)
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID, session['status']))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
-@app.route("/assignment/<assignmentID>/enableReviews")
+@app.route("/assignment/<assignmentID>/enableReviews", methods = ["GET", "POST"])
 def enableReviews(assignmentID):
-    print assign.assignGroupReviews(assignmentID, 2)
+    return render_template("assignment.html", status = session['status'], verified =  session['verified'], assigned = assign.assignRandomReviews(assignmentID, 2))
 
+@app.route("/reviews")
+def viewStudentClasses():
+    return render_template("reviews.html", status = session['status'], verified = session['verified'], classes = classy.getStudentClasses(session['user']))
 
+@app.route("/reviews/class/<classCode>")
+def viewStudentClass(classCode):
+    if 'user' in session:
+        codetemp = classCode.split("-")
+        code = codetemp[0]
+        pd = codetemp[1]
+        theClass = classy.getClass(code)
+        peepsInfo = classy.getStudentsInYourClass(code, pd)
+        #print peepsInfo
+        peeps = peepsInfo['students']
+        return render_template("reviews.html", status = session['status'], verified = session['verified'], className = theClass['className'], assignments = assign.getAssignments(code))
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First"))
+
+@app.route("/reviews/assignment/<assignmentID>", methods=["GET", "POST"])
+def getAssignmentToReview(assignmentID):
+    if 'user' in session:
+        #here is the comments for the code
+        if request.form:
+            if "comments" in request.form:
+                assign.submitComment(request.form['comments'], assign.getAssignedCode(session['user'], assignmentID)[0], session['user'], assignmentID)
+                return render_template("reviews.html", message = "Your comment has been submitted.", status = session['status'], verified = session['verified'], classes = classy.getStudentClasses(session['user']))
+            else:
+                #we're not checking if its false bc it needs to
+                #be true for you to get to this page
+                assignedCode = assign.getAssignedCode(session['user'], assignmentID)[1]
+                return render_template("reviews.html", status = session['status'], verified = session['verified'], message = "Please write something for your comments!", codeToReview = assignedCode, codeSource = "Random Person's", assignment = assign.getAssignmentsByID(assignmentID)[0])
+        else:
+            assignedCode = assign.getAssignedCode(session['user'], assignmentID)[1]
+            if (assignedCode != False):
+                return render_template("reviews.html", status = session['status'], verified = session['verified'], codeToReview = assignedCode, codeSource = "Random Person's", assignment = assign.getAssignmentsByID(assignmentID)[0])
+            else:
+                return render_template("reviews.html", status = session['status'], verified = session['verified'], message = "You haven't been assigned any code to review for this assignment yet.")
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First"))
 
 #This is used by the until now not in use file upload functionallity
 def allowed_file(filename):

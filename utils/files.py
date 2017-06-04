@@ -42,7 +42,7 @@ def getFile(fileID, uploader):
     #if len(data) == 0:
 #        return ''
 #    data = data[0]
-    if data.fileType == "github":
+    if data.source == "github":
         return {
             'uploader': data.uploader,
             'link': data.link,
@@ -54,6 +54,6 @@ def getFile(fileID, uploader):
         return {
             'uploader': data.uploader,
             'assignment': data.assignment,
-            'file': data.read(),
+            'file': data.read().replace('\n', ' <br> '),
             'source': data.source
         }

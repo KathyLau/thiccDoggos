@@ -1,23 +1,23 @@
 {% extends "base.html" %}
 {% block Student_Content %}
-<center>
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-sm-2"></div>
-      <div class="col-sm-8">
+	<center>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8">
 
-        <form class="form-login" method="POST" action="/createGroup">
-          <h2 class="form-signin-heading">Group Information</h2>
-          <input type="text" class="input-block-level" name="groupName" id="groupName" placeholder="groupName">
-          <br><br>
-          <input type="submit" value="create" name="Create Group">
-        </form>
-      </div>
-      <div class="col-sm-2"></div>
-    </div>
-  </div>
-</center>
+					<form class="form-login" method="POST" action="/createGroup">
+						<h2 class="form-signin-heading">Group Information</h2>
+						<input type="text" class="input-block-level" name="groupName" id="groupName" placeholder="groupName">
+						<br><br>
+						<input type="submit" value="create" name="Create Group">
+					</form>
+				</div>
+				<div class="col-sm-2"></div>
+			</div>
+		</div>
+	</center>
 {% endblock %}
 {% block Teacher_Content %}
-<h1>You're in the wrong place, bud</h1>
+	<h1>You're in the wrong place, bud</h1>
 {% endblock %}
