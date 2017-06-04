@@ -32,6 +32,7 @@ def createAssignment( assignName, classCode, dueDate, groupsAllowed, details ):
             'class': classCode,
             'dueDate': dueDate,
             'description':details,
+            'pairs': [],
             'responses': [ ]
     })
 
@@ -94,24 +95,29 @@ def assignRandomReviews(assignmentID, num):
         for pairNumber in range(0, num):
             pair.append(randomStudents[student + pairNumber])
         pairs.append(pair)
-    db.assignments.update({"assignmentID":assignmentID},
-                          {
-                              'pairs': pairs
-                          })
+    db.assignments.update(
+        { "assignmentID": assignmentID },
+        { "$set":
+          {
+              'pairs': pairs
+          }
+        })
     return pairs
 
 #gets assigned code for a student with his email
 def getAssignedCode(email, assignmentID):
-    assignment = db.assignments.find({
+    assignment = db.assignments.find_one({
         'assignmentID': assignmentID
     })
-    if not('pairs' in assignment):
+    if not(assignment['pairs']):
         return False
     else:
         pairs = assignment['pairs']
         for pair in pairs:
             if (pair[0] == email):
+                print getAssignmentSubmissions(pair[1], assignmentID)
                 return getAssignmentSubmissions(pair[1], assignmentID)
-            elif (pair[1] == emai):
+            elif (pair[1] == email):
+                print getAssignmentSubmissions(pair[0], assignmentID)
                 return getAssignmentSubmissions(pair[0], assignmentID)
     

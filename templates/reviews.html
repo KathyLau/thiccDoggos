@@ -2,14 +2,17 @@
 
 {% block Title %}Reviews{% endblock %}
 {% block Student_Content %}
-	{% if your_classes %}
+	{% if message %}
+		{{ message }}
+	{% endif %}
+	{% if classes %}
 		<ul id="classList">
 			{% for class in classes %}
 				<li><a href="/reviews/class/{{class[0]}}"> {{class[1]}} - {{class[0]}}</a></li>
 			{% endfor %}
 		</ul>
 	{% endif %}
-	{% if class %}
+	{% if className %}
 		<h3>Assignments for {{ className }}</h3>
 		<ul>
 			{% for assignment in assignments %}
@@ -18,13 +21,17 @@
 		</ul>
 	{% endif %}
 	{% if assignment %}
+		<h1>{{ codeSource }} Code for Assignment {{ assignment['assignmentName'] }}</h1>
 		<div>
-			{{ codeToReview }}
+			{% if codeToReview %}
+				{{ codeToReview }}
+			{% endif %}
 		</div>
 		<br>
 		<form method="post">
-			<input type="text" value="Write your comments here!" name="comments">
-			<input type="submit" value="Upload File" name="submit">
+			<input type="text" value="Write your comments here!" name="comments" />
+			<br><br>
+			<input type="submit" value="Upload Comments" name="submit" />
 		</form>
 	{% endif %}
 {% endblock %}
