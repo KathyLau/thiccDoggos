@@ -31,10 +31,12 @@
 	{% for assignment in assignments %}
 		<h3>	Assignment: {{assignment['assignmentName']}} </h3>
 		Description: {{assignment['description']}} <br>
-		Due Date: {{assignment['dueDate']}}<br>
+		Upload Due Date: {{assignment['uploadDate']}}<br>
+        Review Enabled: {{assignment['reviewEnabled']}}<br>
+        Review Due Date: {{assignment['reviewDate']}}<br>
 	{% endfor %}
 	<br>
-	{% if responses%}
+	{% if responses %}
 		<h3> Submitted Code  </h3>
 		<div class="col-sm-1">  <a class="btn btn-default" href="/assignment/{{ID}}/enableReviews">Enable Random Pair Reviews</a></div>
 		<br><br>

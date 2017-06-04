@@ -55,7 +55,18 @@ def addToClass( code, studentEmail ):
     #code = classCode-period#
     codeList = code.split("-")
     classCode = codeList[0]
-    period = codeList[1]
+
+    #check to make sure they put a hyphen
+    try:
+        period = codeList[1]
+    except IndexError:
+        return "Missing the Period"
+    
+    #check if period is in the class
+    classs = db.classes.find_one({ 'code':classCode })
+    if period not in classs['periods'].keys():
+        return "Period not found for the Class"
+        
     db.classes.update(
         {'code': classCode },
         {'$push':
@@ -66,6 +77,7 @@ def addToClass( code, studentEmail ):
         {'$push':
          { 'classes': code }
         })
+    return True
 
 #get data of a class
 def getClass( code ):

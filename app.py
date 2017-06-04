@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from utils import utils, accounts, classy, groupy, assign, files
 from threading import Thread
 import os
+import datetime
 
 #connect to mongo
 #connection = MongoClient("localhost", 27017, connect = False)
@@ -232,7 +233,9 @@ def classes():
         if session['status'] == 'student':
             if request.method=="POST":
                 code = request.form["class_code"]
-                classy.addToClass(code, session['user'])
+                returnVal = classy.addToClass(code, session['user'])
+                if returnVal != True:
+                    return render_template("classes.html", status=session['status'], verified=session['verified'], your_classes = classy.getStudentClasses(session['user']), errorMessage=returnVal)
             your_classes = classy.getStudentClasses( session['user'] )
         elif session['status'] == 'teacher':
             your_classes = classy.getTeacherClasses( session['user'] )
@@ -307,13 +310,15 @@ def createAnAssignment():
             return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Assignment Creation Feature" ) )
         if request.form:
             if 'assignmentName'and'classCode' and 'dueDate' and 'details' in request.form:
-                assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['dueDate'], True if 'groupsAllowed' in request.form else False, request.form['details'] )
+                returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], True if 'groupsAllowed' in request.form else False, request.form['details'] )
+                if returnVal != True:
+                    return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.form['classCode'], message = "", errorMessage = returnVal, minDate = "%s-%s-%s"%(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day))
                 return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assignment Created"))
         elif request.args:
             message = ""
             if message in request.args:
                 message = request.args['message']
-            return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.args['classCode'], message = "")
+            return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.args['classCode'], message = message, minDate = "%s-%s-%s"%(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day))
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -393,7 +398,7 @@ def assignment(assignmentID):
         else:
             if request.method=="POST":
                 upload_file(assignmentID)
-            assignments='' #assign.getAssignmentsByID(assignmentID)
+            assignments= '' #assign.getAssignmentsByID(assignmentID)
             prevFiles = assign.getAssignmentSubmissions(session['user'], assignmentID)
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID, session['status']))
     else:

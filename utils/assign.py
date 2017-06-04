@@ -29,20 +29,37 @@ def enableReviews( assignID, filesAssigned ):
         {'$set':{'reviewEnabled': True, 'filesAssigned': int(filesAssigned) }}
     )
 
-def createAssignment( assignName, classCode, dueDate, groupsAllowed, details ):
+def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllowed, details ):
+    #check that dates are valid:
+    for date in [ uploadDate, reviewDate ]:
+        today = datetime.date.today()
+        
+        dateList = date.split("-")
+        submittedYear = int(dateList[0])
+        submittedMonth = int(dateList[1])
+        submittedDay = int(dateList[2])
+
+        submitted = datetime.date( submittedYear, submittedMonth, submittedDay )
+        #if it's not the currYear or later, automatically boot
+        if submitted < today:
+            return "InvalidDate"
+                
     db.assignments.insert_one(
         {
             'assignmentID':createAssignmentCode(),
             'assignmentName': assignName,
             'groupsAllowed': groupsAllowed,
             'class': classCode,
-            'dueDate': dueDate,
+            'uploadDate': uploadDate,
+            'reviewDate': reviewDate,
             'description':details,
             'reviewEnabled': False,
             'filesAssigned': 0,
             'pairs': [],
             'responses': []
     })
+    #Successful completion
+    return True 
 
 def getAssignments( classCode ):
     return [assignment for assignment in db.assignments.find( {'class':classCode } )]
