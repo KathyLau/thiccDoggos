@@ -3,7 +3,7 @@
 {% block Title %}Reviews{% endblock %}
 {% block Student_Content %}
 	{% if message %}
-		{{ message }}
+		<h1>{{ message }}</h1>
 	{% endif %}
 	{% if classes %}
 		<ul id="classList">
@@ -24,7 +24,7 @@
 		<h1>{{ codeSource }} Code for Assignment {{ assignment['assignmentName'] }}</h1>
 		<div>
 			{% if codeToReview %}
-				{{ codeToReview }}
+				<div>{{ codeToReview }}</div>
 			{% endif %}
 		</div>
 		<br>

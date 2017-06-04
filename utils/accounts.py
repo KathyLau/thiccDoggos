@@ -157,33 +157,60 @@ def addStudentFile(email, filename):
     })
 
 #update specified field of email account logged into
-def updateField(email, field, newInfo, confirmInfo):
+def updateField(email, field, newInfo, confirmInfo, accountType):
     if field=='password':
         if newInfo != confirmInfo:
             return False
         else:
             newInfo = hash(newInfo)
-    check = getStudent(email)
-    if check:
-        if field != 'profile':
-            db.students.update(
-            { 'email': email },
-            { '$set': { field: newInfo } }
-        )
-        else:
-            fname = check['profile']['firstName']
-            lname = check['profile']['lastName']
-            if confirmInfo =="firstName":
+    if accountType == "student":
+        check = getStudent(email)
+        if check:
+            if field != 'profile':
                 db.students.update(
-            { 'email': email },
-            { '$set': { field: {'lastName': lname, 'firstName': newInfo}
-            }}
-        )
+                    { 'email': email },
+                    { '$set': { field: newInfo } }
+                )
             else:
-                db.students.update(
-            { 'email': email },
-            { '$set': { field: {'lastName': newInfo, 'firstName': fname}
-            }}
-        )
-        return True
-    return False
+                fname = check['profile']['firstName']
+                lname = check['profile']['lastName']
+                if confirmInfo =="firstName":
+                    db.students.update(
+                        { 'email': email },
+                        { '$set': { field: {'lastName': lname, 'firstName': newInfo}
+                        }}
+                    )
+                else:
+                    db.students.update(
+                        { 'email': email },
+                        { '$set': { field: {'lastName': newInfo, 'firstName': fname}
+                        }}
+                    )
+                    return True
+                return False
+    else:
+        check = getTeacher(email)
+        if check:
+            if field != 'profile':
+                db.teachers.update(
+                    { 'email': email },
+                    { '$set': { field: newInfo } }
+                )
+            else:
+                fname = check['profile']['firstName']
+                lname = check['profile']['lastName']
+                if confirmInfo =="firstName":
+                    db.teachers.update(
+                        { 'email': email },
+                        { '$set': { field: {'lastName': lname, 'firstName': newInfo}
+                        }}
+                    )
+                else:
+                    db.teachers.update(
+                        { 'email': email },
+                        { '$set': { field: {'lastName': newInfo, 'firstName': fname}
+                        }}
+                    )
+                    return True
+                return False
+            

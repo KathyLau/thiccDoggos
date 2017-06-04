@@ -107,9 +107,7 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
         return True
     return False
 
-def registerTeacher(referrer, email, email1):
-    if email != email1:
-        return False
+def registerTeacher(referrer, email):
     #create verification link/profile link
     verificationLink = utils.getVerificationLink()
 
@@ -338,19 +336,25 @@ def createaGroup(code):
 
 
 
-@app.route("/profile", methods=["GET", "POST"])
+@app.route("/settings", methods=["GET", "POST"])
 def profile():
     if request.method=="POST":
-        if request.form['submit']=="Submit Email":
-            accounts.updateField(session['user'], 'email', request.form["new_email"],request.form["new_email"])
-        elif request.form['submit']=="Submit FirstName":
-            accounts.updateField(session['user'], 'profile', request.form["fname"], 'firstName')
+        formMessage = ""
+        if request.form['submit']=="Submit FirstName":
+            accounts.updateField(session['user'], 'profile', request.form["fname"], 'firstName', session['status'])
         elif request.form['submit']=="Submit LastName":
-            accounts.updateField(session['user'], 'profile', request.form["lname"],'lastName')
-
-        else:
-            accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"])
-    return render_template("profile.html", status = session['status'], verified=session['verified'])
+            accounts.updateField(session['user'], 'profile', request.form["lname"],'lastName', session['status'])
+        elif request.form['submit'] == "Submit Password":
+            accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"], session['status'])
+            formMessage = "Password updated."
+        #inviting a new teacher
+        elif request.form['submit'] == "Send Invitation Email" and session['status'] == "teacher":
+            if "email" in request.form:
+                registerTeacher(session['user'], request.form["email"])
+                formMessage = "Invitation sent."
+            else:
+                formMessage = "Please enter an email!"
+    return render_template("profile.html", status = session['status'], verified=session['verified'], message = formMessage)
 
 #just a placeholder, there's no groups.html rn
 @app.route("/groups", methods=["POST", "GET"])
@@ -367,22 +371,21 @@ def groups():
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
-# @app.route("/assignment/<assignmentID>/<studentEmail>", methods=["GET", "POST"])
-# def assignmentStudent(assignmentID, studentEmail):
-#     if 'user' in session:
-#         if session['status'] == 'teacher':
-#             assignments = assign.getAssignmentsByID(assignmentID)
-#             responses = assign.teacherGetAssignments(assignments, assignmentID, 1, studentEmail)
-#             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False)
-#         else:
-#             pass
-#     else:
-#         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
+@app.route("/assignment/<assignmentID>/<studentEmail>", methods=["GET", "POST"])
+def assignmentStudent(assignmentID, studentEmail):
+    if 'user' in session:
+        if session['status'] == 'teacher':
+            assignments = assign.getAssignmentsByID(assignmentID)
+            responses = assign.teacherGetAssignments(assignments, assignmentID, 1, studentEmail)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False, comments = assign.getComments(studentEmail, assignmentID))
+        else:
+            return redirect( url_for( "root", message = "You aren't allowed here." ))
+    else:
+        return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
 @app.route("/assignment/<assignmentID>", methods=["GET", "POST"])
 def assignment(assignmentID):
     if 'user' in session:
-
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
             responses = assign.teacherGetAssignments(assignments, assignmentID, 0, '')
