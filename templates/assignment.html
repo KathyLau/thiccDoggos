@@ -4,65 +4,60 @@
 
 {% block Student_Content %}
 
-<div class="container">
-	<div class="row">
-		<div class="col-sm-6">
-			<form method="post" enctype="multipart/form-data"> ...
-				<input type="file" name="file" id="file"> <br><br>
-				<input type="submit" value="Upload File" name="submit">
-			</form>
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-6">
+				<form method="post" enctype="multipart/form-data"> ...
+					<input type="file" name="file" id="file"> <br><br>
+					<input type="submit" value="Upload File" name="submit">
+				</form>
+			</div>
+			<div class="col-sm-6">
+				{{link | safe}}
+			</div>
 		</div>
-		<div class="col-sm-6">
-{{link | safe}}
-		</div>
+		{% if comments %}
+			<br>
+			<h1>Comments</h1>
+			{% for comment in comments %}
+				<p>{{ comment }}</p>
+			{% endfor %}
+		{% endif %}
 	</div>
-	{% if comments %}
-		<br>
-		<h1>Comments</h1>
-		{% for comment in comments %}
-			<p>{{ comment }}</p>
-		{% endfor %}
-	{% endif %}
-</div>
 {% endblock %}
 
 {% block Teacher_Content %}
 
 	{% for assignment in assignments %}
-<h3>	Assignment: {{assignment['assignmentName']}} </h3>
+		<h3>	Assignment: {{assignment['assignmentName']}} </h3>
 		Description: {{assignment['description']}} <br>
 		Due Date: {{assignment['dueDate']}}<br>
 	{% endfor %}
-<br>
-<h3> Submitted Code  </h3>
-<div class="col-sm-1">  <a class="btn btn-default" href="/assignment/{{ID}}/enableReviews">Enable Random Pair Reviews</a></div>
-<br><br>
-{% for r in responses %}
-<div class="container">
-    <div class="header"><span>
-			{% if link %}
-			<a href="/assignment/{{ID}}/{{r}}"> {{r | safe}}</a>
-			{% else %}
-			{{r | safe}}
-			{% endif %}
-			</span>
-    </div>
+	<br>
+	{% if responses%}
+		<h3> Submitted Code  </h3>
+		<div class="col-sm-1">  <a class="btn btn-default" href="/assignment/{{ID}}/enableReviews">Enable Random Pair Reviews</a></div>
+		<br><br>
+		{% for r in responses %}
+			<div class="container">
+				<div class="header"><span>
+					{% if link %}
+						<a href="/assignment/{{ID}}/{{r}}"> {{r | safe}}</a>
+					{% else %}
+						{{r | safe}}
+					{% endif %}
+				</span>
+				</div>
 
-</div>
-<br>
-{% if comments %}
-	<h1>Comments on this Submission</h1>
-	{% for comment in comments %}
-		<p>{{ comment[0] }}: {{ comment[1] }}</p>
-	{% endfor %}
-{% endif %}
-{% endfor %}
-
-{% if assigned %}
-	<h1>Paired Together Randomly</h1>
-	{% for studentPair in assigned %}
-		<p>{{ studentPair[0] }}, {{ studentPair[1] }}</p>
-	{% endfor %}
-{% endif %}
+			</div>
+			<br>
+		{% endfor %}
+	{% endif %}
+	{% if assigned %}
+		<h1>Paired Together Randomly</h1>
+		{% for studentPair in assigned %}
+			<p>{{ studentPair[0] }}, {{ studentPair[1] }}</p>
+		{% endfor %}
+	{% endif %}
 
 {% endblock %}
