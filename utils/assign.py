@@ -46,9 +46,11 @@ def getAssignmentSubmissions (user, assignmentID):
     prevFiles=[]
     filess = accounts.getStudent(user)['files']
     if len(filess) == 0: return prevFiles
+
     try:
         prevFiles.append(files.getFile(user + '-' + assignmentID, user))
-        prevFiles = prevFiles[0]['file'].replace('\n', ' <br> ')
+        #print prevFiles
+        prevFiles = prevFiles[0]['file']#.replace('\n', ' <br> ')
         start = prevFiles.find("content:")
         prevFiles = prevFiles[start + 8:]
     except: pass
@@ -121,7 +123,7 @@ def getAssignedCode(email, assignmentID):
             elif (pair[1] == email):
                 print getAssignmentSubmissions(pair[0], assignmentID)
                 return [pair[0], getAssignmentSubmissions(pair[0], assignmentID)]
-    
+
 #submits a comment from a student
 def submitComment(comment, codeOwner, submitter, assignmentID):
     db.assignments.update(
