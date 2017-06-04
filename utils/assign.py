@@ -105,19 +105,48 @@ def assignRandomReviews(assignmentID, num):
     return pairs
 
 #gets assigned code for a student with his email
+#returns [person assigned to, that person's code]
 def getAssignedCode(email, assignmentID):
     assignment = db.assignments.find_one({
         'assignmentID': assignmentID
     })
     if not(assignment['pairs']):
-        return False
+        return ["", False]
     else:
         pairs = assignment['pairs']
         for pair in pairs:
             if (pair[0] == email):
                 print getAssignmentSubmissions(pair[1], assignmentID)
-                return getAssignmentSubmissions(pair[1], assignmentID)
+                return [pair[1], getAssignmentSubmissions(pair[1], assignmentID)]
             elif (pair[1] == email):
                 print getAssignmentSubmissions(pair[0], assignmentID)
-                return getAssignmentSubmissions(pair[0], assignmentID)
+                return [pair[0], getAssignmentSubmissions(pair[0], assignmentID)]
     
+#submits a comment from a student
+def submitComment(comment, codeOwner, submitter, assignmentID):
+    db.assignments.update(
+        {
+            'assignmentID': assignmentID,
+            'responses.student': str(codeOwner)
+        },
+        {
+            '$push': {
+                "responses.$.comments": [str(submitter), comment]
+            }
+        }
+    )
+    #for response in assignment['responses']:
+    #    if response['student'] == codeOwner:
+    #        response['comments'].append([submitter, comment])
+
+#shows all comments for user submission of assignment
+def getComments(user, assignmentID):
+    assignment = db.assignments.find_one({ 'assignmentID': assignmentID })
+    comments = []
+    for response in assignment['responses']:
+        if response['student'] == user:
+            for comment in response['comments']:
+                #dont append names
+                comments.append(comment[1])
+            break
+    return comments

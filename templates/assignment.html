@@ -16,6 +16,13 @@
 {{link | safe}}
 		</div>
 	</div>
+	{% if comments %}
+		<br>
+		<h1>Comments</h1>
+		{% for comment in comments %}
+			<p>{{ comment }}</p>
+		{% endfor %}
+	{% endif %}
 </div>
 {% endblock %}
 

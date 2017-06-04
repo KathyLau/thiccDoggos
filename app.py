@@ -310,7 +310,7 @@ def createAnAssignment():
         if request.form:
             if 'assignmentName'and'classCode' and 'dueDate' and 'details' in request.form:
                 assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['dueDate'], True if 'groupsAllowed' in request.form else False, request.form['details'] )
-                return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assigment Created"))
+                return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assignment Created"))
         elif request.args:
             message = ""
             if message in request.args:
@@ -392,7 +392,7 @@ def assignment(assignmentID):
                 upload_file(assignmentID)
             assignments='' #assign.getAssignmentsByID(assignmentID)
             prevFiles = assign.getAssignmentSubmissions(session['user'], assignmentID)
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
@@ -418,21 +418,21 @@ def viewStudentClass(classCode):
     else:
         return redirect( url_for( "root", message = "Please Sign In First"))
 
-@app.route("/reviews/assignment/<assignmentID>")
-def getAssigmentToReview(assignmentID):
+@app.route("/reviews/assignment/<assignmentID>", methods=["GET", "POST"])
+def getAssignmentToReview(assignmentID):
     if 'user' in session:
         #here is the comments for the code
         if request.form:
             if "comments" in request.form:
-                #do something with comments to code here
-                return render_template("home.html", message = "DO SOMETHING FOR VIEW CODE PLZ YA TY LOVE REACC")
+                assign.submitComment(request.form['comments'], assign.getAssignedCode(session['user'], assignmentID)[0], session['user'], assignmentID)
+                return render_template("reviews.html", message = "Your comment has been submitted.", status = session['status'], verified = session['verified'], classes = classy.getStudentClasses(session['user']))
             else:
                 #we're not checking if its false bc it needs to
                 #be true for you to get to this page
-                assignedCode = assign.getAssignedCode(session['user'], assignmentID)
+                assignedCode = assign.getAssignedCode(session['user'], assignmentID)[1]
                 return render_template("reviews.html", status = session['status'], verified = session['verified'], message = "Please write something for your comments!", codeToReview = assignedCode, codeSource = "Random Person's", assignment = assign.getAssignmentsByID(assignmentID)[0])
         else:
-            assignedCode = assign.getAssignedCode(session['user'], assignmentID)
+            assignedCode = assign.getAssignedCode(session['user'], assignmentID)[1]
             if (assignedCode != False):
                 return render_template("reviews.html", status = session['status'], verified = session['verified'], codeToReview = assignedCode, codeSource = "Random Person's", assignment = assign.getAssignmentsByID(assignmentID)[0])
             else:
