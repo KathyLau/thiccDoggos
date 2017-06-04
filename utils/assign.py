@@ -23,6 +23,12 @@ def createAssignmentCode():
     else:
         return code
 
+def enableReviews( assignID, filesAssigned ):
+    db.assignments.update(
+        {'assignmentID': assignID },
+        {'$set':{'reviewEnabled': True, 'filesAssigned': int(filesAssigned) }}
+    )
+
 def createAssignment( assignName, classCode, dueDate, groupsAllowed, details ):
     db.assignments.insert_one(
         {
@@ -32,6 +38,8 @@ def createAssignment( assignName, classCode, dueDate, groupsAllowed, details ):
             'class': classCode,
             'dueDate': dueDate,
             'description':details,
+            'reviewEnabled': False,
+            'filesAssigned': 0,
             'responses': [ ]
     })
 

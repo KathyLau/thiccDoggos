@@ -13,8 +13,8 @@ classes = db['classes']
 #how a user uploads a file
 #takes name of uploader, assignment, and file OBJECT
 #type = upload
-def uploadFile(upload, uploaderName, assignmentName):
-    fileID = fs.put(upload, uploader = uploaderName, assignment = assignmentName, filename = uploaderName + '-' + assignmentName, source = "upload")
+def uploadFile(upload, uploaderName, assignmentID):
+    fileID = fs.put(upload, uploader = uploaderName, assignment = assignmentID, filename = uploaderName + '-' + assignmentID, source = "upload")
     return fileID
 
 def parseGithubLink(link):
@@ -23,7 +23,7 @@ def parseGithubLink(link):
 
 #upload file from github link
 #type = github
-def uploadFileFromGithub(uploaderName, assignmentName, githubUsername, repository, fileName):
+def uploadFileFromGithub(uploaderName, assignmentID, githubUsername, repository, fileName):
     response = urllib2.urlopen('https://raw.githubusercontent.com/{0}/{1}/master/{2}'.format(githubUsername, repository, fileName))
     responseString = response.read()
     fileID = fs.put(responseString, filename = fileName, uploader = uploaderName, assignment = assignmentName, source = "github")
