@@ -52,8 +52,8 @@
 <br>
 {% if comments %}
 	<h1>Comments on this Submission</h1>
-	{% for commment in comments %}
-		<p>{{ comment }}</p>
+	{% for comment in comments %}
+		<p>{{ comment[0] }}: {{ comment[1] }}</p>
 	{% endfor %}
 {% endif %}
 {% endfor %}

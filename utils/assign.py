@@ -140,13 +140,16 @@ def submitComment(comment, codeOwner, submitter, assignmentID):
     #        response['comments'].append([submitter, comment])
 
 #shows all comments for user submission of assignment
-def getComments(user, assignmentID):
+#gives commenter if teacher
+def getComments(user, assignmentID, accountType):
     assignment = db.assignments.find_one({ 'assignmentID': assignmentID })
     comments = []
     for response in assignment['responses']:
         if response['student'] == user:
-            for comment in response['comments']:
-                #dont append names
-                comments.append(comment[1])
-            break
-    return comments
+            if accountType == "teacher":
+                return response['comments']
+            else:
+                for comment in response['comments']:
+                    #dont append names
+                    comments.append(comment[1])
+                return comments

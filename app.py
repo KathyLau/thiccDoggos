@@ -217,7 +217,7 @@ def verify(link):
     #print link
     #print accounts.getAccount(link)
     email = accounts.getAccount(link)[0]['email']
-    accounts.updateField(email, 'verified', True, True)
+    accounts.updateField(email, 'verified', True, True, "student")
     return redirect(url_for('home'))
 
 @app.route("/logout")
@@ -377,7 +377,7 @@ def assignmentStudent(assignmentID, studentEmail):
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
             responses = assign.teacherGetAssignments(assignments, assignmentID, 1, studentEmail)
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False, comments = assign.getComments(studentEmail, assignmentID))
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False, comments = assign.getComments(studentEmail, assignmentID, session['status']))
         else:
             return redirect( url_for( "root", message = "You aren't allowed here." ))
     else:
@@ -395,7 +395,7 @@ def assignment(assignmentID):
                 upload_file(assignmentID)
             assignments='' #assign.getAssignmentsByID(assignmentID)
             prevFiles = assign.getAssignmentSubmissions(session['user'], assignmentID)
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID))
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID, session['status']))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
