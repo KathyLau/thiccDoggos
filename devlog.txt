@@ -79,3 +79,5 @@ student and teachers can now see the files uploaded in text format displayed nic
 
 kathyL -- 2017-05-28 5:00 PM
 fixed bug that let newest file be shown from upload
+kevinZ --2017-06-04 11:14 PM
+made a lot of minor QoL changes.
