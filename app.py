@@ -286,7 +286,7 @@ def viewClass(classCode):
             theClass = classy.getClass(code)
             peepsInfo = classy.getStudentsInYourClass(code, pd)
             #print peepsInfo
-            peeps = peepsInfo['students']
+            peeps = [ accounts.getStudentName(email)['firstName'] + " " + accounts.getStudentName(email)['lastName'] for email in peepsInfo['students'] ]
             return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, peeps=peeps, message=message,  assignments=assign.getAssignments(code))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
@@ -344,22 +344,23 @@ def createaGroup(code):
 @app.route("/settings", methods=["GET", "POST"])
 def profile():
     if request.method=="POST":
-        formMessage = ""
+        message = ""
         if request.form['submit']=="Submit FirstName":
             accounts.updateField(session['user'], 'profile', request.form["fname"], 'firstName', session['status'])
         elif request.form['submit']=="Submit LastName":
             accounts.updateField(session['user'], 'profile', request.form["lname"],'lastName', session['status'])
         elif request.form['submit'] == "Submit Password":
             accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"], session['status'])
-            formMessage = "Password updated."
+            message = "Password updated."
         #inviting a new teacher
         elif request.form['submit'] == "Send Invitation Email" and session['status'] == "teacher":
             if "email" in request.form:
                 registerTeacher(session['user'], request.form["email"])
-                formMessage = "Invitation sent."
+                message = "Invitation sent."
             else:
-                formMessage = "Please enter an email!"
-    return render_template("profile.html", status = session['status'], verified=session['verified'], message = formMessage)
+                message = "Please enter an email!"
+        return render_template("profile.html", status = session['status'], verified=session['verified'], errorMessage = message )
+    return render_template("profile.html", status = session['status'], verified=session['verified'] )
 
 #just a placeholder, there's no groups.html rn
 @app.route("/groups", methods=["POST", "GET"])
@@ -388,13 +389,20 @@ def assignmentStudent(assignmentID, studentEmail):
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
+@app.route("/deleteAssignment/<assignmentID>")
+def deleteAssignment(assignmentID):
+    if 'user' in session:
+        if session['status'] == 'teacher':
+            assign.deleteAssignment(assignmentID)
+    return redirect(url_for("classes"))
+
 @app.route("/assignment/<assignmentID>", methods=["GET", "POST"])
 def assignment(assignmentID):
     if 'user' in session:
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
             responses = assign.teacherGetAssignments(assignments, assignmentID, 0, '')
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, assigned = [],  link=True)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, onTime=responses['onTime'], late=responses['late'], assigned = [],  link=True)
         else:
             if request.method=="POST":
                 upload_file(assignmentID)

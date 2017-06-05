@@ -61,6 +61,9 @@ def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllow
     #Successful completion
     return True 
 
+def deleteAssignment( assignmentID ):
+    db.assignments.delete_one({'assignmentID': assignmentID} )
+
 def getAssignments( classCode ):
     return [assignment for assignment in db.assignments.find( {'class':classCode } )]
 
@@ -96,18 +99,32 @@ def submitAssignment(email, assignmentID):
 # 0 - get only students who submitted a file
 # 1 - get the students with the files
 def teacherGetAssignments(assignments, assignmentID, status, email):
-    responses=[]
     retL = []
     if len(assignments)>0:
-        students = assignments[0]['responses']
-        for s in students:
-            if str(s['student']) not in responses:  responses.append(str(s['student']) )
-        if status == 0: return responses
+        responses = assignments[0]['responses']
+        if status == 0:
+            returnVal = { }
+            onTimeSubmissions = [ ]
+            lateSubmissions = [ ]
+            uploadDueDateList = assignments[0]['uploadDate'].split("-")
+            uploadDueDate = datetime.date(int(uploadDueDateList[0]), int(uploadDueDateList[1]), int(uploadDueDateList[2]))
+            for response in responses:
+               timestamp = response['timestamp']
+               timeList = timestamp.split(" ")[0].split("-")
+               submittedDate = datetime.date(int(timeList[0]), int(timeList[1]), int(timeList[2]))
+               studentProfile = accounts.getStudentName( response['student'] )
+               studentName = "%s, %s"%(studentProfile['lastName'], studentProfile['firstName'])
+               if submittedDate < uploadDueDate:
+                   onTimeSubmissions.append( {'student': studentName, 'email': response['student'] } )
+               else:
+                   lateSubmissions.append( {'student': studentName, 'email': response['student'] } )
+            return {'onTime': onTimeSubmissions, 'late': lateSubmissions }
         elif status == 1:
-            for s in responses:
-                if s==email:
+            responses = assignments[0]['responses']
+            for responses in responses:
+                if response['student']==email:
                     try:
-                        retL.append(getAssignmentSubmissions(str(s),assignmentID))
+                        retL.append(getAssignmentSubmissions(str(response['student']),assignmentID))
                     except: pass
                 #print getAssignmentSubmissions(str(s['student']), assignmentID)
     return retL

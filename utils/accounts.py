@@ -55,6 +55,11 @@ def getStudent(email):
         )
 
 
+#gets the name of the student given an email
+def getStudentName( email ):
+    profile = db.students.find_one({'email': email})['profile']
+    return profile
+
 
 #finds account from email which is psuedo id since it's unique
 def getAccount(link):

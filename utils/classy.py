@@ -122,8 +122,6 @@ def getStudentsInYourClass(code, pd):
         return periods
     return periods[pd]
 
-
-
 #teachers can disband classes
 def disbandClass( code ):
     Class = db.classes.find(
