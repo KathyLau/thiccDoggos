@@ -2,54 +2,54 @@
 
 {% block Title %}Profile{% endblock %}
 {% block Student_Content %}
-<!-- Insert Student End Here -->
-<center>
-<div class="row">
-  <div class="col-sm-2"> </div>
-  <div class="col-sm-8">
-    <form class="form-signin" method="post"> <h3>Join a Class</h3>
-       <input type="text" name="class_code" id="class_code" placeholder="Class Code"> <br>
-       <input type="submit" value="submit" name="submit">
-     </form>
-   </div>
-   <div class="col-sm-2"> </div>
-</div>
-<br>
-<div class="row">
-  <div class="col-sm-2"> </div>
-  <div class="col-sm-8">
-  <h3>  Your Classes</h3>
+	<!-- Insert Student End Here -->
+	<center>
+		<div class="row">
+			<div class="col-sm-2"> </div>
+			<div class="col-sm-8">
+				<form class="form-signin" method="post"> <h3>Join a Class</h3>
+					<input type="text" name="class_code" id="class_code" placeholder="Class Code"> <br>
+					<input type="submit" value="submit" name="submit">
+				</form>
+			</div>
+			<div class="col-sm-2"> </div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-sm-2"> </div>
+			<div class="col-sm-8">
+				<h3>  Your Classes</h3>
 
-    {% for class in your_classes %}
-<a href="/class/{{class[0]}}">   {{class[0] | safe}} </a>- {{class[1] | safe}} - {{class[2] | safe}} <br>
-    {% endfor %}
-   </div>
-   <div class="col-sm-2"> </div>
-</div>
+				{% for class in your_classes %}
+					<a href="/class/{{class[0]}}">   {{class[0] | safe}} </a>- {{class[1] | safe}} - {{class[2] | safe}} <br>
+				{% endfor %}
+			</div>
+			<div class="col-sm-2"> </div>
+		</div>
 {% endblock %}
 
 {% block Teacher_Content %}
-<center>
-  <h3>Your Classes</h3>
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-2"></div>
-      <div class="col-sm-8">
-        <ul id="classList">
-          {% for class in your_classes %}
-          <li><a href="/class/{{class[0]}}"> {{class[1]}} - {{class[0]}}</li>
-          {% endfor %}
-      </div>
-      <div class="col-sm-2"></div>
-    </div>
-    <div class="row">
-      <div class="col-sm-2"></div>
-      <div class="col-sm-8">
-        <hr>
-        <a class="button" href="/createClass">Create a Class</a>
-      </div>
-      <div class="col-sm-2"></div>
-    </div>
-  </div>
-</center>
+	<center>
+		<h3>Your Classes</h3>
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8">
+					<ul id="classList">
+						{% for class in your_classes %}
+							<li><a href="/class/{{class[0]}}"> {{class[1]}} - {{class[0]}}</li>
+						{% endfor %}
+				</div>
+				<div class="col-sm-2"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8">
+					<hr>
+					<a class="button" href="/createClass">Create a Class</a>
+				</div>
+				<div class="col-sm-2"></div>
+			</div>
+		</div>
+	</center>
 {% endblock %}
