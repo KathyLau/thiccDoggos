@@ -29,6 +29,7 @@ def adminCreation():
             'classes':[],
             'groups':[],
             'files':{},
+            'assigned':{},
             'profile':{
                 'firstName':'Student',
                 'lastName':'%s'%(i+1)

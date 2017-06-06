@@ -23,6 +23,9 @@ kathyL -- 2017-05-20 1:29 PM
 fixed some email issues for login/register
 added navbar
 
+celineY -- 2017-05-20 2:00 PM
+updated navbar
+
 kathyL -- 2017-05-20 3:04 PM
 used bootstrap to design html files for profile and classes
 
@@ -30,7 +33,7 @@ kathyL -- 2017-05-11 11:33 AM
 added update fields fxns , styled homepage,
 
 kevinZ -- 2017-05-21 9:12 PM
-made some progress on classes. also, fuck jinja
+made some progress on classes. also, f**k jinja
 
 kathyL -- 2017-05-21 11:13 PM
 made interaction of adding and joining classes between students and teacher work
@@ -42,6 +45,9 @@ added page for groups for classes
 kathyL -- 2017-05-22 12:31 PM
 make create Group and join group pages
 
+celineY -- 2017-05-22 2:30 PM
+styled login and logout
+
 kevinZ -- 2017-05-22 10:05 PM
 bug fixes for smoother login and logout procedure
 
@@ -49,16 +55,22 @@ kevinZ -- 2017-05-22 10:50 PM
 changed db name and added files for reseting and adding admin accounts to database.
 
 kathyL -- 2017-05-23 10:07 AM
-fixed email verificationl link
+fixed email verification link
 
 kevinZ -- 2017-05-24 8:28 PM
-modified classes to match new class details (ie, they now have periods ))
+modified classes to match new class details (ie, they now have periods))
+
+celineY -- 2017-05-24 9:00 PM
+rewrote and discussed new format of site
 
 kevinZ -- 2017-05-24 10:11 PM
 worked on class.html and some backend to go with it
 
 kevinZ -- 2017-05-24 10:39 PM
 finished up on class.html ish.... still gotta do the rest of it
+
+aymanA -- 2017-05-24 11:14 PM
+worked on frontend and basic css for class.html
 
 kathyL -- 2017-05-25 12:34 AM
 worked on displaying students to teachers by periods
@@ -67,17 +79,39 @@ also displays students in a student's class on class page
 kevinZ -- 2017-05-25 10:54 PM
 completed assignment creation on the teacher end. Not sure how the assignment page will look like, so holding off from that from now
 
+celineY -- 017-05-25 11:55 PM
+designed mockup of assignment page
+
 kathyL -- 2017-05-26 12:19 AM
 added assignment routes for teachers and students and updated file name storage
 
 kathyL -- 2017-05-27 5:13 PM
 implemented gridFS file storing
 student can now see file uploaded on the right side of assignment/code page
+*** STARTED ON TOFR'S REC GIFT ***
 
 kathyL -- 2017-05-28 2:15 PM
 student and teachers can now see the files uploaded in text format displayed nicely
 
 kathyL -- 2017-05-28 5:00 PM
 fixed bug that let newest file be shown from upload
-kevinZ --2017-06-04 11:14 PM
+
+aymanA -- 2017-06-03 11:14 PM
+started on code review
+
+kevinZ -- 2017-06-04 11:14 PM
 made a lot of minor QoL changes.
+
+celineY -- 2017-06-05 5:28 PM
+started groups
+
+kathyL -- 2017-05-27 11:20 AM
+*** FINISHED TOFR'S REC GIFT ***
+
+aymanA -- 2017-06-06 12:12 AM
+created functions for showing errors while running code
+
+kevinZ -- 2017-06-06 12:30 AM
+fixing and updating code review
+
+

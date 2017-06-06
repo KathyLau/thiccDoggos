@@ -115,6 +115,8 @@ def addStudent( email, password, firstName, lastName, verificationLink ):
             'classes': [],
             #these are assignmentID:fileID key-value pairs
             'files': {},
+            #these are assignmentID:[studentEmails] key-value pairs
+            'assigned':{},
             'profile': {
                 'firstName': firstName,
                 'lastName': lastName
