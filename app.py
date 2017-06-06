@@ -385,7 +385,8 @@ def assignmentStudent(assignmentID, studentEmail):
         if session['status'] == 'teacher':
             assignmentName = assign.getAssignmentsByID(assignmentID)[0]['assignmentName']
             response = assign.teacherGetResponse(studentEmail, assignmentID)
-            return render_template("assignmentInner.html", status = session['status'], verified=session['verified'], studentName=response[0], submissionDate=response[1], assignmentName=assignmentName, response= response[2], link=False, comments = assign.getComments(studentEmail, assignmentID, session['status']))
+            assignedTo = assign.getAssignedTo(assignmentID, studentEmail)
+            return render_template("assignmentInner.html", status = session['status'], verified=session['verified'], studentName=response[0], submissionDate=response[1], assignmentName=assignmentName, response= response[2], link=False, comments = assign.getComments(studentEmail, assignmentID, session['status']), assignedTo = assignedTo )
         else:
             return redirect( url_for( "root", message = "You aren't allowed here." ))
     else:
@@ -404,7 +405,8 @@ def assignment(assignmentID):
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
             responses = assign.teacherGetAssignments(assignments, assignmentID, 0, '')
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, onTime=responses['onTime'], late=responses['late'], assigned = [],  link=True)
+            reviews = assign.teacherGetReviews(assignmentID)
+            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, onTime=responses['onTime'], late=responses['late'], link=True, codeReview = assign.getCodeReviewStatus(assignmentID), reviewed = reviews['reviewed'], unreviewed = reviews['unreviewed'] )
         else:
             if request.method=="POST":
                 upload_file(assignmentID)
