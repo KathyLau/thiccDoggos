@@ -24,14 +24,6 @@ h3 {
 	font-size: 26px;
 }
 
-.navbar > container-fluid > a {
-	
-}
-
-.navbar > container-fluid > a:hover {
-	
-}
-
 .navbar-brand {
 	font-family: 'Source Sans Pro', sans-serif;
 	font-size: 25px;
@@ -54,6 +46,10 @@ h3 {
 
 .navbar-brand > span {
 	font-weight: 700;
+}
+
+#sidenav-overlay {
+	display: none;
 }
 
 .account {
