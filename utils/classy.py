@@ -79,6 +79,11 @@ def addToClass( code, studentEmail ):
         })
     return True
 
+#remove from class
+def leaveClass(code, email):
+    
+    pass
+
 #get data of a class
 def getClass( code ):
     return db.classes.find_one(
@@ -104,6 +109,8 @@ def getStudentClasses( email ):
             classinfo = db.classes.find_one( {'code': code } )
         #print classinfo
             classes.append([str(classinfo['code'] + '-' + pd), str(classinfo['className']),str(classinfo['teacher']) ])
+    print "\n\n\n"
+    print classes
     return classes
 
 def getTeacherClasses( email ):
@@ -113,6 +120,8 @@ def getTeacherClasses( email ):
     for code in classCodes:
         classinfo = list(db.classes.find({'code':code}))[0]
         classes.append([str(classinfo['code']), str(classinfo['className'])])
+    print "\n\n\n"
+    print classes
     return classes
 
 #0 is for teachers to get all pds

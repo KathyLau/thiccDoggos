@@ -4,62 +4,105 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>CodeReview</title>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<title>StuyCS Code Review</title>
+		<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		
+		<link href="https://fonts.googleapis.com/css?family=Roboto:400,700|Source+Sans+Pro" rel="stylesheet">
+		<link href="static/css/font-awesome.min.css">
+		  <!-- Compiled and minified CSS -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+		
+		<!-- Compiled and minified JavaScript -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+		
+		<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
 		<link rel="stylesheet" type="text/css" href="static/css/styles.css">
 
 	</head>
 	<body>
-		<nav class="navbar navbar-inverse">
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<a class="navbar-brand" href="#">CodeReview</a>
+		<div class="navbar-fixed">
+			<nav>
+				<div class="nav-wrapper teal darken-4">
+					<a class="navbar-brand" style="display: block"><span>StuyCS</span> Code Review</a>
+					<ul class="right hide-on-med-and-down">
+						
+					</ul>
 				</div>
-			</div>
+			</nav>
+		</div>
+        
+		<nav class="navbar navbar-inverse">
 		</nav>
 
-		
-		<div class="panel-body">
-			<div class="row">
-				<div class="col-sm-2"></div>
-				<div class="col-sm-8">
-					<center><h3>{{message}}</h3></center>
-				</div>
-				<div class="col-sm-2"></div>
+		<br>
+
+		{% if message %}
+			<h3>{{message}}</h3>
+		{% endif %}
+			
+		<div class="account">
+			<div class="switcher row">
+				<div class="col s6"><a id="login-button" onclick="swap('login')" class="waves-effect waves-light btn grey switcher-active">Login</a></div>
+				<div class="col s6"><a id="signup-button" onclick="swap('signup')" class="waves-effect waves-light btn grey">Register</a></div>
 			</div>
-			<div class="row">
-				<div class="col-sm-2"></div>
-				<div class="col-sm-4">
-					
-					<form class="form-login" method="post">
-						<h2 class="form-signin-heading">Sign Up</h2>
-						<input type="text" class="input-block-level"  name="email" id="email" placeholder="email">
-						<br><br>
-						<input type="password" class="input-block-level" name="pwd" id="pwd" placeholder="password">
-						<br><br>
-						<input type="password" class="input-block-level" name="pwd2" id="pwd2" placeholder="confirm password">
-						<br><br>
-						<input type="submit" value="signup" name="submit">
-					</form>
+			
+			<div class="login" id="login">
+				<form class="form-login" method="post">
+					<h1 class="form-heading">Log In to Your Account</h1>
+					<div class="input-field">
+						<input type="text" class="form-text" name="email" id="email" />
+						<label for="email">Email</label>
+					</div>
+					<br>
+					<div class="input-field">
+						<input type="password" class="form-text" name="pwd" id="pwd" />
+						<label for="pwd">Password</label>
+					</div>
+					<br>
+					<button class="btn waves-effect waves-light teal darken-3" type="submit" value="login" name="submit">Login</button>
+				</form>
+			</div>
 
-				</div>
-
-				<div class="col-sm-4">
-
-					<form class="form-login" method="post">
-						<h2 class="form-signin-heading">Log In</h2>
-						<input type="text" class="input-block-level"  name="email" id="email" placeholder="email">
-						<br><br>
-						<input type="password" class="input-block-level" name="pwd" id="pwd" placeholder="password">
-						<br><br>
-						<input type="submit" value="login" name="submit"></form>
-
-				</div>
-
-				<div class="col-sm-2"></div>
+			<div class="signup" id="signup">
+				<form class="cover-form" method="post">
+					<h1 class="form-heading">Register for an Account</h1>
+					<div class="input-field">
+						<input type="text" class="form-text" name="email" id="email" />
+						<label for="email">Email</label>
+					</div>
+					<br>
+					<div class="input-field">
+						<input type="password" class="form-text" name="pwd" id="pwd" />
+						<label for="pwd">Password</label>
+					</div>
+					<br>
+					<div class="input-field">
+						<input type="password" class="form-text" name="pwd2" id="pwd2" />
+						<label for="pwd2">Confirm Password</label>
+					</div>
+					<br>
+					<button class="btn waves-effect waves-light teal darken-3" type="submit" value="signup" name="submit">Register</button>
+				</form>
 			</div>
 		</div>
+
+		<script type="text/javascript">
+		 var swap = function(current) {
+			 if (current == "signup") {
+				 $("#login").css("display", "none");
+				 $("#login-button").removeClass("switcher-active");
+				 $("#signup").css("display", "block");
+				 $("#signup-button").addClass("switcher-active");
+			 }
+			 else if (current == "login") {
+				 $("#signup").css("display", "none");
+				 $("#signup-button").removeClass("switcher-active");
+				 $("#login").css("display", "block");
+				 $("#login-button").addClass("switcher-active");
+			 }
+		 }
+		</script>
+		
 	</body>
 </html>
