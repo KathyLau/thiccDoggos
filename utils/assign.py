@@ -23,12 +23,15 @@ def createAssignmentCode():
     else:
         return code
 
-def enableReviews( assignID, filesAssigned ):
+def enableReviews( assignmentID, filesAssigned ):
     db.assignments.update(
-        {'assignmentID': assignID },
+        {'assignmentID': assignmentID },
         {'$set':{'reviewEnabled': True, 'filesAssigned': int(filesAssigned) }}
     )
 
+def getCodeReviewStatus(assignmentID):
+    return db.assignments.find_one({'assignmentID':assignmentID})['reviewEnabled']
+    
 def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllowed, details ):
     #check that dates are valid:
     for date in [ uploadDate, reviewDate ]:
@@ -69,22 +72,6 @@ def getAssignments( classCode ):
 def getAssignmentsByID( ID ):
     return [assignment for assignment in db.assignments.find( {'assignmentID': ID } )]
 
-'''Outdated Version
-def getAssignmentSubmissions (user, assignmentID):
-    prevFiles=[]
-    filess = accounts.getStudent(user)['files']
-    if len(filess) == 0: return prevFiles
-
-    try:
-        prevFiles.append(files.getFile(user + '-' + assignmentID, user))
-        #print prevFiles
-        prevFiles = prevFiles[0]['file']#.replace('\n', ' <br> ')
-        start = prevFiles.find("content:")
-        prevFiles = prevFiles[start + 8:]
-    except: pass
-    return prevFiles
-'''
-
 def getAssignmentSubmission(user, assignmentID ):
     try:
         fileID = db.students.find_one( {'email': user} )['files'][assignmentID]
@@ -101,15 +88,14 @@ def submitAssignment(email, assignmentID):
         db.assignments.update({'assignmentID':assignmentID,
                                'responses.student':email},
                               {'$push':
-                               {'responses.$.comments':['Administrator','File updated, %s'%(datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))]}}
-        )
+                               {'responses.$.comments':{'submitter':'Administrator','comment':'File updated, %s'%(datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')), 'timestamp': datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')} }} )
     else:
         db.assignments.update({"assignmentID":assignmentID},
                               {"$push":
                                {"responses":
                                 {'student': email,
                                  'timestamp': datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'),
-                                 'comments':[] # comments by other students in [classmate: comment] format
+                                 'comments':[] # comments by other students in { submitter, comment, timestamp } format
                                 }}})
 
 
@@ -135,70 +121,62 @@ def teacherGetAssignments(assignments, assignmentID, status, email):
                 timeList = timestamp.split(" ")[0].split("-")
                 submittedDate = datetime.date(int(timeList[0]), int(timeList[1]), int(timeList[2]))
                 studentProfile = accounts.getStudentName( response['student'] )
-                studentName = "%s, %s"%(studentProfile['lastName'], studentProfile['firstName'])
+                studentName = "%s %s"%(studentProfile['firstName'], studentProfile['lastName'])
                 if submittedDate < uploadDueDate:
                     onTimeSubmissions.append( {'student': studentName, 'email': response['student'] } )
                 else:
                     lateSubmissions.append( {'student': studentName, 'email': response['student'] } )
             return {'onTime': onTimeSubmissions, 'late': lateSubmissions }
-'''#Old Code
-def assignRandomReviews(assignmentID, num):
-    assigns = getAssignmentsByID(assignmentID)
-    responses = teacherGetAssignments(assigns, assignmentID, 0, '')
-    randomStudents = random.sample(responses, len(responses))
-    pairs = []
-    for student in range(0, len(randomStudents), num):
-        pair = []
-        for pairNumber in range(0, num):
-            pair.append(randomStudents[student + pairNumber])
-            pairs.append(pair)
-            db.assignments.update(
-                { "assignmentID": assignmentID },
-                { "$set":
-                  {
-                      'pairs': pairs
-                  }
-                })
-    return pairs
-'''
+
+#returns two lists ( in a dictionary )
+#reviewed: code that has been reviewed
+#unreviewed: code that hasn't been reviewed
+def teacherGetReviews(assignmentID):
+    assignment = db.assignments.find_one({'assignmentID':assignmentID})
+    responses = assignment['responses']
+    filesAssigned = ['filesAssigned']
+    reviewed = [ ]
+    unreviewed = [ ]
+    for response in responses:
+        #identify unique commentators (excluding Administrator )
+        count = 0
+        counted = [] 
+        for comment in response['comments']:
+            if comment['submitter'] != 'Administrator' and comment['submitter'] not in counted:
+                count += 1
+                counted.append( comment['submitter'] )
+
+        studentProfile = accounts.getStudentName( response['student'] )
+        studentName = "%s %s"%(studentProfile['firstName'], studentProfile['lastName'])
+        #if not enough reviews, put in unreviewed
+        if count < filesAssigned:
+            unreviewed.append( {'student': studentName, 'email': response['student']})
+        else:
+            reviewed.append( {'student': studentName, 'email': response['student']})
+    return {'reviewed': reviewed, 'unreviewed': unreviewed }
+    
+
+#get all the students assigned to a student's file
+def getAssignedTo(assignmentID, student):
+    return [ student['email'] for student in db.students.find({'assigned.%s'%(assignmentID): student }) ]
 
 #Num is the number of files each student has to review
 def assignRandomReviews(assignmentID, num):
     students = [ response['student'] for response in db.assignments.find_one({'assignmentID':assignmentID})['responses'] ]
-    for student in students:
+    for studentIndex in range(len(students)):
+        student = students[studentIndex]
         #before loopy stuff, make sure that it's possible
         if len(students) > num:
-            rnd = random.sample(students, num)
-            while( student in rnd):
-                rnd = random.sample(students, num)
+            list = [ ]
+            for i in range(num):
+                list.append( students[(studentIndex + i + 1)% len( students ) ] )
             db.students.update({'email':student},
                                {'$set':
-                                {'assigned.%s'%(assignmentID): rnd }
+                                {'assigned.%s'%(assignmentID): list }
                                })
         else:
             #Do the next one down
             assignRandomReviews(assignmentID, num-1)
-
-'''#Old Code
-#gets assigned code for a student with his email
-#returns [person assigned to, that person's code]
-def getAssignedCode(email, assignmentID):
-    assignment = db.assignments.find_one({
-        'assignmentID': assignmentID
-    })
-    if not(assignment['pairs']):
-        return ["", False]
-    else:
-        pairs = assignment['pairs']
-        for pair in pairs:
-            if (pair[0] == email):
-                print getAssignmentSubmission(pair[1], assignmentID)
-                return [pair[1], getAssignmentSubmission(pair[1], assignmentID)]
-            elif (pair[1] == email):
-                print getAssignmentSubmission(pair[0], assignmentID)
-                return [pair[0], getAssignmentSubmission(pair[0], assignmentID)]
-
-'''
 
 #Returns a list of [studentEmail, actualCode] that the student has to review
 def getAssignedCodes(email, assignmentID):
@@ -215,7 +193,7 @@ def submitComment(comment, codeOwner, submitter, assignmentID):
         },
         {
             '$push': {
-                "responses.$.comments": [str(submitter), comment]
+                "responses.$.comments": {'submitter':str(submitter), 'comment': comment, 'timestamp': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}
             }
         }
     )
@@ -231,16 +209,10 @@ def submitComment(comment, codeOwner, submitter, assignmentID):
     #        response['comments'].append([submitter, comment])
 
 #shows all comments for user submission of assignment
-#gives commenter if teacher
 def getComments(user, assignmentID, accountType):
     assignment = db.assignments.find_one({ 'assignmentID': assignmentID })
     comments = []
     for response in assignment['responses']:
-        if response['student'] == user:
-            if accountType == "teacher":
-                return response['comments']
-            else:
-                for comment in response['comments']:
-                    #dont append names
-                    comments.append(comment[1])
-                return comments
+        for comment in response['comments']:
+            comments.append(comment)
+    return comments

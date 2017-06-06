@@ -7,6 +7,7 @@
     <h3>Assignment {{assignmentName}}</h3>
     Student Name: {{studentName}}<br>
     Submitted Time: {{submissionDate}}<br>
+    Assigned To For Code Review: {% for assigned in assignedTo %} {{assigned}} {% endfor %}<br >
     <br>
     <div style="border:2px solid black; padding: 10px">
       {{response | safe}}
@@ -15,8 +16,8 @@
     <br>
     <h1>Comments</h1>
     {% for comment in comments %}
-    <h4>{{ comment[0] }}</h4><br>
-    <p>{{ comment[1] }}</p>
+    <h4>{{ comment['submitter'] }}</h4><p style="font-size:8px; color: gray">{{ comment['timestamp'] }}</p><br>
+    <p>{{ comment['comment'] }}</p>
     {% endfor %}
     {% endif %}
   </div>

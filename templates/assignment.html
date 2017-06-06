@@ -29,7 +29,7 @@
   <br>
   <h1>Comments</h1>
   {% for comment in comments %}
-  <p>{{ comment }}</p>
+  <p>{{ comment['comment'] }}</p>
   {% endfor %}
   {% endif %}
 </div>
@@ -46,28 +46,42 @@ Review Due Date: {{assignment['reviewDate']}}<br>
 {% endfor %}
 <a class="btn btn-default" href="/deleteAssignment/{{ID}}">Delete Assignment</a>
 <br>
+{% if codeReview == False %}
 <a class="btn btn-default" href="/enableReviews/{{ID}}">Enable Random Pair Reviews</a>
+{% endif %}
 <br>
 {% if onTime or late %}
 
 <div class="col-sm-3">
-  <h5>Submitted On Time</h5>
+  <h5>Uploaded On Time</h5>
   {% for response in onTime %}
   <a href="/assignment/{{ID}}/{{response['email']}}">{{response['student']}}</a>
   {% endfor %}
 </div>
 
 <div class="col-sm-3">
-  <h5>Submitted Late</h5>
+  <h5>Uploaded Late</h5>
   {% for response in late %}
   <a href="/assignment/{{ID}}/{{response['email']}}">{{response['student']}}</a>
   {% endfor %}
 </div>
 {% endif %}
-{% if assigned %}
-<h1>Paired Together Randomly</h1>
-{% for studentPair in assigned %}
-<p>{{ studentPair[0] }}, {{ studentPair[1] }}</p>
-{% endfor %}
+{% if codeReview == True %}
+{% if reviewed or unreviewed %}
+<div class="col-sm-3">
+  <h5>Completely Reviewed</h5>
+  {% for response in reviewed %}
+  <a href="/assignment/{{ID}}/{{response['email']}}">{{response['student']}}</a>
+  {% endfor %}
+</div>
+
+<div class="col-sm-3">
+  <h5>Incomplete Reviews</h5>
+  {% for response in unreviewed %}
+  <a href="/assignment/{{ID}}/{{response['email']}}">{{response['student']}}</a>
+  {% endfor %}
+</div>
+
+{% endif %}
 {% endif %}
 {% endblock %}
