@@ -381,9 +381,9 @@ def groups():
 def assignmentStudent(assignmentID, studentEmail):
     if 'user' in session:
         if session['status'] == 'teacher':
-            assignments = assign.getAssignmentsByID(assignmentID)
-            responses = assign.teacherGetAssignments(assignments, assignmentID, 1, studentEmail)
-            return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, ID=assignmentID, responses=responses, link=False, comments = assign.getComments(studentEmail, assignmentID, session['status']))
+            assignmentName = assign.getAssignmentsByID(assignmentID)[0]['assignmentName']
+            response = assign.teacherGetResponse(studentEmail, assignmentID)
+            return render_template("assignmentInner.html", status = session['status'], verified=session['verified'], studentName=response[0], submissionDate=response[1], assignmentName=assignmentName, response= response[2], link=False, comments = assign.getComments(studentEmail, assignmentID, session['status']))
         else:
             return redirect( url_for( "root", message = "You aren't allowed here." ))
     else:
@@ -407,7 +407,7 @@ def assignment(assignmentID):
             if request.method=="POST":
                 upload_file(assignmentID)
             assignments= '' #assign.getAssignmentsByID(assignmentID)
-            prevFiles = assign.getAssignmentSubmissions(session['user'], assignmentID)
+            prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID, session['status']))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
@@ -478,8 +478,8 @@ def upload_file(ID):
         buffer.append("Content-type: %s" % file.content_type)
         buffer.append("File content: %s" % file.stream.read())
         upload = '|'.join(buffer)
-        newID = files.uploadFile(upload, session['user'], ID)
-        accounts.addStudentFile(session['user'], ID)
+        fileID = files.uploadFile(upload, session['user'], ID)
+        accounts.addStudentFile(session['user'], ID, fileID)
         assign.submitAssignment(session['user'], ID)
         return redirect(url_for('assignment', assignmentID=ID))
     else:
