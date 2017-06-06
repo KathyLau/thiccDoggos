@@ -95,3 +95,17 @@ h3 {
 	width: 50%;
 }
 
+.class-fab {
+	position: fixed;
+	right: 2.5%;
+	bottom: 5%;
+}
+
+.class-join {
+	width: 75%;
+	margin: 0 auto;
+}
+
+option {
+	z-index: 9999;
+}

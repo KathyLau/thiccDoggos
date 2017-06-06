@@ -2,22 +2,48 @@
 
 {% block Title %}Profile{% endblock %}
 {% block Student_Content %}
+	<script>
+	 $(document).ready(function() {
+		 $('select').material_select();
+	 });
+	</script>
+	
 	<!-- Insert Student End Here -->
 	<center>
-		<div class="row">
-			<div class="col-sm-2"> </div>
-			<div class="col-sm-8">
-				<form class="form-signin" method="post"> <h3>Join a Class</h3>
-					<input type="text" name="class_code" id="class_code" placeholder="Class Code"> <br>
-					<input type="submit" value="submit" name="submit">
+		<a class="btn-floating btn-large waves-effect waves-light teal darken-4 class-fab" href="#join"><i class="fa fa-plus"></i></a>
+		
+		<div class="modal" id="join">
+			<div class="modal-content">
+				<h3>Join a Class</h3>
+				<br>
+				<form class="form-join" method="post">
+					<div class="input-field class-join">
+						<input type="text" name="code" id="class_code">
+						<label for="code">Class Code</label>
+					</div>
+					<br>
+					<div class="input-field class-join">
+						<select name="period">
+							<option value="1">Period 1</option>
+							<option value="2">Period 2</option>
+							<option value="3">Period 3</option>
+							<option value="4">Period 4</option>
+							<option value="5">Period 5</option>
+							<option value="6">Period 6</option>
+							<option value="7">Period 7</option>
+							<option value="8">Period 8</option>
+							<option value="9">Period 9</option>
+							<option value="10">Period 10</option>
+						</select>
+						<label>Select a Period</label>
+					</div>
+					<br>
+					<button class="btn waves-effect waves-light teal darken-3" type="submit" class="" value="submit" name="submit">Join</button>
 				</form>
 			</div>
-			<div class="col-sm-2"> </div>
 		</div>
-		<br>
-		<div class="row">
-			<div class="col-sm-2"> </div>
-			<div class="col-sm-8">
+
+			
 				<h3>  Your Classes</h3>
 
 				{% for class in your_classes %}
@@ -26,27 +52,31 @@
 			</div>
 			<div class="col-sm-2"> </div>
 		</div>
+		
+<script>
+  $(document).ready(function() {
+      // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+      $('.modal').modal({
+		  dismissible: true, // Modal can be dismissed by clicking outside
+		  opacity: .5, // Opacity of modal background
+		  inDuration: 300, // Transition in duration
+		  outDuration: 200, // Transition out duration
+		  startingTop: '4%', // Starting top style attribute
+		  endingTop: '10%', // Ending top style attribute 
+	  });
+  });
+</script>
+
 {% endblock %}
 
 {% block Teacher_Content %}
 	<center>
-		<h1>Your Classes</h1>
-		
+		<h1>Your Classes</h1>	
 		<div class="collection class-list">
 		{% for class in your_classes %}
 			<a class="collection-item" href="/class/{{class[0]}}">{{class[1]}}</a>
 		{% endfor %}
 		</div>
-				<div class="col-sm-2"></div>
-			</div>
-			<div class="row">
-				<div class="col-sm-2"></div>
-				<div class="col-sm-8">
-					<hr>
-					<a class="button" href="/createClass">Create a Class</a>
-				</div>
-				<div class="col-sm-2"></div>
-			</div>
-		</div>
+		<a class="btn-floating btn-large waves-effect waves-light teal darken-4 class-fab" href="/createClass"><i class="fa fa-plus"></i></a>
 	</center>
 {% endblock %}

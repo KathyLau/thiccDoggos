@@ -234,8 +234,9 @@ def classes():
     if 'user' in session:
         if session['status'] == 'student':
             if request.method=="POST":
-                code = request.form["class_code"]
-                returnVal = classy.addToClass(code, session['user'])
+                code = request.form["code"]
+                period = request.form["period"]
+                returnVal = classy.addToClass(code + "-" + period, session['user'])
                 if returnVal != True:
                     return render_template("classes.html", status=session['status'], verified=session['verified'], your_classes = classy.getStudentClasses(session['user']), errorMessage=returnVal)
             your_classes = classy.getStudentClasses( session['user'] )
