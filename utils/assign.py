@@ -55,7 +55,6 @@ def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllow
             'description':details,
             'reviewEnabled': False,
             'filesAssigned': 0,
-            'pairs': [],
             'responses': []
         })
     #Successful completion
@@ -142,7 +141,7 @@ def teacherGetAssignments(assignments, assignmentID, status, email):
                 else:
                     lateSubmissions.append( {'student': studentName, 'email': response['student'] } )
             return {'onTime': onTimeSubmissions, 'late': lateSubmissions }
-
+'''#Old Code
 def assignRandomReviews(assignmentID, num):
     assigns = getAssignmentsByID(assignmentID)
     responses = teacherGetAssignments(assigns, assignmentID, 0, '')
@@ -161,7 +160,26 @@ def assignRandomReviews(assignmentID, num):
                   }
                 })
     return pairs
+'''
 
+#Num is the number of files each student has to review
+def assignRandomReviews(assignmentID, num):
+    students = [ response['student'] for response in db.assignments.find_one({'assignmentID':assignmentID})['responses'] ]
+    for student in students:
+        #before loopy stuff, make sure that it's possible
+        if len(students) > num:
+            rnd = random.sample(students, num)
+            while( student in rnd):
+                rnd = random.sample(students, num)
+            db.students.update({'email':student},
+                               {'$set':
+                                {'assigned.%s'%(assignmentID): rnd }
+                               })
+        else:
+            #Do the next one down
+            assignRandomReviews(assignmentID, num-1)
+
+'''#Old Code
 #gets assigned code for a student with his email
 #returns [person assigned to, that person's code]
 def getAssignedCode(email, assignmentID):
@@ -180,6 +198,14 @@ def getAssignedCode(email, assignmentID):
                 print getAssignmentSubmissions(pair[0], assignmentID)
                 return [pair[0], getAssignmentSubmissions(pair[0], assignmentID)]
 
+'''
+
+#Returns a list of [studentEmail, actualCode] that the student has to review
+def getAssignedCodes(email, assignmentID):
+    list = db.students.find_one({"email":email})['assigned'][assignmentID]
+    return [ [student, getAssignmentSubmission(student, assignmentID) ] for student in list ]
+
+
 #submits a comment from a student
 def submitComment(comment, codeOwner, submitter, assignmentID):
     db.assignments.update(
@@ -193,6 +219,13 @@ def submitComment(comment, codeOwner, submitter, assignmentID):
             }
         }
     )
+    #once they finished an assignment, they don't have to do it again
+    db.students.update(
+        {'email': submitter},
+        {'$pull':
+         {'assigned.%s'%(assignmentID):codeOwner}}
+    )
+    
     #for response in assignment['responses']:
     #    if response['student'] == codeOwner:
     #        response['comments'].append([submitter, comment])

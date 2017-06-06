@@ -412,10 +412,12 @@ def assignment(assignmentID):
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
 
-@app.route("/assignment/<assignmentID>/enableReviews", methods = ["GET", "POST"])
+@app.route("/enableReviews/<assignmentID>", methods = ["GET", "POST"])
 def enableReviews(assignmentID):
-    return render_template("assignment.html", status = session['status'], verified =  session['verified'], assigned = assign.assignRandomReviews(assignmentID, 2))
-
+    assign.enableReviews(assignmentID, 2)
+    assign.assignRandomReviews(assignmentID, 2)
+    return redirect(url_for("assignment", assignmentID = assignmentID))
+    
 @app.route("/reviews")
 def viewStudentClasses():
     return render_template("reviews.html", status = session['status'], verified = session['verified'], classes = classy.getStudentClasses(session['user']))
@@ -440,19 +442,14 @@ def getAssignmentToReview(assignmentID):
         #here is the comments for the code
         if request.form:
             if "comments" in request.form:
-                assign.submitComment(request.form['comments'], assign.getAssignedCode(session['user'], assignmentID)[0], session['user'], assignmentID)
-                return render_template("reviews.html", message = "Your comment has been submitted.", status = session['status'], verified = session['verified'], classes = classy.getStudentClasses(session['user']))
-            else:
-                #we're not checking if its false bc it needs to
-                #be true for you to get to this page
-                assignedCode = assign.getAssignedCode(session['user'], assignmentID)[1]
-                return render_template("reviews.html", status = session['status'], verified = session['verified'], message = "Please write something for your comments!", codeToReview = assignedCode, codeSource = "Random Person's", assignment = assign.getAssignmentsByID(assignmentID)[0])
+                assign.submitComment(request.form['comments'], request.form['owner'], session['user'], assignmentID)
+                return render_template("reviews.html", errorMessage = "Your comment has been submitted.", status = session['status'], verified = session['verified'], classes = classy.getStudentClasses(session['user']))
+
+        assignedCodes = assign.getAssignedCodes(session['user'], assignmentID)
+        if (assignedCodes != []):
+            return render_template("reviews.html", status = session['status'], verified = session['verified'], codeToReview = assignedCodes, codeSource = "Random Person's", assignment = assign.getAssignmentsByID(assignmentID)[0])
         else:
-            assignedCode = assign.getAssignedCode(session['user'], assignmentID)[1]
-            if (assignedCode != False):
-                return render_template("reviews.html", status = session['status'], verified = session['verified'], codeToReview = assignedCode, codeSource = "Random Person's", assignment = assign.getAssignmentsByID(assignmentID)[0])
-            else:
-                return render_template("reviews.html", status = session['status'], verified = session['verified'], message = "You haven't been assigned any code to review for this assignment yet.")
+            return render_template("reviews.html", status = session['status'], verified = session['verified'], message = "You haven't been assigned any code to review for this assignment yet.")
     else:
         return redirect( url_for( "root", message = "Please Sign In First"))
 
