@@ -87,10 +87,13 @@ def getAssignmentSubmissions (user, assignmentID):
 '''
 
 def getAssignmentSubmission(user, assignmentID ):
-    fileID = db.students.find_one( {'email': user} )['files'][assignmentID]
-    file =  files.getFile(fileID, user)['file']
-    start = file.find("content:")
-    return file[start+8:]
+    try:
+        fileID = db.students.find_one( {'email': user} )['files'][assignmentID]
+        file =  files.getFile(fileID, user)['file']
+        start = file.find("content:")
+        return file[start+8:]
+    except:
+        pass
 
 def submitAssignment(email, assignmentID):
     ts = time.time()
