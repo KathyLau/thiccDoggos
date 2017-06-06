@@ -30,16 +30,13 @@
 
 {% block Teacher_Content %}
 	<center>
-		<h3>Your Classes</h3>
-		<div class="container">
-			<div class="row">
-				<div class="col-sm-2"></div>
-				<div class="col-sm-8">
-					<ul id="classList">
-						{% for class in your_classes %}
-							<li><a href="/class/{{class[0]}}"> {{class[1]}} - {{class[0]}}</li>
-						{% endfor %}
-				</div>
+		<h1>Your Classes</h1>
+		
+		<div class="collection class-list">
+		{% for class in your_classes %}
+			<a class="collection-item" href="/class/{{class[0]}}">{{class[1]}}</a>
+		{% endfor %}
+		</div>
 				<div class="col-sm-2"></div>
 			</div>
 			<div class="row">
