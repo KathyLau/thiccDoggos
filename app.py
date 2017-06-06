@@ -152,10 +152,11 @@ def root():
                 del session['user']
                 return render_template("index.html", message = "Account error. Please try logging in again.")
     else:
+        print request.form
         #User is Not Logged In
         # FOR STUDENTS
         if request.form:
-            if request.form["submit"]=="Login":
+            if request.form["submit"]=="login":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
                 check = accounts.confirmStudent(email, pwd)
@@ -199,7 +200,7 @@ def root():
                 pwd = request.form["pwd"]
                 pwd2 = request.form["pwd2"]
                 registerStudent(email, email, '', '',pwd, pwd2)
-                return render_template("index.html", message = "Signed up ! ")
+                return render_template("index.html", message = "Signed up!")
         else:
             if 'message' in request.args:
                 return render_template("index.html", message = request.args['message'])
