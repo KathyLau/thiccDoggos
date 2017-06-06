@@ -298,7 +298,7 @@ def viewClass(classCode):
 def leaveClass(code):
     classy.leaveClass(code, session['user'])
     return redirect(url_for("classes"), message = "You have left the class.")
-    
+
 @app.route("/changeClassName", methods=['POST'])
 def changeClassName():
     if request.form:
@@ -318,7 +318,7 @@ def createAnAssignment():
             return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Assignment Creation Feature" ) )
         if request.form:
             if 'assignmentName'and'classCode' and 'dueDate' and 'details' in request.form:
-                returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], True if request.form['groupsAllowed']=='true' else False, request.form['details'] )
+                returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], True if 'groupsAllowed' in request.form else False, request.form['details'] )
                 if returnVal != True:
                     return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.form['classCode'], message = "", errorMessage = returnVal, minDate = "%s-%s-%s"%(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day))
                 return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assignment Created"))
@@ -428,7 +428,7 @@ def enableReviews(assignmentID):
     assign.enableReviews(assignmentID, 2)
     assign.assignRandomReviews(assignmentID, 2)
     return redirect(url_for("assignment", assignmentID = assignmentID))
-    
+
 @app.route("/reviews")
 def viewStudentClasses():
     return render_template("reviews.html", status = session['status'], verified = session['verified'], classes = classy.getStudentClasses(session['user']))

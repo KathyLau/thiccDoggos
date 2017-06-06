@@ -31,7 +31,7 @@ def enableReviews( assignmentID, filesAssigned ):
 
 def getCodeReviewStatus(assignmentID):
     return db.assignments.find_one({'assignmentID':assignmentID})['reviewEnabled']
-    
+
 def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllowed, details ):
     #check that dates are valid:
     for date in [ uploadDate, reviewDate ]:
@@ -140,7 +140,7 @@ def teacherGetReviews(assignmentID):
     for response in responses:
         #identify unique commentators (excluding Administrator )
         count = 0
-        counted = [] 
+        counted = []
         for comment in response['comments']:
             if comment['submitter'] != 'Administrator' and comment['submitter'] not in counted:
                 count += 1
@@ -154,7 +154,7 @@ def teacherGetReviews(assignmentID):
         else:
             reviewed.append( {'student': studentName, 'email': response['student']})
     return {'reviewed': reviewed, 'unreviewed': unreviewed }
-    
+
 
 #get all the students assigned to a student's file
 def getAssignedTo(assignmentID, student):
@@ -203,7 +203,7 @@ def submitComment(comment, codeOwner, submitter, assignmentID):
         {'$pull':
          {'assigned.%s'%(assignmentID):codeOwner}}
     )
-    
+
     #for response in assignment['responses']:
     #    if response['student'] == codeOwner:
     #        response['comments'].append([submitter, comment])
@@ -214,5 +214,6 @@ def getComments(user, assignmentID, accountType):
     comments = []
     for response in assignment['responses']:
         for comment in response['comments']:
-            comments.append(comment)
+            if comment['submitter']!=user:
+                comments.append(comment)
     return comments
