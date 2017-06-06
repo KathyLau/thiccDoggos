@@ -134,7 +134,7 @@ def teacherGetAssignments(assignments, assignmentID, status, email):
 def teacherGetReviews(assignmentID):
     assignment = db.assignments.find_one({'assignmentID':assignmentID})
     responses = assignment['responses']
-    filesAssigned = ['filesAssigned']
+    filesAssigned = assignment['filesAssigned']
     reviewed = [ ]
     unreviewed = [ ]
     for response in responses:
