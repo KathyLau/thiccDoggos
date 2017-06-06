@@ -33,7 +33,7 @@ def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllow
     #check that dates are valid:
     for date in [ uploadDate, reviewDate ]:
         today = datetime.date.today()
-        
+
         dateList = date.split("-")
         submittedYear = int(dateList[0])
         submittedMonth = int(dateList[1])
@@ -43,7 +43,7 @@ def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllow
         #if it's not the currYear or later, automatically boot
         if submitted < today:
             return "InvalidDate"
-        
+
     db.assignments.insert_one(
         {
             'assignmentID':createAssignmentCode(),
@@ -58,7 +58,7 @@ def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllow
             'responses': []
         })
     #Successful completion
-    return True 
+    return True
 
 def deleteAssignment( assignmentID ):
     db.assignments.delete_one({'assignmentID': assignmentID} )
@@ -111,12 +111,12 @@ def submitAssignment(email, assignmentID):
                                  'timestamp': datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'),
                                  'comments':[] # comments by other students in [classmate: comment] format
                                 }}})
-        
-    
+
+
 def teacherGetResponse(studentEmail, assignmentID):
     response = db.assignments.find_one({'assignmentID':assignmentID, "responses.student":studentEmail})['responses'][0]
     return [accounts.getStudentName(studentEmail)['firstName'] + " " + accounts.getStudentName(studentEmail)['lastName'], response['timestamp'], getAssignmentSubmission(studentEmail, assignmentID) ]
-        
+
 # get information from assignment ID
 # number coded
 # 0 - get only students who submitted a file
@@ -192,11 +192,11 @@ def getAssignedCode(email, assignmentID):
         pairs = assignment['pairs']
         for pair in pairs:
             if (pair[0] == email):
-                print getAssignmentSubmissions(pair[1], assignmentID)
-                return [pair[1], getAssignmentSubmissions(pair[1], assignmentID)]
+                print getAssignmentSubmission(pair[1], assignmentID)
+                return [pair[1], getAssignmentSubmission(pair[1], assignmentID)]
             elif (pair[1] == email):
-                print getAssignmentSubmissions(pair[0], assignmentID)
-                return [pair[0], getAssignmentSubmissions(pair[0], assignmentID)]
+                print getAssignmentSubmission(pair[0], assignmentID)
+                return [pair[0], getAssignmentSubmission(pair[0], assignmentID)]
 
 '''
 

@@ -222,6 +222,7 @@ def verify(link):
     return redirect(url_for('home'))
 
 @app.route("/logout")
+@app.route("/logout/")
 def logout():
     session.pop("user")
     session.pop("status")
@@ -310,7 +311,7 @@ def createAnAssignment():
             return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Assignment Creation Feature" ) )
         if request.form:
             if 'assignmentName'and'classCode' and 'dueDate' and 'details' in request.form:
-                returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], True if 'groupsAllowed' in request.form else False, request.form['details'] )
+                returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], True if request.form['groupsAllowed']=='true' else False, request.form['details'] )
                 if returnVal != True:
                     return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.form['classCode'], message = "", errorMessage = returnVal, minDate = "%s-%s-%s"%(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day))
                 return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assignment Created"))
@@ -407,7 +408,8 @@ def assignment(assignmentID):
             if request.method=="POST":
                 upload_file(assignmentID)
             assignments= '' #assign.getAssignmentsByID(assignmentID)
-            prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
+            try: prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
+            except: prevFiles = ''
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID, session['status']))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
