@@ -28,7 +28,7 @@ def adminCreation():
             'verified':True,
             'classes':[],
             'groups':[],
-            'files':[],
+            'files':{},
             'profile':{
                 'firstName':'Student',
                 'lastName':'%s'%(i+1)

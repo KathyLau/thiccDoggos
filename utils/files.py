@@ -15,7 +15,9 @@ classes = db['classes']
 #type = upload
 def uploadFile(upload, uploaderName, assignmentID):
     fileID = fs.put(upload, uploader = uploaderName, assignment = assignmentID, filename = uploaderName + '-' + assignmentID, source = "upload")
+    print fileID
     return fileID
+
 
 def parseGithubLink(link):
     linkSplit = link.split("/")
@@ -37,11 +39,15 @@ def uploadFileFromGithub(uploaderName, assignmentID, githubUsername, repository,
 #NOTE: the file is a string
 def getFile(fileID, uploader):
     #data = fs.get(fileID)
-    data = fs.get_last_version(fileID)
+    #data = fs.get_last_version(fileID)
     #data =  list(db.fs.files.find({'assignment': fileID}))
     #if len(data) == 0:
 #        return ''
 #    data = data[0]
+
+    #data = db.fs.files.find_one({"_id": fileID})
+    data = fs.get(fileID)
+    
     if data.source == "github":
         return {
             'uploader': data.uploader,
@@ -54,6 +60,6 @@ def getFile(fileID, uploader):
         return {
             'uploader': data.uploader,
             'assignment': data.assignment,
-            'file': data.read().replace('\n', ' <br> '),
+            'file': data.read().replace('\n', ' <br> ').replace('    ',' &emsp; '),
             'source': data.source
         }

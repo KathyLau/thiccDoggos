@@ -21,15 +21,15 @@
 		</ul>
 	{% endif %}
 	{% if assignment %}
-		<h1>{{ codeSource }} Code for Assignment {{ assignment['assignmentName'] }}</h1>
+		<h1>{{ codeSource | safe}} Code for Assignment {{ assignment['assignmentName'] | safe}}</h1>
 		<div>
 			{% if codeToReview %}
-				<div>{{ codeToReview }}</div>
+				<div>{{ codeToReview | safe }}</div>
 			{% endif %}
 		</div>
 		<br>
 		<form method="post">
-			<input type="text" placeholder="Write your comments here!" name="comments" />
+			<input type="textarea" placeholder="Write your comments here!" name="comments" />
 			<br><br>
 			<input type="submit" value="Upload Comments" name="submit" />
 		</form>

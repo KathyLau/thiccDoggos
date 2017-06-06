@@ -113,8 +113,8 @@ def addStudent( email, password, firstName, lastName, verificationLink ):
             'verificationLink': verificationLink,
             'groups': [],
             'classes': [],
-            #these are file ids
-            'files': [],
+            #these are assignmentID:fileID key-value pairs
+            'files': {},
             'profile': {
                 'firstName': firstName,
                 'lastName': lastName
@@ -154,11 +154,11 @@ def confirmTeacher(email, pwd):
     else:
         return None
 
-def addStudentFile(email, filename):
+def addStudentFile(email, assignmentID, fileID):
     db.students.update(
     { 'email': email },
-    { '$push':
-      {'files': filename }
+    { '$set':
+      {'files.%s'%(assignmentID): fileID }
     })
 
 #update specified field of email account logged into
