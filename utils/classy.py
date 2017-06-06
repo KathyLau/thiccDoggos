@@ -79,6 +79,11 @@ def addToClass( code, studentEmail ):
         })
     return True
 
+#remove from class
+def leaveClass(code, email):
+    
+    pass
+
 #get data of a class
 def getClass( code ):
     return db.classes.find_one(

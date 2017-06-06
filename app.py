@@ -294,6 +294,11 @@ def viewClass(classCode):
     else:
         return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
 
+@app.route("/leaveClass/<code>", methods=["POST"])
+def leaveClass(code):
+    classy.leaveClass(code, session['user'])
+    return redirect(url_for("classes"), message = "You have left the class.")
+    
 @app.route("/changeClassName", methods=['POST'])
 def changeClassName():
     if request.form:
