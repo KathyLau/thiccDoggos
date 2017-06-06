@@ -155,7 +155,7 @@ def root():
         #User is Not Logged In
         # FOR STUDENTS
         if request.form:
-            if request.form["submit"]=="login":
+            if request.form["submit"]=="Login":
                 email = request.form["email"]
                 pwd = request.form["pwd"]
                 check = accounts.confirmStudent(email, pwd)
