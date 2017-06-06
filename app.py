@@ -222,6 +222,7 @@ def verify(link):
     return redirect(url_for('home'))
 
 @app.route("/logout")
+@app.route("/logout/")
 def logout():
     session.pop("user")
     session.pop("status")
@@ -407,7 +408,8 @@ def assignment(assignmentID):
             if request.method=="POST":
                 upload_file(assignmentID)
             assignments= '' #assign.getAssignmentsByID(assignmentID)
-            prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
+            try: prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
+            except: prevFiles = ''
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID, session['status']))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
