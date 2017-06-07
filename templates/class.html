@@ -166,10 +166,10 @@
 	</script>
 	
 	<script type="text/javascript">
-	 var changeName =function(){
+	 var changeName = function() {
 		 var newName = document.getElementById("newClassName").value;
 		 var classCode = document.getElementById("classCode").innerHTML;
-		 $.post("/changeClassName", {"newName": newName, "code": classCode }, function(d){
+		 $.post("/changeClassName", {"newName": newName, "code": classCode }, function(d) {
 			 console.log(d);
 		 })
 		 $('.modal').modal("close");
@@ -177,6 +177,5 @@
 		 className.innerHTML = newName
 	 }
 	 document.getElementById("submitClassName").addEventListener("click", changeName)
-
 	</script>
 {% endblock %}
