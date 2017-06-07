@@ -2,28 +2,67 @@
 {% block stylesheet %}<link rel="stylesheet" type="text/css" href="../static/css/styles.css">{% endblock %}
 {% block Title %}Class{% endblock %}
 {% block Student_Content %}
-
-	<h1>Class Name:<span id="className">{{className}}</span></h1>
 	<br>
-	<p style="font-size: 12px; color: gray">ClassCode:<span id="classCode">{{classCode}}</span></p>
+	<center>
+		<div class="row">
+			<div class="col m3"></div>
+			<div class="col m6">
+				<div class="card grey lighten-4">
+					<div class="card-content black-text">
+						<h1 style="margin: 0">{{ className }}</h1>
+						<h2 class="card-title" style="margin: 0">Period {{ classCode[1] }}</h2>
+						<br>
+						<h2 style="font-size: 30px ; margin: 0">Taught by {{ currentClass['teacherName'] }}</h2>
+						<h2 class="card-title" style="margin: 0"><i class="fa fa-envelope"></i> {{ currentClass['teacher'] }}</h2>
+						<br>
+						<h2 style="font-size: 30px ; margin: 0">Information</h2>
+						<h2 class="card-title" style="margin: 0"><i class="fa fa-id-card-o"></i> {{ classCode[0] }}</h2>
+						<h2 class="card-title" style="margin: 0"><i class="fa fa-user"></i> {{ peeps | length }} student{% if peeps | length != 1 %}s{% endif %}</h2>
+						<h2 class="card-title" style="margin: 0"><i class="fa fa-list"></i> {{ assignments | length }} {% if assignments | length > 1 %}total{% endif %} assigment{% if assignments | length != 1%}s{% endif %}</h2>
+						<br>
+						<a class="btn waves-effect waves-light teal darken-4" href="/class/{{classCode}}/createGroup">Create a Group</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</center>
 
-	<a href="/class/{{classCode}}/createGroup">	Create a Group </a>
+	<div class="row">
+		{% if assignments | length <= 0 %}
+			<div class="col m3"></div>
+		{% endif %}
+		<div class="col m6">
+			<div class="card grey lighten-4">
+				<div class="card-content black-text">
+					<center><span class="card-title">Students</span></center>
+					<ul class="collection">
+						{% for student in peeps %}
+							<li class="collection-item">{{ student[0] }}<span class="right">{{ student[1]}}</span>
+							{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
+		{% if assignments | length > 0 %}
+		<div class="col m6">
+			<div class="card grey lighten-4">
+				<div class="card-content black-text">
+					<center><span class="card-title">Assignments</span></center>
+					<div class="collection">
+						{% for assignment in assignments %}
+							<a class="collection-item" href="/assignment/{{assignment['assignmentID']}}">
+								<span class="right">{{ assignment['uploadDate'][5:7] + "/" + assignment['uploadDate'][8:10] + "/" + assignment['uploadDate'][0:4] }}</span>
+								<h5 style="margin: 0">{{assignment['assignmentName']}}</h5>
+								<p style="color: black">{{assignment['description']}}</p>
+							</a>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+	</div>
 
-
-
-</form>
-	<h3> Students In Your Class </h3>
-
-	{% for p in peeps %}
-		{{p}},
-	{% endfor %}
-
-	<h3>Assignments</h3>
-	<ul>
-		{% for assignment in assignments %}
-			<li><a href="/assignment/{{assignment['assignmentID']}}">Assignment {{assignment['assignmentName']}}</a></li>
-		{% endfor %}
-	</ul>
 {% endblock %}
 {% block Teacher_Content %}
 	<div class="container-fluid">

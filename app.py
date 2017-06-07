@@ -289,8 +289,8 @@ def viewClass(classCode):
             theClass = classy.getClass(code)
             peepsInfo = classy.getStudentsInYourClass(code, pd)
             #print peepsInfo
-            peeps = [ accounts.getStudentName(email)['firstName'] + " " + accounts.getStudentName(email)['lastName'] for email in peepsInfo['students'] ]
-            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, peeps=peeps, message=message,  assignments=assign.getAssignments(code))
+            peeps = [ [accounts.getStudentName(email)['firstName'] + " " + accounts.getStudentName(email)['lastName'], email] for email in peepsInfo['students'] ]
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = [classCode[:-2], classCode[-1:]], currentClass = theClass, peeps=peeps, message=message,  assignments=assign.getAssignments(code))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", ccode=classCode ))
 

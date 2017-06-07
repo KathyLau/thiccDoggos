@@ -51,8 +51,8 @@
 				<form class="form-login" method="post">
 					<h1 class="form-heading">Log In to Your Account</h1>
 					<div class="input-field">
-						<input type="text" class="form-text" name="email" id="email" />
-						<label for="email">Email</label>
+						<input type="email" class="form-text validate" name="email" id="email" />
+						<label for="email" data-error="Please use an actual email!">Email</label>
 					</div>
 					<br>
 					<div class="input-field">
@@ -68,7 +68,7 @@
 				<form class="cover-form" method="post">
 					<h1 class="form-heading">Register for an Account</h1>
 					<div class="input-field">
-						<input type="text" class="form-text" name="email" id="email" />
+						<input type="text" class="form-text validate" name="email" id="email" />
 						<label for="email">Email</label>
 					</div>
 					<br>

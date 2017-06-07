@@ -108,9 +108,9 @@ def getStudentClasses( email ):
         if db.classes.count({'code': code}) > 0:
             classinfo = db.classes.find_one( {'code': code } )
         #print classinfo
-            classes.append([str(classinfo['code'] + '-' + pd), str(classinfo['className']),str(classinfo['teacher']) ])
-    print "\n\n\n"
-    print classes
+        teacher = accounts.getTeacher(classinfo['teacher'])
+        teacherName = teacher['profile']['firstName'] + " " + teacher['profile']['lastName']
+        classes.append([str(classinfo['code'] + '-' + pd), str(classinfo['className']), pd, teacherName])
     return classes
 
 def getTeacherClasses( email ):

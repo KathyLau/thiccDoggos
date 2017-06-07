@@ -43,29 +43,43 @@
 			</div>
 		</div>
 
+		<h1>Your Classes</h1>
+		<div class="row">
+			<div class="col s2"></div>
+			{% for class in your_classes %}
+				<div class="col s2">
+					<div class="card grey lighten-4 class-card small">
+						<div class="card-content black-text">
+							<span class="card-title">{{class[1]}}</span>
+							<p>Period {{class[2]}}</p>
+							<p>{{class[3]}}</p>
+						</div>
+						<div class="card-action">
+							<a class="btn waves-effect waves-light teal darken-4" href="/class/{{class[0]}}">View&nbsp;Class</a>
+						</div>
+					</div>
+				</div>
+				{% if loop.index is divisibleby(4) %}
+                     </div>
+ 					 <div class="row">
+					 <div class="col m2"></div>
+				{% endif %}
 			
-				<h3>  Your Classes</h3>
-
-				{% for class in your_classes %}
-					<a href="/class/{{class[0]}}">   {{class[0] | safe}} </a>- {{class[1] | safe}} - {{class[2] | safe}} <br>
-				{% endfor %}
-			</div>
-			<div class="col-sm-2"> </div>
-		</div>
+			{% endfor %}
 		
-<script>
-  $(document).ready(function() {
-      // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-      $('.modal').modal({
-		  dismissible: true, // Modal can be dismissed by clicking outside
-		  opacity: .5, // Opacity of modal background
-		  inDuration: 300, // Transition in duration
-		  outDuration: 200, // Transition out duration
-		  startingTop: '4%', // Starting top style attribute
-		  endingTop: '10%', // Ending top style attribute 
-	  });
-  });
-</script>
+		<script>
+		 $(document).ready(function() {
+			 // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+			 $('.modal').modal({
+				 dismissible: true, // Modal can be dismissed by clicking outside
+				 opacity: .5, // Opacity of modal background
+				 inDuration: 300, // Transition in duration
+				 outDuration: 200, // Transition out duration
+				 startingTop: '4%', // Starting top style attribute
+				 endingTop: '10%', // Ending top style attribute 
+			 });
+		 });
+		</script>
 
 {% endblock %}
 
@@ -73,9 +87,9 @@
 	<center>
 		<h1>Your Classes</h1>	
 		<div class="collection class-list">
-		{% for class in your_classes %}
-			<a class="collection-item" href="/class/{{class[0]}}">{{class[1]}}</a>
-		{% endfor %}
+			{% for class in your_classes %}
+				<a class="collection-item" href="/class/{{class[0]}}">{{class[1]}}</a>
+			{% endfor %}
 		</div>
 		<a class="btn-floating btn-large waves-effect waves-light teal darken-4 class-fab" href="/createClass"><i class="fa fa-plus"></i></a>
 	</center>
