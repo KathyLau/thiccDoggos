@@ -210,7 +210,8 @@ def root():
 @app.route("/home")
 def home():
     if 'user' in session:
-        return render_template("home.html", status = session['status'], verified = session['verified'] )
+        #return render_template("home.html", status = session['status'], verified = session['verified'] )
+        return redirect(url_for("classes"))
     else:
         return redirect( url_for("root", message = "Please Login or Sign-Up First") )
 
@@ -280,7 +281,14 @@ def viewClass(classCode):
         if session['status'] == 'teacher':
             theClass = classy.getClass(classCode)
             periods = classy.getStudentsInYourClass(classCode, 0)
-            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = classCode, periods=periods, message=message, assignments=assign.getAssignments(classCode))
+            summation = 0;
+            for period in periods:
+                summation += len(periods[period]['students'])
+            students = {}
+            for period in periods:
+                info = classy.getStudentsInYourClass(classCode, period)
+                students[period] = [ [accounts.getStudentName(email)['firstName'] + " " + accounts.getStudentName(email)['lastName'], email] for email in info['students'] ]
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], currentClass = theClass, classCode = classCode, periods=periods, message=message, assignments=assign.getAssignments(classCode), studentCount = summation, students = students)
 
         else:
             codetemp = classCode.split("-")
