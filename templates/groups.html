@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block Student_Content %}
+	<center>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8">
+					<h3>
+
+	<form class="form-create" method="POST">
+
+				<h3>	Groups You Are In </h3>
+
+					{% for group in groups %}
+					{{ group | safe }}
+					{% endfor %}
+
+				</div>
+				<div class="col-sm-2"></div>
+			</div>
+		</div>
+	</center>
+{% endblock %}
+{% block Teacher_Content %}
+	<h1>You're in the wrong place, bud</h1>
+{% endblock %}

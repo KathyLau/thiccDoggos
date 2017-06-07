@@ -380,7 +380,7 @@ def groups():
         elif session['status'] == 'teacher':
             pass
             #your_groups = groupy.getTeacherGroups( session['user'] )
-        return render_template( "base.html" , status = session['status'], verified = session['verified'] )
+        return render_template( "groups.html" , status = session['status'], verified = session['verified'] )
         #return render_template("class.html", status = session['status'], verified=True)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))

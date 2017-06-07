@@ -145,7 +145,6 @@ def teacherGetReviews(assignmentID):
             if comment['submitter'] != 'Administrator' and comment['submitter'] not in counted:
                 count += 1
                 counted.append( comment['submitter'] )
-
         studentProfile = accounts.getStudentName( response['student'] )
         studentName = "%s %s"%(studentProfile['firstName'], studentProfile['lastName'])
         #if not enough reviews, put in unreviewed
@@ -180,8 +179,10 @@ def assignRandomReviews(assignmentID, num):
 
 #Returns a list of [studentEmail, actualCode] that the student has to review
 def getAssignedCodes(email, assignmentID):
-    list = db.students.find_one({"email":email})['assigned'][assignmentID]
-    return [ [student, getAssignmentSubmission(student, assignmentID) ] for student in list ]
+    try:
+        list = db.students.find_one({"email":email})['assigned'][assignmentID]
+        return [ [student, getAssignmentSubmission(student, assignmentID) ] for student in list ]
+    except: return []
 
 
 #submits a comment from a student
@@ -213,7 +214,9 @@ def getComments(user, assignmentID, accountType):
     assignment = db.assignments.find_one({ 'assignmentID': assignmentID })
     comments = []
     for response in assignment['responses']:
-        for comment in response['comments']:
-            if comment['submitter']!=user:
-                comments.append(comment)
+        if response['student'] == user:
+            for comment in response['comments']:
+            #print comment
+                if comment['submitter']!=user:
+                    comments.append(comment)
     return comments
