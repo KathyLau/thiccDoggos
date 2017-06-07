@@ -1,42 +1,60 @@
 {% extends "base.html" %}
 {% block Title %}Create Assignment{% endblock %}
 {% block Teacher_Content %}
+	<script>
+	 $(document).ready(function() {
+		 $('select').material_select();
+	 });
+	</script>
+	
 	<center>
-		<div class="panel-body">
-			<div class="row">
-				<div class="col-sm-2"></div>
-				<div class="col-sm-8">
-
-					<form class="form-create" method="POST" action="/createAssignment">
-						<h2 class="form-signin-heading">Assignment Information</h2>
-						Assignment Name: &nbsp;<input type="text" class="input-block-level" name="assignmentName" placeholder="Ex. MazeSolver" required>
-						<br><br>
-						Description: &nbsp;<input type="textbox" name="details" placeholder="Ex. Leave three positive comments in each code review" required>
-						<br><br>
-
-						Group Size:	 &nbsp;<select name="size">
-							<option value="1"> 1 </option>
-							<option value="2"> 2 </option>
-							<option value="3"> 3 </option>
-							<option value="4"> 4 </option>
-							<option value="5"> 5 </option>
-						</select>
-
-						<br><br>
-
-					    Upload Due Date: &nbsp;<input type="date" name="uploadDate" required>
-                        <br><br>
-                        Review Due Date: &nbsp;<input type="date" name="reviewDate" required>
-						<input type="hidden" name="classCode" value="{{classCode}}">
-						<!-- If we have time to implement groupsAllowed, we will. By default, it will be false -->
-					<br><br>
-
-						<br><br>
-						<input type="submit" value="create" name="Create Assignment">
-					</form>
+		<br>
+		<div class="row">
+			<div class="col m2"></div>
+			<div class="col m8">
+				<div class="card grey lighten-4">
+					<div class="card-content black-text">
+						<h2>Assignment Information</h2>
+						<br>
+						<form class="form-create" method="POST" action="/createAssignment">
+							<div class="input-field class-modal">
+								<input type="text" name="assignmentName" id="assignmentName" required />
+								<label for="assignmentName">Assignment Name</label>
+							</div>
+							<br>
+							<div class="input-field class-modal">
+								<textarea id="details" name="details" class="materialize-textarea" required></textarea>
+								<label for="details">Assignment Description</label>
+							</div>
+							<br>
+							<div class="input-field class-modal">
+								<select name="size">
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+								</select>
+								<label>Select a Group Size</label>
+							</div>
+							<input type="date" name="uploadDate" id="uploadDate" class="datepicker" style="width: 75% ; margin: 0 auto" placeholder="Deadline for Uploading a Submission" required />
+							<br>
+							<input type="hidden" name="classCode" value="{{classCode}}">
+							<br>
+							<input type="date" name="reviewDate" id="reviewDate" class="datepicker" style="width: 75% ; margin: 0 auto" placeholder="Deadline for Reviewing Code" required />
+							<br><br>
+							<center><input type="submit" class="btn waves-effect waves-light teal darken-3" value="create" name="Create Assignment"></center>
+						</form>
+					</div>
 				</div>
-				<div class="col-sm-2"></div>
 			</div>
 		</div>
-	</center>
+
+	<script>
+	 $('.datepicker').pickadate({
+		 selectMonths: true, // Creates a dropdown to control month
+		 selectYears: 5, // Creates a dropdown of 15 years to control year
+		 format: "yyyy-mm-dd"
+	  });
+	</script>
 {% endblock %}
