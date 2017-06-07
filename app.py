@@ -325,7 +325,7 @@ def createAnAssignment():
             session.pop('verified')
             return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Assignment Creation Feature" ) )
         if request.form:
-            if 'assignmentName'and'classCode' and 'dueDate' and 'details' in request.form:
+            if 'assignmentName' and 'details' and "classCode" and "uploadDate" and "reviewDate" in request.form:
                 returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], True if 'groupsAllowed' in request.form else False, request.form['details'] )
                 if returnVal != True:
                     return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.form['classCode'], message = "", errorMessage = returnVal, minDate = "%s-%s-%s"%(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day))
