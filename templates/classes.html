@@ -45,9 +45,8 @@
 
 		<h1>Your Classes</h1>
 		<div class="row">
-			<div class="col s2"></div>
 			{% for class in your_classes %}
-				<div class="col s2">
+				<div class="col s3">
 					<div class="card grey lighten-4 class-card small">
 						<div class="card-content black-text">
 							<span class="card-title">{{class[1]}}</span>
@@ -62,7 +61,6 @@
 				{% if loop.index is divisibleby(4) %}
                      </div>
  					 <div class="row">
-					 <div class="col m2"></div>
 				{% endif %}
 			
 			{% endfor %}
