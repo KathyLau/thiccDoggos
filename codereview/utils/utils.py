@@ -1,3 +1,5 @@
+import os
+
 def getSecretData():
     #get data
     secrets = open(os.path.dirname(__file__) + "secrets.txt", "r")
