@@ -9,6 +9,7 @@ def drop_all():
     db.students.drop()
     db.classes.drop()
     db.assignments.drop()
+    db.groups.drop()
     db.fs.files.drop()
     db.fs.chunks.drop()
 

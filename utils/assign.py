@@ -177,6 +177,13 @@ def assignRandomReviews(assignmentID, num):
             #Do the next one down
             assignRandomReviews(assignmentID, num-1)
 
+
+
+#Num is the number of groups each group has to review
+def assignGroupRandomReviews(assignmentID, num):
+    groups = [ response['members'] for response in db.groups.find({'assignmentID':assignmentID})]
+    
+
 #Returns a list of [studentEmail, actualCode] that the student has to review
 def getAssignedCodes(email, assignmentID):
     try:

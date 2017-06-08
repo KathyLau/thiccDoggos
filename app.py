@@ -437,8 +437,10 @@ def assignment(assignmentID):
 
 @app.route("/enableReviews/<assignmentID>", methods = ["GET", "POST"])
 def enableReviews(assignmentID):
-    assign.enableReviews(assignmentID, 1)
-    assign.assignRandomReviews(assignmentID, 1)
+    assignment = assign.getAssignmentsByID(assignmentID)
+    #if len(assignment) > 0: groupSize = assignment[0]['groupSize']
+    #assign.enableReviews(assignmentID, 1)
+    assign.assignGroupRandomReviews(assignmentID, 1)
     return redirect(url_for("assignment", assignmentID = assignmentID))
 
 @app.route("/reviews")
