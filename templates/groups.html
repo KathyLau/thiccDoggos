@@ -7,15 +7,23 @@
 				<div class="col-sm-8">
 					<h3>
 
-	<form class="form-create" method="POST">
+						<form class="form-create" method="POST">
 
+							<div class="input-field class-modal">
+								Search A Group
+								<input type="text" name="groupName" id="groupName" required />
+							</div>
+							<input type="submit" value="Join Group" name="Join Group">
+						</form>
+<br>
 				<h3>	Groups You Are In </h3>
-
+<br>
 					{% for group in groups %}
-					{{ group | safe }}
+					{{ group | safe }}<br>
 					{% endfor %}
 
-				</div>
+
+
 				<div class="col-sm-2"></div>
 			</div>
 		</div>

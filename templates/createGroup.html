@@ -6,9 +6,18 @@
 				<div class="col-sm-2"></div>
 				<div class="col-sm-8">
 
-					<form class="form-login" method="POST" action="/createGroup">
+					<form class="form-login" method="POST" >
 						<h2 class="form-signin-heading">Group Information</h2>
 						<input type="text" class="input-block-level" name="groupName" id="groupName" placeholder="groupName">
+						<br><br>
+						<div class="input-field class-modal">
+							<select name="size">
+								{% for assignment in assignments %}
+								<option value="{{assignment | safe}}">{{assignment | safe}}</option>
+								{% endfor %}
+							</select>
+							<label>Select the assignment the group is for</label>
+						</div>
 						<br><br>
 						<input type="submit" value="create" name="Create Group">
 					</form>

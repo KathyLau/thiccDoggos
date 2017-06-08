@@ -32,7 +32,7 @@ def enableReviews( assignmentID, filesAssigned ):
 def getCodeReviewStatus(assignmentID):
     return db.assignments.find_one({'assignmentID':assignmentID})['reviewEnabled']
 
-def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllowed, details ):
+def createAssignment( assignName, classCode, uploadDate, reviewDate, groupSize, details ):
     #check that dates are valid:
     for date in [ uploadDate, reviewDate ]:
         today = datetime.date.today()
@@ -51,7 +51,7 @@ def createAssignment( assignName, classCode, uploadDate, reviewDate, groupsAllow
         {
             'assignmentID':createAssignmentCode(),
             'assignmentName': assignName,
-            'groupsAllowed': groupsAllowed,
+            'groupSize': groupSize,
             'class': classCode,
             'uploadDate': uploadDate,
             'reviewDate': reviewDate,
