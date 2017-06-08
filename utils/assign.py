@@ -180,9 +180,7 @@ def assignRandomReviews(assignmentID, num):
 #assign em to each other, helper funcc
 def assignGroupToReview(assignmentID, student, studentsToReview):
     db.students.update(
-        {
-            "email": student
-        }
+        {"email": student}
         ,
         {
             {
