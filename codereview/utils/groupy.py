@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 import random
 import string
-import accounts
+import accounts, assign
 
 #connect to mongo
 connection = MongoClient("127.0.0.1")
@@ -65,3 +65,15 @@ def getStudentGroups( email ):
     if len(student) < 1: return groups
     groupCodes = student['groups']
     return groupCodes
+
+
+def makeRandomGroups(assignmentID):
+    assignment = assign.getAssignmentsByID(assignmentID)
+    if len(assignment) > 0:
+        groupSize = int(assignment[0]['groupSize'])
+    students = [student['student'] for student in db.assignments.find_one({"assignmentID":assignmentID})['responses']]
+    for i in range(0, len(students), groupSize):
+        randomTeamName = ''.join(random.choice(string.lowercase) for i in range(20))
+        createGroup(students[i], assignmentID, randomTeamName, groupSize) #AYMAN ADD UR GROUP NAME GENERATOR HERE
+        for student in students[i+1: i + groupSize]:
+            addToGroup( student, assignmentID, randomTeamName)
