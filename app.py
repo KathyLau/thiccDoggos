@@ -422,7 +422,7 @@ def deleteAssignment(assignmentID):
 @app.route("/assignment/<assignmentID>", methods=["GET", "POST"])
 def assignment(assignmentID):
     if 'user' in session:
-        print groupy.makeRandomGroups(assignmentID)
+        #print groupy.makeRandomGroups(assignmentID)
         if session['status'] == 'teacher':
             assignments = assign.getAssignmentsByID(assignmentID)
             responses = assign.teacherGetAssignments(assignments, assignmentID, 0, '')
