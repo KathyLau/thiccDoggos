@@ -186,8 +186,8 @@ def assignGroupToReview(assignmentID, student, studentsToReview):
         ,
         {
             {
-                "$set": {
-                    "assigned.{0}".format(assignmentID): studentsToReview
+                "$push": {
+                    "assigned.%s" % (assignmentID): studentsToReview
                 }
             }
         }
@@ -196,7 +196,7 @@ def assignGroupToReview(assignmentID, student, studentsToReview):
 #Num is the number of groups each group has to review
 def assignGroupRandomReviews(assignmentID, num):
     groups = [ response['members'] for response in db.groups.find({'assignmentID':assignmentID})]
-    randomGroups = random.sample(groups, len(responses))
+    randomGroups = random.sample(groups, len(groups))
     #iter number
     for group in range(0, len(randomGroups) - 1):
         #for student in each group
