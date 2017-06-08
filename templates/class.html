@@ -87,10 +87,13 @@
 	<div class="modal" id="rename">
 		<div class="modal-content">
 			<h3>Rename the Class</h3>
+			<br><br>
 			<div class="input-field class-modal">
+				<input type="hidden" id="classCode" value="{{ classCode }}"></input>
 				<input type="text" id="newClassName" placeHolder="{{ className }}" />
 				<label for="newClassName">New Class Name</label>
 			</div>
+			<br>
 			<center><button class="btn waves-effect waves-light teal darken-3" type="submit" class="" value="submit" id="submitClassName" name="submit">Rename</button></center>
 		</div>
 	</div>
@@ -166,7 +169,7 @@
 	<script type="text/javascript">
 	 var changeName = function() {
 		 var newName = document.getElementById("newClassName").value;
-		 var classCode = document.getElementById("classCode").innerHTML;
+		 var classCode = document.getElementById("classCode").value;
 		 $.post("/changeClassName", {"newName": newName, "code": classCode }, function(d) {
 			 console.log(d);
 		 })
