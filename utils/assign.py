@@ -177,11 +177,32 @@ def assignRandomReviews(assignmentID, num):
             #Do the next one down
             assignRandomReviews(assignmentID, num-1)
 
-
+#assign em to each other, helper funcc
+def assignGroupToReview(assignmentID, student, studentsToReview):
+    db.students.update(
+        {
+            "email": student
+        }
+        ,
+        {
+            {
+                "$set": {
+                    "assigned.{0}".format(assignmentID): studentsToReview
+                }
+            }
+        }
+    )
 
 #Num is the number of groups each group has to review
 def assignGroupRandomReviews(assignmentID, num):
     groups = [ response['members'] for response in db.groups.find({'assignmentID':assignmentID})]
+    randomGroups = random.sample(groups, len(responses))
+    #iter number
+    for group in range(0, len(randomGroups) - 1):
+        #for student in each group
+        for student in randomGroups[group]:
+            #assign each student to student
+            assignGroupToReview(assignmentID, student, randomGroups[group + 1])
 
 
 #Returns a list of [studentEmail, actualCode] that the student has to review
