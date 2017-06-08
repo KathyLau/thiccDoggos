@@ -105,7 +105,7 @@ made a lot of minor QoL changes.
 celineY -- 2017-06-05 5:28 PM
 started groups
 
-kathyL -- 2017-05-27 11:20 AM
+kathyL -- 2017-06-05 11:20 AM
 *** FINISHED TOFR'S REC GIFT ***
 
 aymanA -- 2017-06-06 12:12 AM
@@ -114,4 +114,5 @@ created functions for showing errors while running code
 kevinZ -- 2017-06-06 12:30 AM
 fixing and updating code review
 
-
+kathyL -- 2017-06-07 11:20 PM
+i debugged tf out of this code and added GROUPS

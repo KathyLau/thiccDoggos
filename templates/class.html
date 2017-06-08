@@ -20,7 +20,7 @@
 						<h2 class="card-title" style="margin: 0"><i class="fa fa-user"></i> {{ peeps | length }} student{% if peeps | length != 1 %}s{% endif %}</h2>
 						<h2 class="card-title" style="margin: 0"><i class="fa fa-list"></i> {{ assignments | length }} {% if assignments | length > 1 %}total{% endif %} assigment{% if assignments | length != 1%}s{% endif %}</h2>
 						<br>
-						<a class="btn waves-effect waves-light teal darken-4" href="/class/{{classCode}}/createGroup">Create a Group</a>
+						<a class="btn waves-effect waves-light teal darken-4" href="/class/{{classCode[0]}}-{{classCode[1]}}/createGroup">Create a Group</a>
 					</div>
 				</div>
 			</div>
@@ -160,11 +160,11 @@
 			 inDuration: 300, // Transition in duration
 			 outDuration: 200, // Transition out duration
 			 startingTop: '4%', // Starting top style attribute
-			 endingTop: '10%', // Ending top style attribute 
+			 endingTop: '10%', // Ending top style attribute
 		 });
 	 });
 	</script>
-	
+
 	<script type="text/javascript">
 	 var changeName = function() {
 		 var newName = document.getElementById("newClassName").value;

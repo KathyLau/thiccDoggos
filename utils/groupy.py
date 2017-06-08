@@ -14,29 +14,33 @@ groups = db['groups']
 #creates a group and adds to database
 #prob need more code
 def createGroup( studentEmail, assignmentName, groupName, limit ):
-    db.classes.update(
-        {'code': code},
-        {'$push':
-         { 'groups': groupName }
-        }
-    )
     db.groups.insert_one(
         {
-            'name': groupName,
+            'assignmentID': assignmentName,
+            'groupName': groupName,
             'members': [studentEmail],
             'assignments': [],
             'groupLimit': limit,
+        })
+    db.students.update(
+        {'email': studentEmail },
+        {'$push':
+         { 'groups': assignmentName + '-' + groupName }
         })
 
 
 #add a single student to group
 def addToGroup( studentEmail, assignmentName, groupName ):
-    count = int(list(db.groups.find({'name': groupName}))[0]['groupLimit'])
-    num_members =int(list(db.groups.find({'groupName': groupName}))[0]['members'])
+    print groupName
+    info = list(db.groups.find({'groupName': groupName}))
+    print info
+    info = info[0]
+    count = int(info['groupLimit'])
+    num_members =int(len(info['members']))
     #fxn to count number of members in group to see if it's full
-    if num_members <= count:
+    if num_members < count and studentEmail not in info['members']:
         db.groups.update(
-            {'name': groupName },
+            {'groupName': groupName },
             {'$push':
              { 'members': studentEmail }
             })
@@ -51,19 +55,13 @@ def addToGroup( studentEmail, assignmentName, groupName ):
 #get data of a group
 def getGroup( name ):
     return db.groups.find(
-        {'name': name }
+        {'groupName': name }
     )
 
 #this fxn is wrong does not work we need a new one
 def getStudentGroups( email ):
     groups = []
-    student = list(db.students.find( {'email': email} ))
+    student = accounts.getStudent(email)
     if len(student) < 1: return groups
-    groupCodes = student[0]['group']
-    classes = []
-    for code in classCodes:
-        groupinfo = list (db.groups.find( {'code': code } ))[0]
-        groups.append(groupinfo)
-        #Insert group information necessary
-        #groups.append([str(info['code']), str(classinfo['className']),str(classinfo['groupLimit']), str(classinfo['teacher']) ])
-    return groups
+    groupCodes = student['groups']
+    return groupCodes

@@ -326,7 +326,7 @@ def createAnAssignment():
             return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Assignment Creation Feature" ) )
         if request.form:
             if 'assignmentName' and 'details' and "classCode" and "uploadDate" and "reviewDate" in request.form:
-                returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], True if 'groupsAllowed' in request.form else False, request.form['details'] )
+                returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], request.form['size' ], request.form['details'] )
                 if returnVal != True:
                     return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.form['classCode'], message = "", errorMessage = returnVal, minDate = "%s-%s-%s"%(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day))
                 return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assignment Created"))
@@ -341,17 +341,19 @@ def createAnAssignment():
 @app.route("/class/<code>/createGroup", methods=['GET', 'POST'])
 def createaGroup(code):
     if 'user' in session:
+        info = assign.getAssignments(code.split('-')[0])
+        assignments = [a['assignmentName']+'-' + a['assignmentID']+ '-' + a['groupSize'] for a in info if a['groupSize']!='1']
         if request.form:
             if 'groupName' in request.form:
-                groups.createGroups( session['user'], '', request.form['groupName'], '5') # we need a way to get group limit
-                return redirect( url_for( 'groups', message = "Group Creation Successful", code=code ))
+                groupy.createGroup( session['user'], request.form['size'].split('-')[1], request.form['groupName'], request.form['size'].split('-')[2]) # we need a way to get group limit
+                return redirect( url_for( 'groups', message = "Group Creation Successful", code=code , assignments=assignments))
         elif request.args:
             if 'message' in request.args:
-                return render_template( "createGroup.html", message = request.args['message'], code=code)
+                return render_template( "createGroup.html", message = request.args['message'], code=code, assignments=assignments)
             else:
                 print request.args
         else:
-            return render_template( "createGroup.html", status = session['status'], verified=session['verified'], code=code )
+            return render_template( "createGroup.html", status = session['status'], verified=session['verified'], code=code , assignments=assignments)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
 
@@ -383,12 +385,14 @@ def profile():
 def groups():
     if 'user' in session:
         if session['status'] == 'student':
-            pass
+            if request.form:
+                if 'groupName' in request.form:
+                    groupy.addToGroup(session['user'], request.form['groupName'].split('-')[0], request.form['groupName'].split('-')[1])
             #your_groups = groupy.getStudentGroups( session['user'] )
         elif session['status'] == 'teacher':
             pass
             #your_groups = groupy.getTeacherGroups( session['user'] )
-        return render_template( "groups.html" , status = session['status'], verified = session['verified'] )
+        return render_template( "groups.html" , status = session['status'], verified = session['verified'], groups=groupy.getStudentGroups(session['user']) )
         #return render_template("class.html", status = session['status'], verified=True)
     else:
         return redirect( url_for( "root", message = "Please Sign In First" ))
@@ -504,4 +508,4 @@ def upload_file(ID):
 
 if __name__ == "__main__":
     app.debug = True
-    app.run()
+    app.run(threaded=True)
