@@ -100,12 +100,12 @@
 
 	<div class="row">
 		<div class="col m4">
-			{% for period in periods %}
+			{% for period in periods | dictsort %}
 				<div class="card grey lighten-4">
 					<div class="card-content black-text">
-						<center><span class="card-title">Period {{ period }}</span></center>
+						<center><span class="card-title">Period {{ period[0] }}</span></center>
 						<ul class="collection">
-							{% for student in students[period] %}
+							{% for student in students[period[0]] %}
 								<li class="collection-item">{{ student[0] }}<span class="right">{{ student[1]}}</span></li>
 							{% endfor %}
 						</ul>
