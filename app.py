@@ -288,7 +288,7 @@ def viewClass(classCode):
             for period in periods:
                 info = classy.getStudentsInYourClass(classCode, period)
                 students[period] = [ [accounts.getStudentName(email)['firstName'] + " " + accounts.getStudentName(email)['lastName'], email] for email in info['students'] ]
-            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], currentClass = theClass, classCode = classCode, periods=periods, message=message, assignments=assign.getAssignments(classCode), studentCount = summation, students = students)
+            return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], currentClass = theClass, classCode = classCode, periods = periods, message=message, assignments=assign.getAssignments(classCode), studentCount = summation, students = students)
 
         else:
             codetemp = classCode.split("-")
