@@ -3,40 +3,50 @@
 <h1>You're in the wrong place, bud</h1>
 {% endblock %}
 {% block Teacher_Content %}
-<center>
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-sm-2"></div>
-      <div class="col-sm-8">
-        
-        <form class="form-login" method="POST" action="/createClass">
-          <h2 class="form-signin-heading">Class Information</h2>
-          Class Name:<input type="text" class="input-block-level" name="className" id="className" placeholder="Ex. AP Computer Science">
-          <br><br>
-          <div class="button-group">
-            <button type="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown">Periods<span class="caret"></button>
-            <ul class="dropdown-menu createDrop">
-              <li><a href="#" class="small" data-value="pd1" tabIndex="-1"><input type="checkbox" name="pd1"/>&nbsp;Period 1</a><li>
-              <li><a href="#" class="small" data-value="pd2" tabIndex="-1"><input type="checkbox" name="pd2"/>&nbsp;Period 2</a><li>
-              <li><a href="#" class="small" data-value="pd3" tabIndex="-1"><input type="checkbox" name="pd3"/>&nbsp;Period 3</a><li>
-              <li><a href="#" class="small" data-value="pd4" tabIndex="-1"><input type="checkbox" name="pd4"/>&nbsp;Period 4</a><li>
-              <li><a href="#" class="small" data-value="pd5" tabIndex="-1"><input type="checkbox" name="pd5"/>&nbsp;Period 5</a><li>
-              <li><a href="#" class="small" data-value="pd6" tabIndex="-1"><input type="checkbox" name="pd6"/>&nbsp;Period 6</a><li>
-              <li><a href="#" class="small" data-value="pd7" tabIndex="-1"><input type="checkbox" name="pd7"/>&nbsp;Period 7</a><li>
-              <li><a href="#" class="small" data-value="pd8" tabIndex="-1"><input type="checkbox" name="pd8"/>&nbsp;Period 8</a><li>
-              <li><a href="#" class="small" data-value="pd9" tabIndex="-1"><input type="checkbox" name="pd9"/>&nbsp;Period 9</a><li>
-              <li><a href="#" class="small" data-value="pd10" tabIndex="-1"><input type="checkbox" name="pd10"/>Period 10</a><li>                
-            </ul>
-          </div>
-          <br><br>
-          <input type="submit" value="create" name="Create Class">
-        </form>
-      </div>
-      <div class="col-sm-2"></div>
-    </div>
-  </div>
-</center>
-
+	<script>
+	 $(document).ready(function() {
+		 $('select').material_select();
+	 });
+	</script>
+	
+	<center>
+		<br>
+		<div class="row">
+			<div class="col m2"></div>
+			<div class="col m8">
+				<div class="card grey lighten-4">
+					<div class="card-content black-text">
+						<h2>Class Information</h2>
+						<form method="post" action="/createClass">
+							<div class="input-field class-modal">
+								<input type="text" name="name" id="name" required />
+								<label for="name">Class Name</label>
+							</div>
+							<br>
+							<div class="input-field class-modal">
+								<select name="periods" multiple>
+									<option value="1">Period 1</option>
+									<option value="2">Period 2</option>
+									<option value="3">Period 3</option>
+									<option value="4">Period 4</option>
+									<option value="5">Period 5</option>
+									<option value="6">Period 6</option>
+									<option value="7">Period 7</option>
+									<option value="8">Period 8</option>
+									<option value="9">Period 9</option>
+									<option value="10">Period 10</option>
+								</select>
+								<label>Select Class Periods</label>
+							</div>
+							<br>
+							<center><input type="submit" class="btn waves-effect waves-light teal darken-3" value="Create Class" name="submit"></center>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</center>
+	
 <script>
   var options = [];
 

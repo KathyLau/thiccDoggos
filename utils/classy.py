@@ -30,7 +30,7 @@ def createClassCode():
 def createClass( teacherEmail, form ):
 
     def getPeriods( formWithChecklist ):
-        return [ key[-1] for key in formWithChecklist.keys() if key[:-1] == 'pd' ]
+        return formWithChecklist.getlist("periods")
 
     teacher = list(db.teachers.find( {'email':teacherEmail} ))[0]
     code = createClassCode()
