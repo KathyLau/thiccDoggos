@@ -82,7 +82,7 @@ def sendRegistrationEmail(email, referrer, verificationLink):
     <br>
     <a href="{1}" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
     </center>
-    '''.format(whoReferred['name'], "http://127.0.0.1:5000/verify/" + verificationLink)
+    '''.format(referrer, "http://127.0.0.1:5000/verify/" + verificationLink)
     sendEmailAsync(app, message)
 
 #registers student and adds to database, stills requires email verif.
@@ -108,9 +108,9 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
         return True
     return False
 
-def registerTeacher(referrer, email):
+def registerTeacher(referrer, email, firstName, lastName):
     #create verification link/profile link
-    verificationLink = utils.getVerificationLink()
+    verificationLink = accounts.getVerificationLink() + "T"
 
     #the teacher who referred this one to signup
     whoReferred = accounts.getTeacher(referrer)
@@ -121,7 +121,7 @@ def registerTeacher(referrer, email):
     if not(alreadyRegistered):
         #send email here
         sendRegistrationEmail(email, referrer, verificationLink)
-        addTeacher( email, verificationLink )
+        accounts.addTeacher( email, firstName, lastName, verificationLink )
 
         return True
     return False
@@ -220,11 +220,22 @@ def home():
 
 @app.route("/verify/<link>")
 def verify(link):
-    #print link
-    #print accounts.getAccount(link)
-    email = accounts.getAccount(link)[0]['email']
-    accounts.updateField(email, 'verified', True, True, "student")
-    return redirect(url_for('home'))
+    if len(link) == 10:
+        email = accounts.getAccount(link)[0]['email']
+        accounts.updateField(email, 'verified', True, True, "student")
+        return redirect(url_for('home'))
+    else:
+        email = accounts.getTeacherAccount(link)[0]['email']
+        accounts.updateField(email, 'verified', True, True, "teacher")
+        return redirect(url_for("password", link = link))
+
+@app.route("/password/<link>", methods = ["GET", "POST"])
+def password(link):
+    account = accounts.getTeacherAccount(link)[0]['email']
+    if request.method == "POST":
+        accounts.updateField(account, "password", request.form["password"], request.form["confirm-password"], "teacher")
+        return redirect(url_for("home", message = "Teacher account created."))
+    return render_template("password.html")
 
 @app.route("/logout")
 @app.route("/logout/")
@@ -368,21 +379,24 @@ def createaGroup(code):
 def profile():
     if request.method=="POST":
         message = ""
-        if request.form['submit']=="Submit FirstName":
-            accounts.updateField(session['user'], 'profile', request.form["fname"], 'firstName', session['status'])
-        elif request.form['submit']=="Submit LastName":
-            accounts.updateField(session['user'], 'profile', request.form["lname"],'lastName', session['status'])
-        elif request.form['submit'] == "Submit Password":
-            accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"], session['status'])
-            message = "Password updated."
+        if request.form['submit'] == "profile":
+            if request.form["first"] != "":
+                accounts.updateField(session['user'], 'profile', request.form["first"], 'firstName', session['status'])
+                message = "Name updated."
+            if request.form["last"] != "":
+                accounts.updateField(session['user'], 'profile', request.form["last"],'lastName', session['status'])
+                message = "Name updated."
+            if request.form['password'] != "":
+                accounts.updateField(session['user'], 'password', request.form["password"], request.form["confirm-password"], session['status'])
+                message = "Password updated."
         #inviting a new teacher
-        elif request.form['submit'] == "Send Invitation Email" and session['status'] == "teacher":
+        elif request.form['submit'] == "invite" and session['status'] == "teacher":
             if "email" in request.form:
-                registerTeacher(session['user'], request.form["email"])
+                registerTeacher(session['user'], request.form["email"], request.form["first"], request.form["last"])
                 message = "Invitation sent."
             else:
                 message = "Please enter an email!"
-        return render_template("profile.html", status = session['status'], verified=session['verified'], errorMessage = message )
+        return render_template("profile.html", status = session['status'], verified=session['verified'], errorMessage = message, person = accounts.getStudent(session['user']) if session['status'] == "student" else accounts.getTeacher(session['user']))
     return render_template("profile.html", status = session['status'], verified=session['verified'] )
 
 #just a placeholder, there's no groups.html rn
