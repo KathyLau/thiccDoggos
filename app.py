@@ -199,7 +199,10 @@ def root():
                 email = request.form["email"]
                 pwd = request.form["pwd"]
                 pwd2 = request.form["pwd2"]
-                registerStudent(email, email, '', '',pwd, pwd2)
+                registerStudent(email, email, request.form["first"], request.form["last"], pwd, pwd2)
+                #ayylmao
+                accounts.updateField(session['user'], 'profile', request.form["first"], 'firstName', 'student')
+                accounts.updateField(session['user'], 'profile', request.form["last"], 'lastName', 'student')
                 return render_template("index.html", message = "Signed up!")
         else:
             if 'message' in request.args:
