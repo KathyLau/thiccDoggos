@@ -29,6 +29,9 @@ def createGroup( studentEmail, assignmentName, groupName, limit ):
         })
 
 
+def getGroups(assignmentID):
+    db.groups.find({'assignmentID': assignmentID})
+    
 #add a single student to group
 def addToGroup( studentEmail, assignmentName, groupName ):
     print groupName
