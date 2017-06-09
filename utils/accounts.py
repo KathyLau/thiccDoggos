@@ -82,6 +82,27 @@ def getAccount(link):
             }
         )'''
 
+def getTeacherAccount(link):
+    return db.teachers.find(
+            {
+                'verificationLink': link
+            }
+        )
+'''    count = db.students.count(
+        {
+            'verificationLink': link
+        }
+    )
+    #print count
+    if count != 1:
+        return False
+    return db.students.find_one(
+            {
+                'verificationLink': link
+            }
+        )'''
+
+
 def getTeacher(email):
     count = db.teachers.count(
         {
@@ -130,6 +151,7 @@ def addTeacher( email, firstName, lastName, verificationLink ):
             'email': email,
             'password': 'admin',
             'verified': False,
+            'verificationLink': verificationLink,
             'classes': [],
             'profile': {
                 'firstName': 'N/A',
