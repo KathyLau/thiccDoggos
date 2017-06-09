@@ -268,7 +268,9 @@ def createaClass():
             if 'className' in request.form:
                 print request.form
                 if request.form['className'] == '':
-                    return redirect( url_for( 'classes', message = "Please enter a valid class name" ))
+                    return redirect( url_for( 'classes', message = "Please enter a valid class name." ))
+                elif request.form['periods'] == '':
+                    return redirect(url_for("classes", message = "Please select one or more periods."))
                 classy.createClass( session['user'], request.form )
                 return redirect( url_for( 'classes', message = "Class Creation Successful" ))
         elif request.args:
@@ -313,6 +315,8 @@ def viewClass(classCode):
             theClass = classy.getClass(code)
             peepsInfo = classy.getStudentsInYourClass(code, pd)
             #print peepsInfo
+            print "\n\n\n"
+            print theClass
             peeps = [ [accounts.getStudentName(email)['firstName'] + " " + accounts.getStudentName(email)['lastName'], email] for email in peepsInfo['students'] ]
             return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = [classCode[:-2], classCode[-1:]], currentClass = theClass, peeps=peeps, message=message,  assignments=assign.getAssignments(code))
     else:
@@ -389,6 +393,8 @@ def profile():
             if request.form['password'] != "":
                 accounts.updateField(session['user'], 'password', request.form["password"], request.form["confirm-password"], session['status'])
                 message = "Password updated."
+            for classerino in classy.getTeacherClasses(session['user']):
+                classy.updateTeacherName(classerino[0], request.form["first"], request.form["last"])
         #inviting a new teacher
         elif request.form['submit'] == "invite" and session['status'] == "teacher":
             if "email" in request.form:
