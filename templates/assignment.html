@@ -37,19 +37,38 @@
 
 {% block Teacher_Content %}
 
-{% for assignment in assignments %}
-<h3>	Assignment: {{assignment['assignmentName']}} </h3>
-Description: {{assignment['description']}} <br>
-Upload Due Date: {{assignment['uploadDate']}}<br>
-Review Enabled: {{assignment['reviewEnabled']}}<br>
-Review Due Date: {{assignment['reviewDate']}}<br>
-{% endfor %}
-<a class="btn btn-default" href="/deleteAssignment/{{ID}}">Delete Assignment</a>
-<br>
-{% if codeReview == False %}
-<a class="btn btn-default" href="/enableReviews/{{ID}}">Enable Random Pair Reviews</a>
-{% endif %}
-<br>
+	{% for assignment in assignments %}
+		<br><br>
+		<div class="row">
+			<div class="col m3"></div>
+			<div class="col m6 card grey lighten-4">
+				<div class="card-content black-text">
+					<center style="font-size: 16px;">
+						<br>
+						<h1 class="card-heading" style="margin: 0">{{assignment['assignmentName']}}</h1>
+						<br>
+						<h2 style="margin: 0 ; font-size: 24px" class="card-title">{{ assignment['description'] }}</h2>
+						<br>
+						<a class="btn btn-default waves-effect waves-light teal darken-3" href="/deleteAssignment/{{ID}}">Delete Assignment</a>
+						<br><br>
+						<p><i class="fa fa-calendar"></i> (Upload Deadline) {{ assignment['uploadDate'][5:7] + "/" + assignment['uploadDate'][8:10] + "/" + assignment['uploadDate'][0:4] }}</p>
+						<br>
+						<p><i class="fa fa-calendar"></i> (Review Deadline) {{ assignment['reviewDate'][5:7] + "/" + assignment['reviewDate'][8:10] + "/" + assignment['reviewDate'][0:4] }}</p>
+						<br>
+						<p>{% if assignment['reviewEnabled'] %}<i class="fa fa-check"></i> Students are reviewing{% else %}<i class="fa fa-cog"></i> Students are uploading {% endif %}code.</p>
+						<br>
+						<p>Each student reviews {{ assignment['numToReview'] }} other students.</p>
+						<br>
+						<p>{% if assignment['groupSize'] == 1 %}<i class="fa fa-times"></i> {% else %}<i class="fa fa-check"></i> {% endif %}Groups are {% if assignment['groupSize'] == 1 %}not {% endif %}enabled.</p>
+						<br>
+						{% if codeReview == False %}
+							<a class="btn waves-effect waves-light btn-default teal darken-3" href="/enableReviews/{{ID}}">Enable Random {% if assignment['groupSize'] == 1 %}Pair{% else %}Group{% endif %} Reviews</a>
+						{% endif %}
+					</center>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
 {% if onTime or late %}
 
 <div class="col-sm-3">
