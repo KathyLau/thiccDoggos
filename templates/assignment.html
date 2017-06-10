@@ -4,35 +4,69 @@
 
 {% block Student_Content %}
 
-<div class="container">
-  <div class="row">
-    <div class="col-sm-3"></div>
-	<div class="col-sm-6" style="text-align:center">
-	  <form method="post" enctype="multipart/form-data"> ...
-		<input type="file" name="file" id="file" required> <br><br>
-		<input type="submit" value="Upload File" name="submit">
-	  </form>
-	</div>
-    <div class="col-sm-3"></div>
-  </div>
-  <div class="row">
-    <div class="col-sm-3"></div>
-	<div class="col-sm-6">
-      <h3>Your Uploaded File</h3>
-      <div style="display:block; border: 2px solid black; padding:10px;">
-	    {{link | safe}}
-	  </div>
-    </div>
-    <div class="col-sm-3"></div>
-  </div>
-  {% if comments %}
-  <br>
-  <h1>Comments</h1>
-  {% for comment in comments %}
-  <p>{{ comment['comment'] }}</p>
-  {% endfor %}
-  {% endif %}
-</div>
+	<center>
+		<br>
+		<div class="row">
+			<div class="col m2"></div>
+			<div class="col m8">
+				<div class="card" style="background-color: rgb(250, 250, 250)">
+					<br>
+					<h2>Upload an Assignment</h2>
+					<br>
+					<form method="post" enctype="multipart/form-data">
+						<div class="file-field input-field class-modal">
+							<div class="btn waves-effect waves-light teal darken-3">
+								<span>File</span>
+								<input type="file" name="file" id="file" />
+							</div>
+							<div class="file-path-wrapper">
+								<input class="file-path validate" type="text">
+							</div>
+						</div>
+						<br>
+						<center><span class="card-title">OR</span></center>
+						<br>
+						<div class="input-field class-modal">
+							<input type="text" name="github" id="github" placeholder="https://github.com/username/repository/blob/master/file" />
+							<label for="github">Link to File on Github</label>
+						</div>
+						<br>
+						<input type="submit" class="btn waves-effect waves-light teal darken-3" value="Upload File" name="submit" />
+						<br><br><br>
+					</form>		
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col m2"></div>
+			<div class="col m8">
+				<div class="card" style="background-color: rgb(250, 250, 250)">
+					<br>
+					<h2>Uploaded Code</h2>
+					<pre>
+						<code style="text-align: left">{{ link | safe }}</code>
+					</pre>
+				</div>
+			</div>
+		</div>
+
+		{% if comments %}
+		<div class="row">
+			<div class="col m2"></div>
+			<div class="col m8">
+				<br>
+				<h2>Comments</h2>
+				<ul class="collection">
+					{% for comment in comments %}
+						<li class="collection-item">{{ comment['comment'] }}</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+		{% endif %}
+	</center>
+	
 {% endblock %}
 
 {% block Teacher_Content %}
@@ -41,7 +75,7 @@
 		<br><br>
 		<div class="row">
 			<div class="col m3"></div>
-			<div class="col m6 card grey lighten-4">
+			<div class="col m6 card">
 				<div class="card-content black-text">
 					<center style="font-size: 16px;">
 						<br>
