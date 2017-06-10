@@ -455,8 +455,7 @@ def assignment(assignmentID):
             if request.method=="POST":
                 upload_file(assignmentID)
             assignments= '' #assign.getAssignmentsByID(assignmentID)
-            try: prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
-            except: prevFiles = ''
+            prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID, session['status']))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
@@ -520,25 +519,33 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 def upload_file(ID):
-    if 'file' not in request.files:
-        return 'No file part'
-    file = request.files['file']
-    if file.filename == '':
-        flash('No selected file')
-        return redirect(request.url)
-    if file and allowed_file(file.filename):
-        buffer = []
-        buffer.append("Content-type: %s" % file.content_type)
-        buffer.append("File content: %s" % file.stream.read())
-        upload = '|'.join(buffer)
-        fileID = files.uploadFile(upload, session['user'], ID)
+    if request.files['file'].filename == "" and request.form['github'] == "":
+        return render_template("assignment.html", errorMessage = "No file uploaded.")
+    elif request.files['file'].filename != "" and request.form['github'] != "":
+        return render_template("assignment.html", errorMessage = "Please only upload from one source.")
+    elif request.form['github'] != "" and request.files['file'].filename == "": 
+        linkData = files.parseGithubLink(request.form['github'])
+        fileID = files.uploadFileFromGithub(session['user'], ID, linkData[0], linkData[1], linkData[2])
         accounts.addStudentFile(session['user'], ID, fileID)
         assign.submitAssignment(session['user'], ID)
-        return redirect(url_for('assignment', assignmentID=ID))
-    else:
-        return "Not accepted file"
-
-
+        return redirect(url_for('assignment', assignmentID = ID))
+    elif request.form['github'] == "" and 'file' in request.files:
+        file = request.files['file']
+        if file.filename == '':
+            return render_template("assignment.html", errorMessage = "Please upload a file.")
+        if file and allowed_file(file.filename):
+            buffer = []
+            buffer.append("Content-type: %s" % file.content_type)
+            buffer.append("File content: %s" % file.stream.read())
+            upload = '|'.join(buffer)
+            fileID = files.uploadFile(upload, session['user'], ID)
+            accounts.addStudentFile(session['user'], ID, fileID)
+            assign.submitAssignment(session['user'], ID)
+            return redirect(url_for('assignment', assignmentID=ID))
+        else:
+            return render_template("assignment.html", errorMessage = "Not accepted filetype.")
+        
+        
 if __name__ == "__main__":
     app.debug = True
     app.run(threaded=True)
