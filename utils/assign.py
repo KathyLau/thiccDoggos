@@ -74,13 +74,16 @@ def getAssignmentsByID( ID ):
     return [assignment for assignment in db.assignments.find( {'assignmentID': ID } )]
 
 def getAssignmentSubmission(user, assignmentID ):
-    try:
-        fileID = db.students.find_one( {'email': user} )['files'][assignmentID]
-        file =  files.getFile(fileID, user)['file']
-        start = file.find("content:")
-        return file[start+8:]
-    except:
-        pass
+    fileID = db.students.find_one( {'email': user} )['files'][assignmentID]
+    thisFile = files.getFile(fileID, user)
+    print "\n\n\n\n\n"
+    print thisFile
+    if thisFile['source'] == "github":
+        return thisFile['file']
+    else:
+        fileData = thisFile['file']
+        start = fileData.find("content:")
+        return fileData[start+8:]
 
 def submitAssignment(email, assignmentID):
     ts = time.time()
