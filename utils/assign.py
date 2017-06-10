@@ -245,14 +245,10 @@ def submitComment(comment, codeOwner, submitter, assignmentID):
 def getComments(user, assignmentID, accountType):
     assignment = db.assignments.find_one({ 'assignmentID': assignmentID })
     comments = []
-    print "\n\n\n"
     for response in assignment['responses']:
-        print response
         if response['student'] == user:
             for comment in response['comments']:
-                print comment
-            #print comment
+                #print comment
                 if comment['submitter']!=user and comment['submitter'] != "Administrator":
                     comments.append(comment)
-    print "\n\n\n"
     return comments
