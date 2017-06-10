@@ -529,14 +529,18 @@ def upload_file(ID):
         accounts.addStudentFile(session['user'], ID, fileID)
         assign.submitAssignment(session['user'], ID)
         return redirect(url_for('assignment', assignmentID = ID))
-    elif request.form['github'] == "" and 'file' in request.files:
+    elif request.form['github'] == "" and request.files['file'].filename != "":
         file = request.files['file']
-        if file.filename == '':
-            return render_template("assignment.html", errorMessage = "Please upload a file.")
         if file and allowed_file(file.filename):
             buffer = []
             buffer.append("Content-type: %s" % file.content_type)
-            buffer.append("File content: %s" % file.stream.read())
+            if "nlogo" in file.filename:
+                fileData = file.stream.read()
+                netlogoCodeIndex = fileData.find("@#$#@#$#@")
+                netlogoCode = fileData[0:netlogoCodeIndex]
+                buffer.append("File content: %s" % netlogoCode)
+            else:
+                buffer.append("File content: %s" % file.stream.read())
             upload = '|'.join(buffer)
             fileID = files.uploadFile(upload, session['user'], ID)
             accounts.addStudentFile(session['user'], ID, fileID)
