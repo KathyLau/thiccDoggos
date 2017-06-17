@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block Title %}Profile{% endblock %}
+{% block Title %}Classes{% endblock %}
 {% block Student_Content %}
 	<script>
 	 $(document).ready(function() {
@@ -18,7 +18,7 @@
 				<br>
 				<form class="form-join" method="post">
 					<div class="input-field class-modal">
-						<input type="text" name="code" id="class_code">
+						<input type="text" name="code" id="class_code" required>
 						<label for="code">Class Code</label>
 					</div>
 					<br>

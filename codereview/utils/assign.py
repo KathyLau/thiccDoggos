@@ -32,7 +32,7 @@ def enableReviews( assignmentID, filesAssigned ):
 def getCodeReviewStatus(assignmentID):
     return db.assignments.find_one({'assignmentID':assignmentID})['reviewEnabled']
 
-def createAssignment( assignName, classCode, uploadDate, reviewDate, groupSize, details ):
+def createAssignment( assignName, classCode, uploadDate, reviewDate, groupSize, details, numToReview ):
     #check that dates are valid:
     for date in [ uploadDate, reviewDate ]:
         today = datetime.date.today()
@@ -56,6 +56,7 @@ def createAssignment( assignName, classCode, uploadDate, reviewDate, groupSize, 
             'uploadDate': uploadDate,
             'reviewDate': reviewDate,
             'description':details,
+            'numToReview': numToReview,
             'reviewEnabled': False,
             'filesAssigned': 0,
             'responses': []
@@ -73,13 +74,14 @@ def getAssignmentsByID( ID ):
     return [assignment for assignment in db.assignments.find( {'assignmentID': ID } )]
 
 def getAssignmentSubmission(user, assignmentID ):
-    try:
-        fileID = db.students.find_one( {'email': user} )['files'][assignmentID]
-        file =  files.getFile(fileID, user)['file']
-        start = file.find("content:")
-        return file[start+8:]
-    except:
-        pass
+    fileID = db.students.find_one( {'email': user} )['files'][assignmentID]
+    thisFile = files.getFile(fileID, user)
+    if thisFile['source'] == "github":
+        return thisFile['file']
+    else:
+        fileData = thisFile['file']
+        start = fileData.find("content:")
+        return fileData[start+8:]
 
 def submitAssignment(email, assignmentID):
     ts = time.time()
@@ -244,7 +246,7 @@ def getComments(user, assignmentID, accountType):
     for response in assignment['responses']:
         if response['student'] == user:
             for comment in response['comments']:
-            #print comment
-                if comment['submitter']!=user:
+                #print comment
+                if comment['submitter']!=user and comment['submitter'] != "Administrator":
                     comments.append(comment)
     return comments

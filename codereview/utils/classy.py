@@ -97,6 +97,18 @@ def updateName( code, newName ):
          {'className':newName}
         })
 
+def updateTeacherName( code, firstName, lastName ):
+    currentName = db.classes.find_one({'code':code})['teacherName'].split(" ")
+    if firstName != "":
+        currentName[0] = firstName
+    if lastName != "":
+        currentName[1] = lastName
+    db.classes.update(
+        {'code':code},
+        {'$set':
+         {'teacherName':currentName[0] + " " + currentName[1]}
+        })
+    
 def getStudentClasses( email ):
     student = accounts.getStudent(email)
     classCodes = student['classes']
@@ -120,8 +132,6 @@ def getTeacherClasses( email ):
     for code in classCodes:
         classinfo = list(db.classes.find({'code':code}))[0]
         classes.append([str(classinfo['code']), str(classinfo['className'])])
-    print "\n\n\n"
-    print classes
     return classes
 
 #0 is for teachers to get all pds

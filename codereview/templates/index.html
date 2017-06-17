@@ -32,76 +32,79 @@
 			</nav>
 		</div>
         
-		<nav class="navbar navbar-inverse">
-		</nav>
-
 		<br>
 
 		{% if message %}
 			<h3>{{message}}</h3>
 		{% endif %}
-			
-		<div class="account">
-			<div class="switcher row">
-				<div class="col s6"><a id="login-button" onclick="swap('login')" class="waves-effect waves-light btn grey switcher-active">Login</a></div>
-				<div class="col s6"><a id="signup-button" onclick="swap('signup')" class="waves-effect waves-light btn grey">Register</a></div>
-			</div>
-			
-			<div class="login" id="login">
-				<form class="form-login" method="post">
-					<h1 class="form-heading">Log In to Your Account</h1>
-					<div class="input-field">
-						<input type="email" class="form-text validate" name="email" id="email" />
-						<label for="email" data-error="Please use an actual email!">Email</label>
-					</div>
-					<br>
-					<div class="input-field">
-						<input type="password" class="form-text" name="pwd" id="pwd" />
-						<label for="pwd">Password</label>
-					</div>
-					<br>
-					<button class="btn waves-effect waves-light teal darken-3" type="submit" value="login" name="submit">Login</button>
-				</form>
-			</div>
 
-			<div class="signup" id="signup">
-				<form class="cover-form" method="post">
-					<h1 class="form-heading">Register for an Account</h1>
-					<div class="input-field">
-						<input type="text" class="form-text validate" name="email" id="email" />
-						<label for="email">Email</label>
+		<div class="account card">
+			<div class="row">
+				<div class="col s12">
+					<ul class="tabs">
+						<li class="tab col s6"><a class="active teal-text darken-3" href="#login">Login</a></li>
+						<li class="tab col s6"><a class="teal-text darken-3" href="#signup">Register</a></li>
+						<div class="indicator teal darken-3" style="z-index:1"></div>
+					</ul>
+				</div>
+				<div id="login" class="col s12 login">
+					<div class="col s1"></div>
+					<div class="col s10">
+						<form class="form-login" method="post">
+							<h1 class="card-title">Log In to Your Account</h1>
+							<div class="input-field">
+								<input type="email" class="form-text validate" name="email" id="email" required />
+								<label for="email" data-error="Please use an actual email!">Email</label>
+							</div>
+							<br>
+							<div class="input-field">
+								<input type="password" class="form-text" name="pwd" id="pwd" required />
+								<label for="pwd">Password</label>
+							</div>
+							<br>
+							<button class="btn waves-effect waves-light teal darken-3" type="submit" value="login" name="submit">Login</button>
+						</form>
 					</div>
-					<br>
-					<div class="input-field">
-						<input type="password" class="form-text" name="pwd" id="pwd" />
-						<label for="pwd">Password</label>
+				</div>
+				<div id="signup" class="col s12 signup">
+					<div class="col s1"></div>
+					<div class="col s10">
+						<form class="cover-form" method="post">
+							<h1 class="card-title">Register for an Account</h1>
+							<div class="input-field col s5" style="padding: 0">
+								<input type="text" class="form-tet" name="first" id="first" required />
+								<label for="first">First Name</label>
+							</div>
+							<div class="col s2"></div>
+							<div class="input-field col s5" style="padding: 0">
+								<input type="text" class="form-tet" name="last" id="last" required />
+								<label for="last">Last Name</label>
+							</div>
+							<br><br><br>
+							<div class="input-field">
+								<input type="text" class="form-text validate" name="email" id="email" required />
+								<label for="email">Email</label>
+							</div>
+							<div class="input-field">
+								<input type="password" class="form-text" name="pwd" id="pwd" required />
+								<label for="pwd">Password</label>
+							</div>
+							<div class="input-field">
+								<input type="password" class="form-text" name="pwd2" id="pwd2" required />
+								<label for="pwd2">Confirm Password</label>
+							</div>
+							<br>
+							<button class="btn waves-effect waves-light teal darken-3" type="submit" value="signup" name="submit">Register</button>
+						</form>
 					</div>
-					<br>
-					<div class="input-field">
-						<input type="password" class="form-text" name="pwd2" id="pwd2" />
-						<label for="pwd2">Confirm Password</label>
-					</div>
-					<br>
-					<button class="btn waves-effect waves-light teal darken-3" type="submit" value="signup" name="submit">Register</button>
-				</form>
+				</div>
 			</div>
 		</div>
 
 		<script type="text/javascript">
-		 var swap = function(current) {
-			 if (current == "signup") {
-				 $("#login").css("display", "none");
-				 $("#login-button").removeClass("switcher-active");
-				 $("#signup").css("display", "block");
-				 $("#signup-button").addClass("switcher-active");
-			 }
-			 else if (current == "login") {
-				 $("#signup").css("display", "none");
-				 $("#signup-button").removeClass("switcher-active");
-				 $("#login").css("display", "block");
-				 $("#login-button").addClass("switcher-active");
-			 }
-		 }
+		 $(document).ready(function(){
+			 $('ul.tabs').tabs();
+		 });
 		</script>
 		
 	</body>

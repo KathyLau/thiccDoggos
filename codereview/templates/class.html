@@ -99,7 +99,12 @@
 	</div>
 
 	<div class="row">
-		<div class="col m4">
+		{% if assignments | length > 0 %}
+			<div class="col m1"></div>
+		{% else %}
+			<div class="col m4"></div>
+		{% endif %}
+		<div class="col m{% if assignments | length > 0 %}5{% else %}4{% endif %}">
 			{% for period in periods | dictsort %}
 				<div class="card grey lighten-4">
 					<div class="card-content black-text">
@@ -114,25 +119,8 @@
 			{% endfor %}
 		</div>
 
-		<div class="col m4">
-			{% for period in periods %}
-				{% if periods[period]['groups'] %}
-					<div class="card grey lighten-4">
-						<div class="card-content black-text">
-							<center><span class="card-title">Period {{ period }}</span></center>
-							<ul class="collection">
-								{% for group in periods[period]['groups'] %}
-									<li class="collection-item">{{ group }}</li>
-								{% endfor %}
-							</ul>
-						</div>
-					</div>
-				{% endif %}
-			{% endfor %}
-		</div>
-
 		{% if assignments | length > 0 %}
-		<div class="col m4">
+		<div class="col m5">
 			<div class="card grey lighten-4">
 				<div class="card-content black-text">
 					<center><span class="card-title">Assignments</span></center>

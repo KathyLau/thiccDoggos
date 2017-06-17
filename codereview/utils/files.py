@@ -15,20 +15,24 @@ classes = db['classes']
 #type = upload
 def uploadFile(upload, uploaderName, assignmentID):
     fileID = fs.put(upload, uploader = uploaderName, assignment = assignmentID, filename = uploaderName + '-' + assignmentID, source = "upload")
-    print fileID
     return fileID
 
 
 def parseGithubLink(link):
     linkSplit = link.split("/")
-    pass
+    retLink = [linkSplit[3], linkSplit[4], ""]
+    for i in range(7, len(linkSplit)):
+        retLink[2] += linkSplit[i] + "/"
+    retLink[2] = retLink[2][:-1]
+    return retLink
 
 #upload file from github link
 #type = github
 def uploadFileFromGithub(uploaderName, assignmentID, githubUsername, repository, fileName):
-    response = urllib2.urlopen('https://raw.githubusercontent.com/{0}/{1}/master/{2}'.format(githubUsername, repository, fileName))
+    githubLink = 'https://raw.githubusercontent.com/{0}/{1}/master/{2}'.format(githubUsername, repository, fileName)
+    response = urllib2.urlopen(githubLink)
     responseString = response.read()
-    fileID = fs.put(responseString, filename = fileName, uploader = uploaderName, assignment = assignmentName, source = "github")
+    fileID = fs.put(responseString, filename = fileName, uploader = uploaderName, assignment = assignmentID, link = githubLink, source = "github")
     return fileID
 
 #get a file
@@ -51,7 +55,7 @@ def getFile(fileID, uploader):
     if data.source == "github":
         return {
             'uploader': data.uploader,
-            'link': data.link,
+            #'link': data.link,
             'assignment': data.assignment,
             'file': data.read(),
             'source': data.source

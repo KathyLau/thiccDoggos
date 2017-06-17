@@ -7,6 +7,11 @@ from utils import utils, accounts, classy, groupy, assign, files
 from threading import Thread
 import os
 import datetime
+import sys
+
+#friggin unicode
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 #connect to mongo
 #connection = MongoClient("localhost", 27017, connect = False)
@@ -26,7 +31,7 @@ app = Flask(__name__)
 app.secret_key = secrets['app-secret-key']
 
 UPLOAD_FOLDER = './data/'
-ALLOWED_EXTENSIONS = set(['java', 'py', 'rkt', 'nlogo'])
+ALLOWED_EXTENSIONS = set(['java', 'py', 'rkt', 'nlogo', 'txt'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -67,7 +72,7 @@ def sendVerificationEmail(email, verificationLink):
     <br><br>
     <a href="{0}" style="padding: 1.5% ; text-decoration: none ; color: #404040; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Verify Email</a>
 </center>
-    '''.format("http://127.0.0.1:5000/verify/" + verificationLink)
+    '''.format("http://codereview.stuycs.org/verify/" + verificationLink)
     sendEmailAsync(app, message)
 
 #this sends a mail to register a teacher account
@@ -82,7 +87,7 @@ def sendRegistrationEmail(email, referrer, verificationLink):
     <br>
     <a href="{1}" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
     </center>
-    '''.format(whoReferred['name'], "http://127.0.0.1:5000/verify/" + verificationLink)
+    '''.format(referrer, "http://codereview.stuycs.org/verify/" + verificationLink)
     sendEmailAsync(app, message)
 
 #registers student and adds to database, stills requires email verif.
@@ -108,9 +113,9 @@ def registerStudent(email, email1, firstName, lastName, password1, password2):
         return True
     return False
 
-def registerTeacher(referrer, email):
+def registerTeacher(referrer, email, firstName, lastName):
     #create verification link/profile link
-    verificationLink = utils.getVerificationLink()
+    verificationLink = accounts.getVerificationLink() + "T"
 
     #the teacher who referred this one to signup
     whoReferred = accounts.getTeacher(referrer)
@@ -121,7 +126,7 @@ def registerTeacher(referrer, email):
     if not(alreadyRegistered):
         #send email here
         sendRegistrationEmail(email, referrer, verificationLink)
-        addTeacher( email, verificationLink )
+        accounts.addTeacher( email, firstName, lastName, verificationLink )
 
         return True
     return False
@@ -199,7 +204,10 @@ def root():
                 email = request.form["email"]
                 pwd = request.form["pwd"]
                 pwd2 = request.form["pwd2"]
-                registerStudent(email, email, '', '',pwd, pwd2)
+                registerStudent(email, email, request.form["first"], request.form["last"], pwd, pwd2)
+                #ayylmao
+                accounts.updateField(session['user'], 'profile', request.form["first"], 'firstName', 'student')
+                accounts.updateField(session['user'], 'profile', request.form["last"], 'lastName', 'student')
                 return render_template("index.html", message = "Signed up!")
         else:
             if 'message' in request.args:
@@ -217,11 +225,22 @@ def home():
 
 @app.route("/verify/<link>")
 def verify(link):
-    #print link
-    #print accounts.getAccount(link)
-    email = accounts.getAccount(link)[0]['email']
-    accounts.updateField(email, 'verified', True, True, "student")
-    return redirect(url_for('home'))
+    if len(link) == 10:
+        email = accounts.getAccount(link)[0]['email']
+        accounts.updateField(email, 'verified', True, True, "student")
+        return redirect(url_for('home'))
+    else:
+        email = accounts.getTeacherAccount(link)[0]['email']
+        accounts.updateField(email, 'verified', True, True, "teacher")
+        return redirect(url_for("password", link = link))
+
+@app.route("/password/<link>", methods = ["GET", "POST"])
+def password(link):
+    account = accounts.getTeacherAccount(link)[0]['email']
+    if request.method == "POST":
+        accounts.updateField(account, "password", request.form["password"], request.form["confirm-password"], "teacher")
+        return redirect(url_for("home", message = "Teacher account created."))
+    return render_template("password.html")
 
 @app.route("/logout")
 @app.route("/logout/")
@@ -254,7 +273,9 @@ def createaClass():
             if 'className' in request.form:
                 print request.form
                 if request.form['className'] == '':
-                    return redirect( url_for( 'classes', message = "Please enter a valid class name" ))
+                    return redirect( url_for( 'classes', message = "Please enter a valid class name." ))
+                elif request.form['periods'] == '':
+                    return redirect(url_for("classes", message = "Please select one or more periods."))
                 classy.createClass( session['user'], request.form )
                 return redirect( url_for( 'classes', message = "Class Creation Successful" ))
         elif request.args:
@@ -328,7 +349,7 @@ def createAnAssignment():
             return redirect( url_for( "root", message = "Please Sign in as a Teacher to Access the Assignment Creation Feature" ) )
         if request.form:
             if 'assignmentName' and 'details' and "classCode" and "uploadDate" and "reviewDate" in request.form:
-                returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], request.form['size' ], request.form['details'] )
+                returnVal = assign.createAssignment( request.form['assignmentName'], request.form['classCode'], request.form['uploadDate'], request.form['reviewDate'], request.form['size' ], request.form['details'], request.form['numToReview'] )
                 if returnVal != True:
                     return render_template("createAssignment.html", status=session['status'], verified=session['verified'], classCode=request.form['classCode'], message = "", errorMessage = returnVal, minDate = "%s-%s-%s"%(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day))
                 return redirect( url_for( "viewClass", classCode=request.form['classCode'], message = "Assignment Created"))
@@ -365,21 +386,26 @@ def createaGroup(code):
 def profile():
     if request.method=="POST":
         message = ""
-        if request.form['submit']=="Submit FirstName":
-            accounts.updateField(session['user'], 'profile', request.form["fname"], 'firstName', session['status'])
-        elif request.form['submit']=="Submit LastName":
-            accounts.updateField(session['user'], 'profile', request.form["lname"],'lastName', session['status'])
-        elif request.form['submit'] == "Submit Password":
-            accounts.updateField(session['user'], 'password', request.form["new_password"], request.form["confirm_password"], session['status'])
-            message = "Password updated."
+        if request.form['submit'] == "profile":
+            if request.form["first"] != "":
+                accounts.updateField(session['user'], 'profile', request.form["first"], 'firstName', session['status'])
+                message = "Name updated."
+            if request.form["last"] != "":
+                accounts.updateField(session['user'], 'profile', request.form["last"],'lastName', session['status'])
+                message = "Name updated."
+            if request.form['password'] != "":
+                accounts.updateField(session['user'], 'password', request.form["password"], request.form["confirm-password"], session['status'])
+                message = "Password updated."
+            for classerino in classy.getTeacherClasses(session['user']):
+                classy.updateTeacherName(classerino[0], request.form["first"], request.form["last"])
         #inviting a new teacher
-        elif request.form['submit'] == "Send Invitation Email" and session['status'] == "teacher":
+        elif request.form['submit'] == "invite" and session['status'] == "teacher":
             if "email" in request.form:
-                registerTeacher(session['user'], request.form["email"])
+                registerTeacher(session['user'], request.form["email"], request.form["first"], request.form["last"])
                 message = "Invitation sent."
             else:
                 message = "Please enter an email!"
-        return render_template("profile.html", status = session['status'], verified=session['verified'], errorMessage = message )
+        return render_template("profile.html", status = session['status'], verified=session['verified'], errorMessage = message, person = accounts.getStudent(session['user']) if session['status'] == "student" else accounts.getTeacher(session['user']))
     return render_template("profile.html", status = session['status'], verified=session['verified'] )
 
 #just a placeholder, there's no groups.html rn
@@ -432,8 +458,10 @@ def assignment(assignmentID):
             if request.method=="POST":
                 upload_file(assignmentID)
             assignments= '' #assign.getAssignmentsByID(assignmentID)
-            try: prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
-            except: prevFiles = ''
+            try:
+                prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
+            except:
+                prevFiles = ""
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID, session['status']))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
@@ -441,12 +469,14 @@ def assignment(assignmentID):
 @app.route("/enableReviews/<assignmentID>", methods = ["GET", "POST"])
 def enableReviews(assignmentID):
     assignment = assign.getAssignmentsByID(assignmentID)
-    if len(assignment) > 0: groupSize = assignment[0]['groupSize']
+    if len(assignment) > 0:
+        groupSize = int(assignment[0]['groupSize'])
+        numToReview = int(assignment[0]['numToReview'])
     #assign.enableReviews(assignmentID, 1)
-    if groupSize ==1:
-        assign.assignRandomReviews(assignmentID, 1)
+    if groupSize == 1:
+        assign.assignRandomReviews(assignmentID, numToReview)
     else:
-        assign.assignGroupRandomReviews(assignmentID, 1)
+        assign.assignGroupRandomReviews(assignmentID, numToReview)
     return redirect(url_for("assignment", assignmentID = assignmentID))
 
 @app.route("/reviews")
@@ -495,25 +525,62 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 def upload_file(ID):
-    if 'file' not in request.files:
-        return 'No file part'
-    file = request.files['file']
-    if file.filename == '':
-        flash('No selected file')
-        return redirect(request.url)
-    if file and allowed_file(file.filename):
-        buffer = []
-        buffer.append("Content-type: %s" % file.content_type)
-        buffer.append("File content: %s" % file.stream.read())
-        upload = '|'.join(buffer)
-        fileID = files.uploadFile(upload, session['user'], ID)
+    if request.files['file'].filename == "" and request.form['github'] == "":
+        return render_template("assignment.html", errorMessage = "No file uploaded.")
+    elif request.files['file'].filename != "" and request.form['github'] != "":
+        return render_template("assignment.html", errorMessage = "Please only upload from one source.")
+    elif request.form['github'] != "" and request.files['file'].filename == "": 
+        linkData = files.parseGithubLink(request.form['github'])
+        fileID = files.uploadFileFromGithub(session['user'], ID, linkData[0], linkData[1], linkData[2])
         accounts.addStudentFile(session['user'], ID, fileID)
         assign.submitAssignment(session['user'], ID)
-        return redirect(url_for('assignment', assignmentID=ID))
-    else:
-        return "Not accepted file"
-
-
+        if ".nlogo" in linkData[2]:
+            fileType = ""
+        elif ".java" in linkData[2]:
+            fileType = "java"
+        elif ".py" in linkData[2]:
+            fileType = "python"
+        elif ".rkt" in linkData[2]:
+            fileType = "scheme"
+        else:
+            fileType = ""
+        print "\n\n\n"
+        print fileType
+        return redirect(url_for('assignment', assignmentID = ID, filetype = fileType))
+    elif request.form['github'] == "" and request.files['file'].filename != "":
+        try:
+            file = request.files['file']
+            if file and allowed_file(file.filename):
+                buffer = []
+                buffer.append("Content-type: %s" % file.content_type)
+                if "nlogo" in file.filename:
+                    fileData = file.stream.read()
+                    netlogoCodeIndex = fileData.find("@#$#@#$#@")
+                    netlogoCode = fileData[0:netlogoCodeIndex]
+                    buffer.append("File content: %s" % netlogoCode)
+                else:
+                    buffer.append("File content: %s" % file.stream.read())
+                if "nlogo" in file.filename:
+                    fileType = ""
+                elif "java" in file.filename:
+                    fileType = "java"
+                elif "py" in file.filename:
+                    fileType = "python"
+                elif "rkt" in file.filename:
+                    fileType = "scheme"
+                else:
+                    fileType = ""
+                upload = '|'.join(buffer)
+                fileID = files.uploadFile(upload, session['user'], ID)
+                accounts.addStudentFile(session['user'], ID, fileID)
+                assign.submitAssignment(session['user'], ID)
+                return redirect(url_for('assignment', assignmentID=ID, filetype = fileType))
+            else:
+                return render_template("assignment.html", errorMessage = "Not accepted filetype.")
+        except:
+            return render_template("assignment.html", errorMessage = "Invalid file type.")
+        
+        
 if __name__ == "__main__":
     app.debug = True
     app.run(threaded=True)
