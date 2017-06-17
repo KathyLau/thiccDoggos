@@ -15,7 +15,6 @@ classes = db['classes']
 #type = upload
 def uploadFile(upload, uploaderName, assignmentID):
     fileID = fs.put(upload, uploader = uploaderName, assignment = assignmentID, filename = uploaderName + '-' + assignmentID, source = "upload")
-    print fileID
     return fileID
 
 

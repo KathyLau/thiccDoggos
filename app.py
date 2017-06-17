@@ -7,6 +7,11 @@ from utils import utils, accounts, classy, groupy, assign, files
 from threading import Thread
 import os
 import datetime
+import sys
+
+#friggin unicode
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 #connect to mongo
 #connection = MongoClient("localhost", 27017, connect = False)
@@ -26,7 +31,7 @@ app = Flask(__name__)
 app.secret_key = secrets['app-secret-key']
 
 UPLOAD_FOLDER = './data/'
-ALLOWED_EXTENSIONS = set(['java', 'py', 'rkt', 'nlogo'])
+ALLOWED_EXTENSIONS = set(['java', 'py', 'rkt', 'nlogo', 'txt'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -67,7 +72,7 @@ def sendVerificationEmail(email, verificationLink):
     <br><br>
     <a href="{0}" style="padding: 1.5% ; text-decoration: none ; color: #404040; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Verify Email</a>
 </center>
-    '''.format("http://127.0.0.1:5000/verify/" + verificationLink)
+    '''.format("http://codereview.stuycs.org/verify/" + verificationLink)
     sendEmailAsync(app, message)
 
 #this sends a mail to register a teacher account
@@ -82,7 +87,7 @@ def sendRegistrationEmail(email, referrer, verificationLink):
     <br>
     <a href="{1}" style="padding: 5% ; text-decoration: none ; border: 1px solid black ; text-transform: uppercase ; font-weight: 500 ; font-family: Arial ; padding-left: 10% ; padding-right: 10%">Create Account</a>
     </center>
-    '''.format(referrer, "http://127.0.0.1:5000/verify/" + verificationLink)
+    '''.format(referrer, "http://codereview.stuycs.org/verify/" + verificationLink)
     sendEmailAsync(app, message)
 
 #registers student and adds to database, stills requires email verif.
@@ -315,8 +320,6 @@ def viewClass(classCode):
             theClass = classy.getClass(code)
             peepsInfo = classy.getStudentsInYourClass(code, pd)
             #print peepsInfo
-            print "\n\n\n"
-            print theClass
             peeps = [ [accounts.getStudentName(email)['firstName'] + " " + accounts.getStudentName(email)['lastName'], email] for email in peepsInfo['students'] ]
             return render_template("class.html", status = session['status'], verified=session['verified'], className = theClass['className'], classCode = [classCode[:-2], classCode[-1:]], currentClass = theClass, peeps=peeps, message=message,  assignments=assign.getAssignments(code))
     else:
@@ -455,7 +458,10 @@ def assignment(assignmentID):
             if request.method=="POST":
                 upload_file(assignmentID)
             assignments= '' #assign.getAssignmentsByID(assignmentID)
-            prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
+            try:
+                prevFiles = assign.getAssignmentSubmission(session['user'], assignmentID)
+            except:
+                prevFiles = ""
             return render_template("assignment.html", status = session['status'], verified=session['verified'], assignments=assignments, link=prevFiles, comments = assign.getComments(session['user'], assignmentID, session['status']))
     else:
         return redirect( url_for( "root", message = "Please Sign In First", code=classCode ))
@@ -528,26 +534,51 @@ def upload_file(ID):
         fileID = files.uploadFileFromGithub(session['user'], ID, linkData[0], linkData[1], linkData[2])
         accounts.addStudentFile(session['user'], ID, fileID)
         assign.submitAssignment(session['user'], ID)
-        return redirect(url_for('assignment', assignmentID = ID))
-    elif request.form['github'] == "" and request.files['file'].filename != "":
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            buffer = []
-            buffer.append("Content-type: %s" % file.content_type)
-            if "nlogo" in file.filename:
-                fileData = file.stream.read()
-                netlogoCodeIndex = fileData.find("@#$#@#$#@")
-                netlogoCode = fileData[0:netlogoCodeIndex]
-                buffer.append("File content: %s" % netlogoCode)
-            else:
-                buffer.append("File content: %s" % file.stream.read())
-            upload = '|'.join(buffer)
-            fileID = files.uploadFile(upload, session['user'], ID)
-            accounts.addStudentFile(session['user'], ID, fileID)
-            assign.submitAssignment(session['user'], ID)
-            return redirect(url_for('assignment', assignmentID=ID))
+        if ".nlogo" in linkData[2]:
+            fileType = ""
+        elif ".java" in linkData[2]:
+            fileType = "java"
+        elif ".py" in linkData[2]:
+            fileType = "python"
+        elif ".rkt" in linkData[2]:
+            fileType = "scheme"
         else:
-            return render_template("assignment.html", errorMessage = "Not accepted filetype.")
+            fileType = ""
+        print "\n\n\n"
+        print fileType
+        return redirect(url_for('assignment', assignmentID = ID, filetype = fileType))
+    elif request.form['github'] == "" and request.files['file'].filename != "":
+        try:
+            file = request.files['file']
+            if file and allowed_file(file.filename):
+                buffer = []
+                buffer.append("Content-type: %s" % file.content_type)
+                if "nlogo" in file.filename:
+                    fileData = file.stream.read()
+                    netlogoCodeIndex = fileData.find("@#$#@#$#@")
+                    netlogoCode = fileData[0:netlogoCodeIndex]
+                    buffer.append("File content: %s" % netlogoCode)
+                else:
+                    buffer.append("File content: %s" % file.stream.read())
+                if "nlogo" in file.filename:
+                    fileType = ""
+                elif "java" in file.filename:
+                    fileType = "java"
+                elif "py" in file.filename:
+                    fileType = "python"
+                elif "rkt" in file.filename:
+                    fileType = "scheme"
+                else:
+                    fileType = ""
+                upload = '|'.join(buffer)
+                fileID = files.uploadFile(upload, session['user'], ID)
+                accounts.addStudentFile(session['user'], ID, fileID)
+                assign.submitAssignment(session['user'], ID)
+                return redirect(url_for('assignment', assignmentID=ID, filetype = fileType))
+            else:
+                return render_template("assignment.html", errorMessage = "Not accepted filetype.")
+        except:
+            return render_template("assignment.html", errorMessage = "Invalid file type.")
         
         
 if __name__ == "__main__":
